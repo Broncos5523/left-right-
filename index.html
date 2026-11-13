@@ -16,16 +16,45 @@ function assign(which,value){if(which==='left')left=value;else right=value;if(va
 $('game').addEventListener('change',()=>{left='team0';right='team1';render()});$('left').addEventListener('change',e=>assign('left',e.target.value));$('right').addEventListener('change',e=>assign('right',e.target.value));$('swap').addEventListener('click',()=>{[left,right]=[right,left];render()});$('reset').addEventListener('click',()=>{left='team0';right='team1';render()});$('send').addEventListener('click',()=>{$('message').textContent='Preview ready: LEFT — '+name(left)+'; RIGHT — '+name(right)+'. Remote TV control is not connected yet.'});render();
 </script><section><h2>4. Connect remote control</h2><p class="status">Sign in with your Firebase controller account. The two TVs will follow assignments after secure database access is enabled.</p><label for="email">Controller email</label><input id="email" type="email" autocomplete="username" placeholder="Email address" style="width:100%;padding:12px;background:#202b3d;color:white;border:1px solid #40516b;border-radius:10px;font:inherit"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" style="width:100%;padding:12px;background:#202b3d;color:white;border:1px solid #40516b;border-radius:10px;font:inherit"><div class="actions"><button id="login">Connect</button><button id="logout">Sign out</button></div><p id="remoteStatus" role="status" class="status">Not connected</p></section>
 <script>
-window.addEventListener('error',e=>{const s=document.getElementById('remoteStatus');if(s)s.textContent='Page script error: '+e.message});
-window.addEventListener('unhandledrejection',e=>{const s=document.getElementById('remoteStatus');if(s)s.textContent='Connection error: '+(e.reason?.code||e.reason?.message||'Unknown error')});
-document.getElementById('login').addEventListener('click',()=>{document.getElementById('remoteStatus').textContent='Connecting to Firebase…'},true);
+const remoteStatus=document.getElementById('remoteStatus');
+let firebaseReady=false,loginStarted=false;
+document.getElementById('login').addEventListener('click',()=>{
+ loginStarted=true;
+ remoteStatus.textContent=firebaseReady?'Signing in…':'Firebase library has not loaded. Check browser connection.';
+},true);
+window.addEventListener('error',e=>{remoteStatus.textContent='JavaScript error: '+e.message});
+window.addEventListener('unhandledrejection',e=>{remoteStatus.textContent='Connection error: '+(e.reason?.code||e.reason?.message||'Unknown')});
 </script>
 <script type="module">
-import {db,auth,ref,set,signInWithEmailAndPassword,onAuthStateChanged,signOut} from './firebase.js';
-const status=document.getElementById('remoteStatus');let connected=false;status.textContent='Firebase SDK loaded. Ready to sign in.';
-onAuthStateChanged(auth,user=>{connected=!!user;status.textContent=user?'Signed in. Remote commands are available when database rules are configured.':'Not signed in.'});
-document.getElementById('login').onclick=async()=>{try{await signInWithEmailAndPassword(auth,document.getElementById('email').value,document.getElementById('password').value);document.getElementById('password').value=''}catch(e){status.textContent='Sign-in failed: '+e.code}};
-document.getElementById('logout').onclick=()=>signOut(auth);
-document.getElementById('send').textContent='Send to both TVs';
-document.getElementById('send').addEventListener('click',async()=>{if(!connected){status.textContent='Sign in before sending commands.';return}const selected=document.getElementById('game').value;const values={left,right};try{await Promise.all(Object.entries(values).map(([side,choice])=>set(ref(db,'screens/'+side),{type:choice.startsWith('team')?'team':choice,game:selected,team:choice.startsWith('team')?games[selected][Number(choice.slice(-1))]:null,updatedAt:Date.now()})));status.textContent='Assignments sent to Firebase.'}catch(e){status.textContent='Send failed: '+e.code}});
+try {
+ const sdk=await import('./firebase.js');
+ const {db,auth,ref,set,signInWithEmailAndPassword,onAuthStateChanged,signOut}=sdk;
+ firebaseReady=true;
+ let connected=false;
+ remoteStatus.textContent='Firebase loaded. Ready to sign in.';
+ onAuthStateChanged(auth,user=>{
+  connected=!!user;
+  remoteStatus.textContent=user?'Signed in to Firebase.':'Ready to sign in.';
+ },error=>remoteStatus.textContent='Auth state error: '+(error.code||error.message));
+ document.getElementById('login').addEventListener('click',async()=>{
+  remoteStatus.textContent='Signing in…';
+  try {
+   await signInWithEmailAndPassword(auth,document.getElementById('email').value,document.getElementById('password').value);
+   document.getElementById('password').value='';
+   remoteStatus.textContent='Signed in to Firebase.';
+  } catch(e) {remoteStatus.textContent='Sign-in failed: '+(e.code||e.message)}
+ });
+ document.getElementById('logout').addEventListener('click',()=>signOut(auth));
+ document.getElementById('send').textContent='Send to both TVs';
+ document.getElementById('send').addEventListener('click',async()=>{
+  if(!connected){remoteStatus.textContent='Sign in before sending commands.';return}
+  const selected=document.getElementById('game').value,values={left,right};
+  try {
+   await Promise.all(Object.entries(values).map(([side,choice])=>set(ref(db,'screens/'+side),{type:choice.startsWith('team')?'team':choice,game:selected,team:choice.startsWith('team')?games[selected][Number(choice.slice(-1))]:null,updatedAt:Date.now()})));
+   remoteStatus.textContent='Assignments sent to Firebase.';
+  }catch(e){remoteStatus.textContent='Send failed: '+(e.code||e.message)}
+ });
+} catch(e) {
+ remoteStatus.textContent='Firebase module failed to load: '+(e.message||e);
+}
 </script></body></html>
