@@ -1,0 +1,42 @@
+# Football probable-personnel branch — implementation checkpoint
+
+**Branch:** `feature/football-personnel-engine-20261113`  
+**Production deployment:** NO. Existing GitHub Pages and locked scoreboard CSS have not been edited.
+
+## Implemented in football-board.js
+
+- Fetch selected game's ESPN summary using its exact event ID.
+- Retrieve depth charts and roster for selected team; refresh non-game sources at most every 10 minutes.
+- Use league-wide injury report when team injury report is missing or empty; exclude explicitly "Out"/"Inactive"/IR/suspended candidates when report is applicable to the current game. An empty injury feed is UNKNOWN, not a clean bill of health.
+- Seed six offense rows with QB, two eligible receivers, RB/receiver/TE flex choices, even before the first box-score stat.
+- Seed six defensive rows with CB1, CB2, EDGE1, EDGE2, S1, LB1, with position-based fallbacks.
+- Preserve prior selections in browser localStorage by event, team and phase (offense/defense); do not replace players when a new play lacks usable player IDs.
+- Read ESPN embedded last-play participants when present; candidates identified in the most recent play can replace flexible players.
+- RB rushing/receiving stats switch from latest positively identified rushing/pass play, using **current-game box-score totals** only.
+- Show en dash for missing statistics and a note stating probable personnel, not an official on-field listing.
+- Keep previously displayed rows during a total personnel-source outage if available.
+- No edits to `team-board.html`, Firebase assignments, controller or other sports.
+
+## Mock data checks executed in code workspace (not live-feed validation)
+
+| Scenario | Result |
+|---|---|
+| Depth chart + roster, 0 game stats | PASS: six eligible offense rows |
+| WR1 in league-wide injuries, marked Out | PASS: excluded and receivers promoted |
+| RB identified on pass with receiving box-score stats | PASS: shows REC/YDS/TD rather than rushing stats |
+| Opponent is last-play offense | PASS: selected board shows defensive anchors |
+| Two starting EDGE candidates in depth chart | PASS: both displayed |
+| New play without player IDs | PASS: prior eligible headshots/slots unchanged |
+| JavaScript compilation | PASS |
+
+## Still unverified and not ready for main
+
+- ESPN's actual 2026 NFL and CFB depth-chart and injuries payloads, particularly smaller college programs.
+- Real-world game-day inactive completeness; ESPN injury list is not guaranteed to equal official 90-minute game-day inactive report.
+- Whether last-play participants exist inside browser-accessible summary JSON (if absent, the engine intentionally holds existing slots).
+- Live swap timing and possession/drive matching during turnovers, official reviews and unusual plays.
+- A live test for five-WR and multiple-TE packages. Those remain inferred, not established by current data.
+- Screen behavior and performance on the user's Fire TV Silk devices.
+- Historical finalized games may require event-dated depth charts and availability rather than today's roster.
+
+**Next:** validate one real selected NFL event and one CFB event using actual returned JSON, then correct schema gaps before a consolidated visual review. No API subscription has been purchased or required.
