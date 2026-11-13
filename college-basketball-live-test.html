@@ -137,7 +137,7 @@ try{
  for(const game of games){const o=document.createElement('option');o.value=game.id;o.textContent=game.label;select.append(o)}
  if(games.some(x=>x.id===old))select.value=old;
  message(games.length+' games found · '+games.filter(x=>x.rank===0).length+' reporting live status. Select the match you are watching.');
-}catch(e){message('Could not load today's ESPN games: '+e.message+'. You can still enter a game ID.',true)}
+}catch(e){message('Could not load ESPN games for this date: '+e.message+'. You can still enter a game ID.',true)}
 }
 async function sample(){
 if(!currentId||inFlight)return;inFlight=true;
