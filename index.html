@@ -4,7 +4,7 @@
 <header><small>MAN CAVE SPORTS BOOK</small><h1>LEFT RIGHT · TV Command Center</h1><div class="muted">Controller foundation · Remote-control beta</div></header>
 <section><div class="row"><h2>1. Select a game</h2><span class="pill">LIVE FEED</span></div><p class="status">Today's live and upcoming matchups load automatically. Demo examples are available at the bottom of the list.</p><label for="game">Game</label><select id="game"><option value="nba">NBA · Celtics vs Knicks</option><option value="nfl">NFL · Broncos vs Chiefs</option><option value="nhl">NHL · Bruins vs Maple Leafs</option><option value="mlb">MLB · Red Sox vs Yankees</option><option value="wnba">WNBA · Fever vs Liberty</option><option value="cfb">CFB · Arizona vs Arizona State</option><option value="cbb">CBB · Arizona vs UCLA</option></select><p id="scheduleStatus" class="status">Loading actual game schedule…</p><button id="refreshGames" type="button">Refresh live games</button></section>
 <section><h2>2. Assign the teams</h2><div class="grid"><div class="screen"><strong>LEFT FIRE TV</strong><p id="leftName"></p><label for="left">Display</label><select id="left"></select></div><div class="screen"><strong>RIGHT FIRE TV</strong><p id="rightName"></p><label for="right">Display</label><select id="right"></select></div></div><div class="actions"><button id="swap">⇄ Swap away / home</button><button id="reset">Assign two teams</button></div><p class="status">Away team defaults to LEFT; home team defaults to RIGHT. Swap teams anytime. Existing boards can also be selected independently.</p></section>
-<section><h2>3. Review before sending</h2><div class="grid"><div class="screen"><strong>LEFT PREVIEW</strong><p id="leftPreview"></p></div><div class="screen"><strong>RIGHT PREVIEW</strong><p id="rightPreview"></p></div></div><p class="status">Actual approved player-board visuals will be integrated without redesign. This is an assignment preview only.</p><button class="primary" id="send">Preview assignments</button><p id="message" role="status" class="status">No TV commands are sent in this version.</p></section>
+<section><h2>3. Review before sending</h2><div class="grid"><div class="screen"><strong>LEFT PREVIEW</strong><p id="leftPreview"></p></div><div class="screen"><strong>RIGHT PREVIEW</strong><p id="rightPreview"></p></div></div><p class="status">Actual approved player-board visuals will be integrated without redesign. This is an assignment preview only.</p><button class="primary" id="send">Preview assignments</button><p id="message" role="status" class="status">Assignments ready. Sign in and use Send to both TVs.</p></section>
 <section><h2>Existing boards</h2><p><a href="https://caveup.pages.dev/" target="_blank" rel="noopener">Upcoming Matchups</a> · <a href="https://testcave.pages.dev/" target="_blank" rel="noopener">Live Games / Results</a></p><p class="status">These original sites remain unchanged. LEFT RIGHT player pages can load them using their existing addresses.</p></section>
 <footer>Live schedules and remote assignments are in beta. Verified current-game personnel, player statistics and approved artwork integration are still in development.</footer></main><script>
 const games={nba:['Boston Celtics','New York Knicks'],nfl:['Denver Broncos','Kansas City Chiefs'],nhl:['Boston Bruins','Toronto Maple Leafs'],mlb:['Boston Red Sox','New York Yankees'],wnba:['Indiana Fever','New York Liberty'],cfb:['Arizona Wildcats','Arizona State Sun Devils'],cbb:['Arizona Wildcats','UCLA Bruins']};
@@ -13,7 +13,7 @@ function choices(){return [['team0',games[$('game').value][0]],['team1',games[$(
 function name(v){return choices().find(x=>x[0]===v)?.[1]||'—'}
 function render(){for(const id of ['left','right']){$(id).innerHTML=choices().map(([v,n])=>'<option value="'+v+'">'+n+'</option>').join('');$(id).value=id==='left'?left:right} $('leftName').textContent=name(left);$('rightName').textContent=name(right);$('leftPreview').textContent=name(left);$('rightPreview').textContent=name(right);$('message').textContent='No TV commands are sent in this version.'}
 function assign(which,value){if(which==='left')left=value;else right=value;if(value.startsWith('team')){const other=value==='team0'?'team1':'team0';if(which==='left')right=other;else left=other}render()}
-$('game').addEventListener('change',()=>{left='team0';right='team1';render()});$('left').addEventListener('change',e=>assign('left',e.target.value));$('right').addEventListener('change',e=>assign('right',e.target.value));$('swap').addEventListener('click',()=>{[left,right]=[right,left];render()});$('reset').addEventListener('click',()=>{left='team0';right='team1';render()});$('send').addEventListener('click',()=>{$('message').textContent='Preview ready: LEFT — '+name(left)+'; RIGHT — '+name(right)+'. Remote TV control is not connected yet.'});render();
+$('game').addEventListener('change',()=>{left='team0';right='team1';render()});$('left').addEventListener('change',e=>assign('left',e.target.value));$('right').addEventListener('change',e=>assign('right',e.target.value));$('swap').addEventListener('click',()=>{[left,right]=[right,left];render()});$('reset').addEventListener('click',()=>{left='team0';right='team1';render()});$('send').addEventListener('click',()=>{$('message').textContent='Ready to send: LEFT — '+name(left)+'; RIGHT — '+name(right)+'.'});render();
 </script><section><h2>4. Connect remote control</h2><p class="status">Sign in with your Firebase controller account. The two TVs will follow assignments after secure database access is enabled.</p><label for="email">Controller email</label><input id="email" type="email" autocomplete="username" placeholder="Email address" style="width:100%;padding:12px;background:#202b3d;color:white;border:1px solid #40516b;border-radius:10px;font:inherit"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" style="width:100%;padding:12px;background:#202b3d;color:white;border:1px solid #40516b;border-radius:10px;font:inherit"><div class="actions"><button id="login">Connect</button><button id="logout">Sign out</button></div><p id="remoteStatus" role="status" class="status">Not connected</p></section>
 <script>
 const remoteStatus=document.getElementById('remoteStatus');
@@ -66,29 +66,30 @@ function day(d){const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{time
 async function refresh(){
  const status=document.getElementById('scheduleStatus'),sel=document.getElementById('game');
  status.textContent='Checking league schedules…';
- const today=day(new Date()),results=await Promise.allSettled(leagues.map(async ([key,path])=>{
-  const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/scoreboard?dates='+today,{cache:'no-store'});
+ const today=day(new Date()),yesterday=day(new Date(Date.now()-86400000));const results=await Promise.allSettled(leagues.flatMap(([key,path])=>[yesterday,today].map(async gameDay=>{
+  const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/scoreboard?dates='+gameDay,{cache:'no-store'});
   if(!r.ok)throw Error(key+' '+r.status);
   const data=await r.json();
   return (data.events||[]).map(e=>{const comp=e.competitions?.[0],teams=comp?.competitors||[];
    if(teams.length!==2)return null;
-   const ordered=[teams.find(t=>t.homeAway==='away'),teams.find(t=>t.homeAway==='home')];if(ordered.some(t=>!t))return null;const names=[ordered[1],ordered[0]].map(t=>t.team?.displayName||t.team?.name).filter(Boolean);
+   const ordered=[teams.find(t=>t.homeAway==='away'),teams.find(t=>t.homeAway==='home')];if(ordered.some(t=>!t))return null;const names=ordered.map(t=>t.team?.displayName||t.team?.name).filter(Boolean);
    if(names.length!==2)return null;
    const state=e.status?.type?.state||'pre';
    return {key,id:String(e.id),names,state,date:e.date,priority:names.some(n=>fav.includes(n))?1:0};
   }).filter(Boolean);
- }));
- const all=results.flatMap(r=>r.status==='fulfilled'?r.value:[]).filter(g=>g.state==='in'||g.state==='pre').sort((a,b)=>(b.priority-a.priority)||((a.state==='in'?0:1)-(b.state==='in'?0:1))||new Date(a.date)-new Date(b.date));
- if(!all.length){status.textContent='No live or upcoming games returned. Demo matchups remain available.';return}
- const previous=sel.value;const previousLeft=left,previousRight=right;sel.innerHTML='';
- for(const g of all){games[g.key+'-'+g.id]=g.names;const o=document.createElement('option');o.value=g.key+'-'+g.id;o.textContent=(g.state==='in'?'LIVE · ':'TODAY · ')+g.key.toUpperCase()+' · '+g.names.join(' vs ');o.dataset.event=g.id;o.dataset.sport=g.key;sel.appendChild(o)}
+ })));
+
+ const seen=new Set();const all=results.flatMap(r=>r.status==='fulfilled'?r.value:[]).filter(g=>{if(!['in','pre','post'].includes(g.state))return false;const key=g.key+'-'+g.id;if(seen.has(key))return false;seen.add(key);return true}).sort((a,b)=>(a.state==='in'?0:a.state==='pre'?1:2)-(b.state==='in'?0:b.state==='pre'?1:2)||(b.priority-a.priority)||new Date(a.date)-new Date(b.date));
+ if(!all.length){status.textContent='No games returned in the last two days. Existing TV assignments are unaffected.';return}
+ const previous=sel.value;const previousOption=sel.selectedOptions[0];const held={label:previousOption?.textContent||'',event:previousOption?.dataset.event||'',sport:previousOption?.dataset.sport||''};const previousLeft=left,previousRight=right;sel.innerHTML='';
+ for(const g of all){games[g.key+'-'+g.id]=g.names;const o=document.createElement('option');o.value=g.key+'-'+g.id;o.textContent=(g.state==='in'?'LIVE · ':g.state==='post'?'FINAL · ':'UPCOMING · ')+g.key.toUpperCase()+' · '+g.names.join(' vs ');o.dataset.event=g.id;o.dataset.sport=g.key;sel.appendChild(o)}
+ if(previous&&!all.some(g=>g.key+'-'+g.id===previous)&&held.event&&games[previous]){const o=document.createElement('option');o.value=previous;o.textContent='HELD · '+held.label.replace(/^(LIVE|FINAL|UPCOMING|TODAY|HELD) · /,'');o.dataset.event=held.event;o.dataset.sport=held.sport;sel.appendChild(o)}
  const demo=document.createElement('optgroup');demo.label='DEMO — examples only';for(const d of fallback){const o=document.createElement('option');o.value=d.value;o.textContent=d.text;demo.appendChild(o)}sel.appendChild(demo);
- if(all.some(g=>g.key+'-'+g.id===previous))sel.value=previous;
+ if([...sel.options].some(o=>o.value===previous))sel.value=previous;
  else sel.selectedIndex=0;
  function update(){const o=sel.selectedOptions[0];selectedGameId=o?.dataset.event||null;if(sel.value!==previous){left='team0';right='team1'}else{left=previousLeft;right=previousRight}render()}
- sel.addEventListener('change',()=>{selectedGameId=sel.selectedOptions[0]?.dataset.event||null});
  update();
- status.textContent=all.length+' live/upcoming matchups loaded from ESPN. Scores and player data not yet integrated. Refresh for updates.';
+ status.textContent=all.length+' live, upcoming, or recently completed games loaded. FINAL boards stay assigned until you choose another game.';
 }
 document.getElementById('refreshGames').addEventListener('click',refresh);
 refresh().catch(e=>document.getElementById('scheduleStatus').textContent='Schedule unavailable: '+e.message+'. Demo matchups remain.');
