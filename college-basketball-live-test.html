@@ -29,7 +29,7 @@ strong{color:#f4f7ff}code{color:#cce3ff;overflow-wrap:anywhere}
 </div>
 <div class="card">
 <h2>What the feed actually contains</h2>
-<div id="diagnosis" class="muted">Select a game to begin sampling every 15 seconds.</div><p id="quickCorrelation" class="muted">Lineup/substitution evidence: waiting for consecutive samples.</p>
+<div id="diagnosis" class="muted">Select a game to begin sampling every 15 seconds.</div><p id="quickCorrelation" class="muted">Lineup/substitution evidence: waiting for consecutive samples.</p><p id="parserInfo" class="muted">Substitution parser: waiting for feed.</p>
 <div class="twocol">
 <section><h2 id="teamA">AWAY</h2><div id="listA" class="muted">No data yet.</div></section>
 <section><h2 id="teamB">HOME</h2><div id="listB" class="muted">No data yet.</div></section>
@@ -115,9 +115,12 @@ for(const x of players){const row=document.createElement('div');row.className='p
 }
 function subKey(s){return String(s.id||s.sequenceNumber||s.period?.number+'|'+s.clock?.displayValue+'|'+s.text)}
 function parsedSubstitution(s){
- const txt=String(s.text||'').trim().replace(/\.$/,'');
- const m=txt.match(/^(.+?) (?:enters (?:the )?game|checks in|subs in|substitutes in) for (.+)$/i);
- return m?{incoming:norm(m[1]),outgoing:norm(m[2]),text:txt}:null;
+ const txt=String(s.text||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+ const m=txt.match(/(?:^|[,:]\s*)(.+?)\s+(?:enters (?:the )?game|checks in|subs in|substitutes in|replaces)\s+(?:for\s+)?(.+?)(?:[.!]|$)/i);
+ if(!m)return null;
+ const cleanup=x=>x.replace(/\s*\([^)]*\)\s*$/,'').trim();
+ const incoming=norm(cleanup(m[1])),outgoing=norm(cleanup(m[2]));
+ return incoming&&outgoing?{incoming,outgoing,text:txt,teamId:String(s.team?.id||'')}:null;
 }
 function compareSamples(teams,rosters,active,plays,subs){
  const previous=observations.filter(x=>x.id===currentId).at(-1);
@@ -126,6 +129,8 @@ function compareSamples(teams,rosters,active,plays,subs){
  const freshSubs=subs.filter(x=>!oldKeys.has(subKey(x)));
  const newSubs=freshSubs.length,newPlays=Math.max(0,plays.length-previous.plays);
  const pairs=freshSubs.map(parsedSubstitution).filter(Boolean);
+ // Allow up to two neighboring 15-second samples for provider lag.
+ const nearby=[...pairs,...changes.slice(-2).flatMap(x=>x.pairs||[])];
  const shifts=[];
  for(const t of teams){
   const old=new Set(previous.active[t.id]||[]),now=new Set(active[t.id]||[]);
@@ -133,19 +138,30 @@ function compareSamples(teams,rosters,active,plays,subs){
   const removed=[...old].filter(id=>!now.has(id));
   if(!added.length&&!removed.length)continue;
   const lookup=new Map(rosters[t.id].map(x=>[x.id,x.name]));
-  shifts.push({team:t.name,added:added.map(id=>lookup.get(id)||id),removed:removed.map(id=>lookup.get(id)||id)});
+  shifts.push({team:t.name,teamId:t.id,added:added.map(id=>lookup.get(id)||id),removed:removed.map(id=>lookup.get(id)||id)});
  }
  const exactMatches=[];
- for(const pair of pairs){
+ for(const pair of nearby){
    for(const shift of shifts){
      const entered=shift.added.some(n=>norm(n)===pair.incoming);
      const left=shift.removed.some(n=>norm(n)===pair.outgoing);
-     if(entered&&left)exactMatches.push({team:shift.team,in:pair.incoming,out:pair.outgoing});
+     if(entered&&left&&(!pair.teamId||pair.teamId===shift.teamId))exactMatches.push({team:shift.team,in:pair.incoming,out:pair.outgoing});
    }
  }
- const record={time:new Date().toLocaleTimeString(),substitutions:newSubs,plays:newPlays,shifts,
+ const record={time:new Date().toLocaleTimeString(),substitutions:newSubs,plays:newPlays,shifts,pairs,
    exactMatches,correlated:newSubs>0&&shifts.length>0,unexplained:newSubs===0&&shifts.length>0};
  changes.push(record);changes=changes.slice(-30);
+ // Also match an active change with a substitution arriving up to two samples later.
+ for(let i=Math.max(0,changes.length-3);i<changes.length-1;i++){
+   const earlier=changes[i];
+   if(!earlier.shifts.length||earlier.exactMatches.length)continue;
+   const later=changes.slice(i+1,i+3).flatMap(x=>x.pairs||[]);
+   for(const pair of later)for(const shift of earlier.shifts){
+     if(pair.teamId&&pair.teamId!==shift.teamId)continue;
+     if(shift.added.some(n=>norm(n)===pair.incoming)&&shift.removed.some(n=>norm(n)===pair.outgoing))
+       earlier.exactMatches.push({team:shift.team,in:pair.incoming,out:pair.outgoing});
+   }
+ }
  const matched=changes.filter(x=>x.correlated).length;
  const unexplained=changes.filter(x=>x.unexplained).length;
  const changed=changes.filter(x=>x.shifts.length).length;
@@ -158,8 +174,12 @@ function compareSamples(teams,rosters,active,plays,subs){
   '\n'+(exact>=2?'Multiple named substitutions match both entering and leaving active-player flags.':exact===1?'One named substitution matches an IN/OUT change.':matched?'Lineup changes overlap substitution records, but no exact player-name pair has matched.':'Waiting for a lineup change during a recorded substitution.')+
   ' This is supporting evidence, not independent on-court verification.';
  $('quickCorrelation').textContent=exact?
-   'EXACT SUBSTITUTION MATCHES: '+exact+' IN/OUT name-pair'+(exact===1?'':'s')+' observed.':
+   'EXACT SUBSTITUTION MATCHES: '+exact+' IN/OUT name-pair'+(exact===1?'':'s')+' observed (allowing up to ~30s feed lag).':
    'LINEUP CHECK: '+changed+' change intervals; '+matched+' overlapped substitutions. Exact name matches not established.';
+ const lastExamples=freshSubs.slice(-3).map(x=>String(x.text||'').slice(0,160));
+ $('parserInfo').textContent='New substitution events this sample: '+newSubs+
+   ' · Recognized player IN/OUT pairs: '+pairs.length+
+   ' · Example source text: '+(lastExamples.join(' | ')||'none since last sample');
  const latest=changes.filter(x=>x.shifts.length).slice(-5).reverse();
  const log=$('changeLog');log.replaceChildren();
  for(const x of latest){
@@ -225,7 +245,7 @@ finally{inFlight=false}
 }
 function inspect(id){
 if(!/^\d{7,15}$/.test(String(id))){message('Enter a valid numeric ESPN game ID.',true);return}
-currentId=String(id);observations=[];changes=[];$('correlation').textContent='Waiting for consecutive samples during gameplay.';$('quickCorrelation').textContent='Lineup/substitution evidence: waiting for consecutive samples.';$('changeLog').replaceChildren();if(timer)clearInterval(timer);
+currentId=String(id);observations=[];changes=[];$('parserInfo').textContent='Substitution parser: waiting for feed.';$('correlation').textContent='Waiting for consecutive samples during gameplay.';$('quickCorrelation').textContent='Lineup/substitution evidence: waiting for consecutive samples.';$('changeLog').replaceChildren();if(timer)clearInterval(timer);
 sample();timer=setInterval(sample,15000);
 }
 $('refresh').addEventListener('click',loadGames);
