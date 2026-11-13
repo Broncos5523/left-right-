@@ -1,0 +1,67 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEFT RIGHT · Basketball Visual Preview</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;background:#0c101b;color:#f7f9ff}
+*{box-sizing:border-box}body{margin:0}main{max-width:620px;margin:auto;padding:16px 14px 48px}
+h1{font-size:1.35rem;margin:3px 0 8px}small,.muted{color:#aebbd0}.card{background:#172032;border:1px solid #354159;border-radius:15px;padding:13px;margin:12px 0}
+label{font-size:.92rem;font-weight:700;display:block;margin:10px 0 6px}
+select,button{font:inherit;color:#fff;background:#26334a;border:1px solid #50627e;padding:11px;border-radius:9px;min-width:0}
+select{width:100%}button{width:100%;cursor:pointer}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.primary{background:#156dd5;border-color:#438cf4;font-weight:700}
+.frame{width:100%;max-width:450px;aspect-ratio:9/16;border:0;background:#000;display:block;margin:14px auto 0}
+a{color:#9bc9ff}#status{font-size:.86rem;line-height:1.5}
+</style></head><body><main>
+<small>MAN CAVE SPORTS BOOK · DEVELOPMENT PREVIEW</small>
+<h1>College Basketball · Active Five</h1>
+<p class="muted">A phone-friendly preview using the approved portrait scoreboard design. This page cannot send TV commands or modify the two live displays.</p>
+<div class="card">
+<label for="games">Game</label><select id="games"><option value="401921721">North Alabama @ Miami (Nov 13, 2026 · reference)</option></select>
+<div class="row">
+<div><label for="which">Team</label><select id="which"><option value="away">Away</option><option value="home">Home</option></select></div>
+<div><label for="side">Screen layout</label><select id="side"><option value="left">LEFT</option><option value="right">RIGHT</option></select></div>
+</div>
+<button id="show" class="primary" type="button" style="margin-top:12px">Show player board preview</button>
+<p id="status" class="muted" role="status">Loading today's college basketball games…</p>
+</div>
+<iframe class="frame" id="frame" title="Approved basketball team-board preview" referrerpolicy="no-referrer" loading="eager"></iframe>
+<p class="muted">Live college games can use ESPN's five active players. If the selected game has ended or a full five isn't available, the preview will explicitly label the fallback instead of claiming those players are currently on the court.</p>
+</main><script>
+(()=>{
+const $=id=>document.getElementById(id);
+const root='https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/';
+const known={id:'401921721',away:'North Alabama Lions',home:'Miami Hurricanes',label:'North Alabama @ Miami (Nov 13 · reference)'};
+let games=new Map([[known.id,known]]);
+function day(){const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).map(x=>[x.type,x.value]));return p.year+p.month+p.day}
+function show(){
+ const g=games.get($('games').value)||known;
+ const side=$('side').value,team=g[$('which').value];
+ const query=new URLSearchParams({sport:'cbb',team,eventId:g.id,side});
+ $('frame').src='./basketball-active-five-board.html?'+query.toString();
+ $('status').textContent='Preview: '+team+' · '+side.toUpperCase()+' layout. No TV assignments changed.';
+}
+$('show').addEventListener('click',show);
+async function refresh(){
+try{
+ const response=await fetch(root+'scoreboard?dates='+day()+'&groups=50&limit=500',{cache:'no-store'});
+ if(!response.ok)throw Error('ESPN HTTP '+response.status);
+ const data=await response.json();
+ const all=(data.events||[]).map(e=>{
+  const xs=e.competitions?.[0]?.competitors||[],away=xs.find(x=>x.homeAway==='away'),home=xs.find(x=>x.homeAway==='home');
+  if(!away?.team||!home?.team)return null;
+  const state=e.status?.type?.state||'pre';
+  return{id:String(e.id),away:away.team.displayName,home:home.team.displayName,
+    label:(state==='in'?'LIVE':state==='post'?'FINAL':'UPCOMING')+' · '+away.team.shortDisplayName+' @ '+home.team.shortDisplayName,
+    rank:state==='in'?0:state==='pre'?1:2};
+ }).filter(Boolean).sort((a,b)=>a.rank-b.rank);
+ games=new Map([[known.id,known],...all.map(x=>[x.id,x])]);
+ const sel=$('games');sel.replaceChildren();
+ for(const g of games.values()){const option=document.createElement('option');option.value=g.id;option.textContent=g.label;sel.appendChild(option)}
+ const preferred=all.find(x=>x.id===known.id)||all.find(x=>x.rank===0)||all[0]||known;
+ sel.value=preferred.id;
+ $('status').textContent='Loaded '+all.length+' games. Choose a matchup and view the proposed board.';
+ show();
+}catch(e){$('status').textContent='Could not load live schedule: '+e.message+'. Reference matchup is available for preview.';show()}
+}
+refresh();
+})();
+</script></body></html>
