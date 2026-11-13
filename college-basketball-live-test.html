@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEFT RIGHT · CBB Live Lineup Lab</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Arial,sans-serif;background:#080d17;color:#f0f5ff}
+*{box-sizing:border-box}body{margin:0}main{max-width:940px;margin:auto;padding:20px 15px 65px}
+h1{font-size:1.6rem;margin:6px 0}h2{font-size:1.03rem;margin:0 0 10px}p{line-height:1.5}
+small,.muted{color:#adbcd4;font-size:.86rem}.card{background:#151f32;border:1px solid #34435e;padding:16px;border-radius:15px;margin:13px 0}
+label{font-weight:700;display:block;margin:8px 0 6px}
+input,select,button{font:inherit;color:#fff;background:#22314a;border:1px solid #526989;border-radius:10px;padding:11px;width:100%;min-width:0}
+button{cursor:pointer;font-weight:700}button.primary{background:#176bd0;border-color:#338ae9}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.flex{display:flex;gap:9px}.flex>*{flex:1}
+.tag{display:inline-block;padding:4px 8px;border-radius:20px;border:1px solid #647691;font-size:.75rem;margin:4px 5px 4px 0}
+.good{color:#95e2b3}.warn{color:#f6cb83}.bad{color:#ffaaa2}
+.player{border-bottom:1px solid #354259;padding:7px 0}.player:last-child{border:0}
+strong{color:#f4f7ff}code{color:#cce3ff;overflow-wrap:anywhere}
+#diagnosis{white-space:pre-wrap;line-height:1.6}details{margin-top:8px}summary{cursor:pointer}
+@media(max-width:570px){.twocol{grid-template-columns:1fr}}
+</style></head><body><main>
+<small>MAN CAVE SPORTS BOOK · DEVELOPMENT RESEARCH</small>
+<h1>College Basketball · Live Lineup Lab</h1>
+<p class="muted">A separate, read-only probe for ESPN's five-on-court data. It does not send commands to your TVs or modify your approved board. Active flags may NOT mean on-court participation until validated.</p>
+<div class="card">
+<label for="game">Today's games (live first)</label>
+<select id="game"><option value="">Loading games…</option></select>
+<div class="flex" style="margin-top:10px"><button id="refresh">Refresh games</button><button class="primary" id="start">Inspect this game</button></div>
+<details><summary>Can't find your game? Enter an ESPN game ID</summary><label for="manual">Game ID</label><input id="manual" inputmode="numeric" pattern="[0-9]*" placeholder="e.g. 401820123"><button id="manualGo" style="margin-top:9px">Inspect game ID</button></details>
+<p id="status" role="status" class="muted">Loading schedule…</p>
+</div>
+<div class="card">
+<h2>What the feed actually contains</h2>
+<div id="diagnosis" class="muted">Select a game to begin sampling every 15 seconds.</div>
+<div class="twocol">
+<section><h2 id="teamA">AWAY</h2><div id="listA" class="muted">No data yet.</div></section>
+<section><h2 id="teamB">HOME</h2><div id="listB" class="muted">No data yet.</div></section>
+</div>
+</div>
+<div class="card">
+<h2>Evidence checks</h2>
+<div id="evidence" class="muted">No samples recorded.</div>
+<details><summary>Raw data summary (diagnostic only)</summary><pre id="debug" style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px">—</pre></details>
+</div>
+<div class="card">
+<h2>Interpretation guide</h2>
+<p class="muted"><strong>Five active players</strong> is only a candidate signal. If those five change with substitutions across multiple samples, it becomes much more credible. A true inferred five-player lineup also requires reliable starters and a complete substitution sequence. If neither source supports exactly five, the report will say <strong>unverified</strong> rather than guessing. This page requires a browser with access to ESPN's unofficial Site API.</p>
+</div>
+</main><script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const root='https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/';
+const arr=x=>Array.isArray(x)?x:[];
+const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+let currentId='',timer=null,inFlight=false,observations=[],currentNames={};
+const dt=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
+function today(){const p=Object.fromEntries(dt.formatToParts(new Date()).map(x=>[x.type,x.value]));return p.year+p.month+p.day;}
+function message(s,problem=false){$('status').textContent=s;$('status').className=problem?'bad':'muted'}
+async function get(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('ESPN HTTP '+r.status);return r.json()}
+function gameMeta(data){
+const competition=data.header?.competitions?.[0]||{},teams=arr(competition.competitors);
+const away=teams.find(x=>x.homeAway==='away')||teams[0]||{},home=teams.find(x=>x.homeAway==='home')||teams[1]||{};
+return [{id:String(away.team?.id||''),name:away.team?.displayName||'Away'},{id:String(home.team?.id||''),name:home.team?.displayName||'Home'}];
+}
+function boxscore(data,teamId){
+const side=arr(data.boxscore?.players).find(x=>String(x.team?.id)===String(teamId));
+const found=new Map();
+for(const g of arr(side?.statistics))for(const x of arr(g.athletes)){
+  const a=x.athlete||{},id=String(a.id||'');if(!id)continue;
+  const old=found.get(id)||{};
+  found.set(id,{id,name:a.displayName||a.fullName||old.name||id,
+    starter:x.starter===true||a.starter===true||old.starter===true,
+    active:x.active===true||a.active===true||old.active===true,
+    didNotPlay:x.didNotPlay===true||a.didNotPlay===true||old.didNotPlay===true});
+}
+return [...found.values()];
+}
+function allPlays(data){
+const raw=arr(data.plays?.all).length?arr(data.plays.all):arr(data.plays);
+const seen=new Set();
+return raw.filter(p=>{
+ const id=String(p.id||p.sequenceNumber||p.text||'');
+ if(seen.has(id))return false;seen.add(id);return true;
+}).sort((a,b)=>{
+ const x=Number(a.sequenceNumber??a.sequence??NaN),y=Number(b.sequenceNumber??b.sequence??NaN);
+ return Number.isFinite(x)&&Number.isFinite(y)?x-y:0;
+});
+}
+function subEvents(plays){
+return plays.filter(x=>/substitution|enters the game for/i.test(String(x.type?.text||'')+' '+String(x.text||'')));
+}
+function reconstructed(teams,rosters,subs){
+const result={};
+for(const t of teams){
+ const roster=rosters[t.id]||[],starters=roster.filter(x=>x.starter);
+ const pool=new Map(roster.map(x=>[norm(x.name),x]));
+ const lineup=new Set(starters.map(x=>x.id));
+ let applied=0,ambiguous=0;
+ for(const sub of subs){
+  const match=String(sub.text||'').trim().replace(/\.$/,'').match(/^(.+?) enters the game for (.+)$/i);
+  if(!match){ambiguous++;continue}
+  const incoming=pool.get(norm(match[1])),outgoing=pool.get(norm(match[2]));
+  if(!incoming||!outgoing)continue;
+  if(lineup.has(outgoing.id)){lineup.delete(outgoing.id);lineup.add(incoming.id);applied++}
+  else ambiguous++;
+ }
+ result[t.id]={starters:starters.length,applied,ambiguous,players:roster.filter(x=>lineup.has(x.id)),valid:starters.length===5&&lineup.size===5};
+}
+return result;
+}
+function displayPlayers(element,players,explain){
+element.replaceChildren();
+const intro=document.createElement('p');intro.className='muted';intro.textContent=explain;element.append(intro);
+if(!players.length){const p=document.createElement('p');p.textContent='No five-player group verified.';element.append(p);return}
+for(const x of players){const row=document.createElement('div');row.className='player';row.textContent=x.name+(x.starter?' · starter':'');element.append(row)}
+}
+function recentHistory(id){
+const latest=observations.filter(x=>x.id===id);
+if(latest.length<2)return 'Waiting for a second sample to compare player changes.';
+const prev=latest[latest.length-2],now=latest[latest.length-1];
+const shifts=Object.keys(now.active||{}).map(teamId=>{
+ const a=new Set(prev.active[teamId]||[]),b=new Set(now.active[teamId]||[]);
+ const added=[...b].filter(x=>!a.has(x)),removed=[...a].filter(x=>!b.has(x));
+ return (currentNames[teamId]||teamId)+': '+(added.length||removed.length?'active flags changed (+'+added.length+' / -'+removed.length+')':'active flags unchanged');
+});
+return shifts.join('\n');
+}
+async function loadGames(){
+try{
+ const data=await get(root+'scoreboard?dates='+today()+'&groups=50&limit=500');
+ const games=arr(data.events).map(e=>{
+  const team=arr(e.competitions?.[0]?.competitors),away=team.find(x=>x.homeAway==='away'),home=team.find(x=>x.homeAway==='home');
+  if(!away||!home)return null;
+  return{id:String(e.id),label:(e.status?.type?.state==='in'?'LIVE':e.status?.type?.state==='post'?'FINAL':'UPCOMING')+' · '+(away.team?.shortDisplayName||away.team?.displayName)+' @ '+(home.team?.shortDisplayName||home.team?.displayName),
+   rank:e.status?.type?.state==='in'?0:e.status?.type?.state==='pre'?1:2};
+ }).filter(Boolean).sort((a,b)=>a.rank-b.rank);
+ const select=$('game'),old=select.value;select.replaceChildren();
+ for(const game of games){const o=document.createElement('option');o.value=game.id;o.textContent=game.label;select.append(o)}
+ if(games.some(x=>x.id===old))select.value=old;
+ message(games.length+' games found · '+games.filter(x=>x.rank===0).length+' reporting live status. Select the match you are watching.');
+}catch(e){message('Could not load today's ESPN games: '+e.message+'. You can still enter a game ID.',true)}
+}
+async function sample(){
+if(!currentId||inFlight)return;inFlight=true;
+try{
+ const data=await get(root+'summary?event='+encodeURIComponent(currentId));
+ const teams=gameMeta(data);currentNames=Object.fromEntries(teams.map(x=>[x.id,x.name]));
+ const rosters=Object.fromEntries(teams.map(x=>[x.id,boxscore(data,x.id)]));
+ const plays=allPlays(data),subs=subEvents(plays),lineups=reconstructed(teams,rosters,subs);
+ const active=Object.fromEntries(teams.map(x=>[x.id,rosters[x.id].filter(y=>y.active).map(y=>y.id)]));
+ observations.push({id:currentId,time:new Date().toISOString(),active,plays:plays.length,subs:subs.length});
+ observations=observations.slice(-60);
+ const count=observations.filter(x=>x.id===currentId).length;
+ const state=data.header?.competitions?.[0]?.status?.type?.state||'unknown';
+ $('diagnosis').textContent='Game ID: '+currentId+'\nGame status: '+state+'\nSamples collected: '+count+'\nPlay records received: '+plays.length+'\nSubstitution events received: '+subs.length+'\nLast sample: '+new Date().toLocaleTimeString();
+ for(const [i,t] of teams.entries()){
+  $('team'+(i?'B':'A')).textContent=t.name;
+  const activePlayers=rosters[t.id].filter(x=>x.active),rec=lineups[t.id];
+  const active5=activePlayers.length===5;
+  const show=active5?activePlayers:rec.valid?rec.players:[];
+  const label=active5?'ESPN active=true: exactly 5 (needs validation across substitutions)':rec.valid?'INFERRED: starters + '+rec.applied+' parsed substitutions, not independently verified':'Unverified: '+activePlayers.length+' active flags, '+rec.starters+' starters reported';
+  displayPlayers($('list'+(i?'B':'A')),show,label);
+ }
+ $('evidence').textContent='ESPN active counts: '+teams.map(t=>t.name+' '+active[t.id].length).join(' | ')+'\n'+recentHistory(currentId)+'\n'+'Substitutions parsed: '+teams.map(t=>t.name+' '+lineups[t.id].applied+' applied').join(' | ')+'\nNote: this page shows evidence, not proof of real-time on-court tracking.';
+ $('debug').textContent=JSON.stringify({status:state,teamInfo:teams,boxscoreKeys:Object.keys(data.boxscore||{}),playRecords:plays.length,latestPlay:plays.at(-1)?.text||'',latestSubstitutions:subs.slice(-4).map(x=>({type:x.type?.text,text:x.text,team:x.team?.id})),counts:teams.map(t=>({team:t.name,roster:rosters[t.id].length,active:active[t.id].length,starters:lineups[t.id].starters,inferred:lineups[t.id].players.length}))},null,2);
+ message('Collecting live samples every 15 seconds. No TV settings changed.');
+}catch(e){message('Could not read this game: '+e.message+'. Previous sample remains visible.',true)}
+finally{inFlight=false}
+}
+function inspect(id){
+if(!/^\d{7,15}$/.test(String(id))){message('Enter a valid numeric ESPN game ID.',true);return}
+currentId=String(id);observations=[];if(timer)clearInterval(timer);
+sample();timer=setInterval(sample,15000);
+}
+$('refresh').addEventListener('click',loadGames);
+$('start').addEventListener('click',()=>inspect($('game').value));
+$('manualGo').addEventListener('click',()=>inspect($('manual').value.trim()));
+loadGames();
+})();
+</script></body></html>
