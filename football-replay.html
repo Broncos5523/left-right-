@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEFT RIGHT · Archived Football Feed Replay</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif;background:#0a0e16;color:#eef3ff}
+*{box-sizing:border-box}body{margin:0}main{max-width:840px;margin:auto;padding:20px 15px 60px}
+h1{font-size:1.45rem;margin:3px 0 5px}h2{font-size:1.07rem}p{line-height:1.5}
+.muted{color:#acb8cf}section{background:#151e30;border:1px solid #324059;border-radius:14px;padding:14px;margin-top:13px}
+label{display:block;font-weight:600;margin-bottom:6px}input,select,button{font:inherit;padding:11px;border-radius:9px;border:1px solid #4b6285;background:#243149;color:#fff;max-width:100%}
+input,select{width:100%}button{cursor:pointer}button.primary{background:#1764cc;border-color:#388ce2}
+.controls{display:flex;flex-wrap:wrap;gap:8px}.controls button{flex:1;min-width:110px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+small{color:#a5b4cd}code{overflow-wrap:anywhere;color:#d9e7ff}
+.box{border:1px solid #394861;padding:10px;border-radius:8px;margin:5px 0;background:#0e1521}
+.name{font-weight:700}.chip{display:inline-block;padding:2px 6px;background:#304262;border-radius:12px;margin:2px;font-size:.75rem}
+.warning{color:#eacb87}.success{color:#96e0b7}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.controls button{min-width:80px}}
+</style></head>
+<body><main>
+<small>MAN CAVE SPORTS BOOK · DEVELOPMENT DIAGNOSTIC</small>
+<h1>Archived football replay</h1>
+<p class="muted">Examines completed-game play data one snap at a time. Does not control TVs, alter the approved scoreboard, or claim to reconstruct a complete historical on-field lineup.</p>
+<section>
+<label for="sample">Historical game</label>
+<select id="sample"><option value="nfl:401772870">NFL · Denver Broncos @ Houston Texans · Nov 2, 2025</option><option value="cfb:401756925">CFB · Arizona Wildcats @ Houston Cougars · Oct 18, 2025</option><option value="custom">Another ESPN event ID</option></select>
+<div class="grid">
+<div><label for="league">League</label><select id="league"><option value="nfl">NFL</option><option value="cfb">NCAA Football</option></select></div>
+<div><label for="event">ESPN event ID</label><input id="event" inputmode="numeric" value="401772870" maxlength="20"></div>
+</div>
+<p><button id="load" class="primary" type="button">Load archived plays</button></p>
+<div id="status" role="status" class="muted">Ready. The ESPN endpoint is queried directly by this browser; access depends on browser/network restrictions.</div>
+</section>
+<section>
+<h2>Replay controls</h2>
+<div class="controls"><button id="start" type="button" disabled>First snap</button><button id="prev" type="button" disabled>Previous</button><button id="next" type="button" disabled>Next</button><button id="end" type="button" disabled>Last snap</button></div>
+<p id="progress" class="muted">No play selected.</p>
+<div id="current" class="box">Awaiting ESPN data.</div>
+<div class="grid">
+<div><h2>Credited player IDs (if exposed)</h2><div id="players" class="box">—</div></div>
+<div><h2>Replay coverage</h2><div id="coverage" class="box">—</div></div>
+</div>
+</section>
+<section>
+<h2>How this diagnostic is used</h2>
+<p class="muted">A replay advances through recorded plays and reveals which player IDs ESPN actually supplies. It tests parsing and retention opportunities, <strong>not</strong> the provider's live latency, historical game-day inactives, or complete 11/22 participation. A postgame box score would reveal future statistics, so this page deliberately does not use final box-score totals as if they were live.</p>
+<p><small>Historical ESPN site API is unofficial and may stop working. The separate football-personnel QA document records outstanding integration issues.</small></p>
+</section>
+</main><script>
+(()=>{
+ const $=id=>document.getElementById(id);
+ let snaps=[],index=0,lastIds=[];
+ const norm=x=>String(x||'').toLowerCase();
+ const idOf=x=>String(x?.id||x?.athlete?.id||x?.player?.id||x?.playerId||x?.athleteId||'');
+ function setStatus(s,bad=false){$('status').textContent=s;$('status').className=bad?'warning':'muted'}
+ function listPlays(data){
+  const out=[],seen=new Set();
+  const collect=v=>{
+   if(!Array.isArray(v))return;
+   for(const x of v){
+    if(!x||typeof x!=='object')continue;
+    const id=String(x.id||x.playId||x.sequenceNumber||x.period?.number+'-'+x.clock?.displayValue+'-'+x.text);
+    if(seen.has(id))continue;seen.add(id);out.push(x);
+   }
+  };
+  collect(Array.isArray(data.plays)?data.plays:data.plays?.all);
+  const driveSets=Array.isArray(data.drives)?data.drives:[...((data.drives?.previous)||[]),...((data.drives?.current)?[data.drives.current]:[])];
+  for(const drive of driveSets)collect(drive.plays);
+  return out;
+ }
+ function eventCategory(x){
+   const label=norm(x.type?.text||x.playType?.text||x.type?.displayName||x.text);
+   if(/kickoff|punt|extra point|field goal|timeout|end of |coin toss/.test(label))return 'special/administrative';
+   if(/pass|rush|ran |run |sack|scramble|interception|fumble/.test(label))return 'possible scrimmage';
+   return 'other/uncertain';
+ }
+ function participants(play){
+  const out=[],seen=new Set();
+  for(const p of [...(Array.isArray(play.participants)?play.participants:[]),...(Array.isArray(play.athletes)?play.athletes:[]),...(Array.isArray(play.players)?play.players:[])]){
+    const person=p?.athlete||p?.player||p;
+    const id=idOf(person);
+    if(!id||seen.has(id))continue;
+    seen.add(id);
+    out.push({id,name:person.displayName||person.fullName||person.name||'',role:person.position?.abbreviation||p.role||p.type||''});
+  }
+  return out;
+ }
+ function update(){
+  const x=snaps[index];if(!x)return;
+  const category=eventCategory(x),ids=participants(x);
+  if(ids.length)lastIds=ids;
+  $('progress').textContent='Snap candidate '+(index+1)+' / '+snaps.length+' · '+category;
+  $('current').textContent='Q'+(x.period?.number||'?')+' · '+(x.clock?.displayValue||'--:--')+' · '+(x.text||x.type?.text||'No description');
+  $('players').replaceChildren();
+  for(const p of ids){
+   const line=document.createElement('div');line.className='box';
+   const strong=document.createElement('span');strong.className='name';strong.textContent=p.name||'Player ID '+p.id;
+   const label=document.createElement('small');label.textContent=' · ID '+p.id+(p.role?' · '+p.role:'');
+   line.append(strong,label);$('players').append(line);
+  }
+  if(!ids.length){
+   const span=document.createElement('span');span.className='muted';
+   span.textContent='No participant IDs in this play. Last confirmed IDs stay in memory: '+(lastIds.map(x=>x.name||x.id).join(', ')||'none');
+   $('players').append(span);
+  }
+  const typeCounts=snaps.reduce((o,x)=>{o[eventCategory(x)]=(o[eventCategory(x)]||0)+1;return o},{});
+  const withIds=snaps.filter(x=>participants(x).length>0).length;
+  $('coverage').textContent=withIds+'/'+snaps.length+' total play records have structured player IDs ('+(snaps.length?Math.round(100*withIds/snaps.length):0)+'%). Possible scrimmage plays: '+(typeCounts['possible scrimmage']||0)+'. This is not a complete snap-participation percentage.';
+  $('start').disabled=$('prev').disabled=index===0;
+  $('next').disabled=$('end').disabled=index>=snaps.length-1;
+ }
+ $('sample').addEventListener('change',()=>{
+  if($('sample').value==='custom')return;
+  const [league,id]=$('sample').value.split(':');
+  $('league').value=league;$('event').value=id;
+ });
+ for(const [id,fn] of [
+  ['start',()=>index=0],['prev',()=>index=Math.max(0,index-1)],['next',()=>index=Math.min(snaps.length-1,index+1)],['end',()=>index=snaps.length-1]
+ ])$(''+id).addEventListener('click',()=>{fn();update()});
+ $('load').addEventListener('click',async()=>{
+  const id=$('event').value.trim(),league=$('league').value;
+  if(!/^\d{7,15}$/.test(id)){setStatus('Enter a numeric ESPN event ID.',true);return}
+  const path=league==='cfb'?'college-football':'nfl';
+  const url='https://site.api.espn.com/apis/site/v2/sports/football/'+path+'/summary?event='+encodeURIComponent(id);
+  $('load').disabled=true;setStatus('Requesting archived '+league.toUpperCase()+' game '+id+'…');
+  try{
+   const response=await fetch(url,{cache:'no-store'});
+   if(!response.ok)throw Error('HTTP '+response.status);
+   const data=await response.json();
+   snaps=listPlays(data);
+   if(!snaps.length)throw Error('Game summary returned no replayable plays. Another ESPN play-by-play endpoint may be needed.');
+   index=0;lastIds=[];
+   setStatus('Loaded '+snaps.length+' unique recorded plays for game '+id+'.');
+   update();
+  }catch(error){snaps=[];['start','prev','next','end'].forEach(id=>$(id).disabled=true);setStatus('Archive feed unavailable: '+error.message,true)}
+  finally{$('load').disabled=false}
+ });
+})();
+</script></body></html>
