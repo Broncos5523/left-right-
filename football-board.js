@@ -14,7 +14,7 @@
   const base='https://site.api.espn.com/apis/site/v2/sports/'+path+'/';
   const arr=x=>Array.isArray(x)?x:[];
   const statusText=x=>String(typeof x==='string'?x:x?.displayName||x?.name||x?.type||x?.description||x?.abbreviation||'');
-  const idOf=x=>String(x?.id||x?.athlete?.id||x?.player?.id||'');
+  const idOf=x=>String(x?.id||x?.athlete?.id||x?.player?.id||x?.playerId||x?.athleteId||'');
   const photo=x=>{const h=x?.headshot?.href||x?.headshot;return typeof h==='string'&&/^https:\/\//.test(h)?h:''};
   const unavailable=s=>/^(out|inactive|injuredreserve|ir|suspended|pup|nonfootballinjury|nfi)$/.test(norm(s));
   const roleOf=s=>{
@@ -47,8 +47,13 @@
     if(teamCache.id===String(teamId)&&Date.now()-teamCache.stamp<600000)return teamCache;
     const root=base+'teams/'+encodeURIComponent(teamId);
     const responses=await Promise.allSettled([get(root+'/depthcharts'),get(root+'/roster'),get(root+'/injuries')]);
-    const [depth,roster,injuries]=responses.map(x=>x.status==='fulfilled'?x.value:null);
+    let [depth,roster,injuries]=responses.map(x=>x.status==='fulfilled'?x.value:null);
+    if(!Array.isArray(injuries?.injuries)||injuries.injuries.length===0){
+      try{injuries=await get(base+'injuries')}catch(e){injuries=null}
+    }
     // A missing injury report is UNKNOWN availability, not proof of good health.
+    const differentTeam=teamCache.id!==String(teamId);
+    if(differentTeam){teamCache.depth=null;teamCache.roster=null;teamCache.injuries=null}
     teamCache.id=String(teamId);teamCache.stamp=Date.now();
     if(depth)teamCache.depth=depth;if(roster)teamCache.roster=roster;
     if(injuries)teamCache.injuries=injuries;
@@ -93,7 +98,9 @@
       });
     }
     for(const x of injuryEntries(injuries)){
-      const id=idOf(x),name=norm(x.athlete?.displayName);
+      if(x?.team?.id!=null&&String(x.team.id)!==String(teamId))continue;
+      if(x?.athlete?.team?.id!=null&&String(x.athlete.team.id)!==String(teamId))continue;
+      const id=idOf(x.athlete||x),name=norm(x.athlete?.displayName);
       if(!id&&!name)continue;
       const st=statusText(x.status||x.fantasy?.status);
       const date=x.date?new Date(x.date).getTime():null;
@@ -173,7 +180,7 @@
     for(const d of arr(data.drives?.previous))plays.push(...arr(d.plays));
     if(data.drives?.current)plays.push(...arr(data.drives.current.plays));
     for(let i=plays.length-1;i>=0;i--){
-      const x=plays[i],label=String(x.type?.text||x.type?.displayName||x.text||'');
+      const x=plays[i],label=String(x.type?.text||x.playType?.text||x.type?.displayName||x.text||'');
       if(/kickoff|punt|extra point|two.point|field goal|timeout|end of|penalty|coin toss/i.test(label))continue;
       if(/pass|rush|ran |run |sack|scramble|interception|fumble/i.test(label))return x;
     }
@@ -267,14 +274,14 @@
       const context=await getTeamContext(tid);
       const side=arr(data.boxscore?.players).find(x=>String(x.team?.id)===String(tid)||norm(x.team?.displayName)===norm(team));
       const pool=candidatePool(context.depth,context.roster,context.injuries,side,tid,state!=='post',data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
-      const play=recentPlay(data),pid=String(play?.id||play?.sequenceNumber||'');
+      const play=recentPlay(data),pid=String(play?.id||play?.playId||play?.sequenceNumber||'');
       const confirmed=playIds(play);
-      const playTeamId=String(play?.team?.id||competition.situation?.possession||'');
+      const playTeamId=String(play?.team?.id||play?.teamId||play?.start?.team?.id||competition.situation?.possession||'');
       const mode=playTeamId&&playTeamId!==String(tid)?'defense':'offense';
       if(pid&&pid!==lastPlayId){
         lastPlayId=pid;
-        const isPass=/pass|reception|catch/i.test(play?.text||play?.type?.text||'');
-        const isRush=/rush|ran |run |carry/i.test(play?.text||play?.type?.text||'');
+        const isPass=/pass|reception|catch/i.test(play?.text||play?.type?.text||play?.playType?.text||'');
+        const isRush=/rush|ran |run |carry/i.test(play?.text||play?.type?.text||play?.playType?.text||'');
         for(const id of confirmed){
           const c=pool.find(x=>x.id===id);
           if(c?.role==='RB'){
@@ -284,6 +291,12 @@
         }
       }
       const selected=select(pool,mode,confirmed);
+      // If all personnel endpoints fail, do not erase the previously rendered board.
+      if(!selected.length&&rows.some(row=>!!row.querySelector('.player')?.textContent&&!/UNAVAILABLE|UNVERIFIED|PLAYER DATA/.test(row.querySelector('.player').textContent))){
+        band.textContent='PERSONNEL DATA DELAYED';
+        note.textContent='Keeping the last displayed football players while ESPN personnel sources are unavailable.';
+        return;
+      }
       if(selected.length)save(mode,selected);
       rows.forEach((row,i)=>renderRow(row,selected[i]));
       band.textContent=selected.length?'PROBABLE '+mode.toUpperCase():'PERSONNEL DATA PENDING';
