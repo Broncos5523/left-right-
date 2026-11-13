@@ -42,3 +42,14 @@ The prior implementation assembled each box-score statistics group into a flat a
 - `team-board.html` — updated only to load `basketball-board.js`; approved visual style intact.
 - `basketball-board.js` — new shared basketball selector.
 - `college-basketball-live-test.html` — existing production read-only lineup lab, unchanged by this feature branch.
+
+## Renderer-level integration checks (mocked browser/ESPN responses)
+
+- Initial UNA active five (Osman, Whitted, Yates, Patton, Clark) -> **PASS**: exact names, proper source title.
+- Subsequent active change Patton OUT / Lax IN -> **PASS**: only the substituted identity changes.
+- Third response with no `active=true` flags -> **PASS**: same five remain, with `LAST KNOWN FIVE` label.
+- Fourth request throws a network error -> **PASS**: previously displayed player rows retained; descriptive retry message.
+- Current-game PTS/REB/AST fields read correctly across separate statistics groups -> **PASS**.
+- One periodic refresh callback registered, no mock controller/Firebase requests -> **PASS**.
+
+All tests above use mocked data and DOM nodes. They do not confirm ESPN API latency, live field semantics across other games, or Fire TV performance.
