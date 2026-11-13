@@ -75,4 +75,43 @@ if(sport==='nhl'){
  }
  update();setInterval(update,45000);
 }
-</script></body></html>
+</script>
+<script>
+if(['nba','wnba','cbb'].includes(sport)){
+ const path={nba:'basketball/nba',wnba:'basketball/wnba',cbb:'basketball/mens-college-basketball'}[sport];
+ const id=p.get('eventId'),meta=app.querySelector('.meta'),band=app.querySelector('.band');
+ band.textContent='GAME PARTICIPANTS';
+ const get=async()=>{const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(id),{cache:'no-store'});if(!r.ok)throw Error('ESPN HTTP '+r.status);return r.json()};
+ const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const pick=(data,keys,labels)=>{const idx=data.keys.findIndex(x=>keys.includes(norm(x)));const j=idx<0?data.labels.findIndex(x=>labels.includes(norm(x))):idx;return j<0?'—':data.a.stats?.[j]??'—'};
+ async function update(){
+  if(!id){meta.textContent='SELECT A LIVE GAME TO LOAD STATS';return}
+  try{
+   const data=await get(),competitors=data.header?.competitions?.[0]?.competitors||[];
+   const match=competitors.find(x=>norm(x.team?.displayName)===norm(team)||norm(x.team?.name)===norm(team));
+   if(!match)throw Error('Team not in selected event');
+   const logo=app.querySelector('.logo');if(match.team?.logo){logo.src=match.team.logo;logo.hidden=false}
+   app.querySelector('.score').textContent=match.score??'—';
+   const record=match.record?.find?.(x=>x.type==='total')?.summary||match.record?.[0]?.summary||match.records?.[0]?.summary||'';
+   app.querySelector('.team-record').textContent=record;
+   if(sport==='cbb')setRank(match.curatedRank?.current??match.team?.rank??match.rank);
+   const side=data.boxscore?.players?.find(x=>norm(x.team?.id)===norm(match.team?.id)||norm(x.team?.displayName)===norm(team));
+   const players=(side?.statistics||[]).flatMap(g=>(g.athletes||[]).filter(a=>!a.didNotPlay&&!a.athlete?.didNotPlay).map(a=>({a,keys:(g.keys||[]).map(norm),labels:(g.labels||[]).map(norm)})));
+   const active=players.filter(x=>x.a.active===true||x.a.athlete?.active===true);
+   const ranked=(active.length===5?active:players).slice(0,5);
+   app.querySelectorAll('.row').forEach((row,i)=>{
+    const item=ranked[i],portrait=row.querySelector('.portrait'),name=row.querySelector('.player'),labels=row.querySelectorAll('.stats small'),values=row.querySelectorAll('.stats b');
+    if(!item){portrait.textContent='—';name.textContent='NO VERIFIED PLAYER';values.forEach(v=>v.textContent='—');return}
+    const a=item.a.athlete||{};name.textContent=a.displayName||'PLAYER';name.style.fontSize=name.textContent.length>17?'clamp(11px,2.6vw,16px)':'';
+    portrait.textContent='';if(a.headshot?.href){const img=document.createElement('img');img.src=a.headshot.href;img.alt='';img.style.cssText='height:10vh;max-width:100%;object-fit:contain';img.onerror=()=>{portrait.textContent='HEADSHOT UNAVAILABLE'};portrait.appendChild(img)}else portrait.textContent='HEADSHOT UNAVAILABLE';
+    const stats=[pick(item,['points'],['pts']),pick(item,['rebounds','totalrebounds'],['reb']),pick(item,['assists'],['ast'])];
+    labels.forEach((el,j)=>el.textContent=['PTS','REB','AST'][j]);values.forEach((el,j)=>el.textContent=stats[j]);
+   });
+   meta.textContent='ESPN · VERIFIED CURRENT-GAME STATS';
+   app.querySelector('.note').textContent='Players shown are current-game box-score participants, not confirmed five players presently on court. Live stats may be delayed.';
+  }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
+ }
+ update();setInterval(update,45000);
+}
+</script>
+</body></html>
