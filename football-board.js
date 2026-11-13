@@ -91,7 +91,7 @@
     }
     // QB / RB / WR are display roles, not a claim they are on the field.
     add(byType.passing.filter(x=>x.position==='QB'),1);
-    add(byType.passing,1);
+    if(!selected.length)add(byType.passing,1);
     add(byType.rushing.filter(x=>['RB','FB','HB'].includes(x.position)),2);
     add(byType.receiving.filter(x=>['WR','TE'].includes(x.position)),3);
     add(byType.receiving,6);
@@ -144,7 +144,7 @@
       const record=Array.isArray(records)?(records.find(x=>x.type==='total')||records[0])?.summary||'':(records.summary||'');
       app.querySelector('.team-record').textContent=record;
       if(sport==='cfb')setRank(match.curatedRank?.current??match.team?.rank??match.rank);
-      const side=data.boxscore?.players?.find(x=>String(x.team?.id||'')===String(match.team?.id||'')||norm(x.team?.displayName)===norm(team)||norm(x.team?.abbreviation)===norm(match.team?.abbreviation));
+      const side=data.boxscore?.players?.find(x=>(match.team?.id!=null&&x.team?.id!=null&&String(x.team.id)===String(match.team.id))||norm(x.team?.displayName)===norm(team)||norm(x.team?.abbreviation)===norm(match.team?.abbreviation));
       const players=selectPlayers(side);
       rows.forEach((row,i)=>renderPlayer(row,players[i]));
       band.textContent=players.length?'OFFENSIVE CONTRIBUTORS':'GAME STATS PENDING';
