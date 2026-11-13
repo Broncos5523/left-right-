@@ -1,0 +1,4 @@
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {getDatabase,ref,set,onValue} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,signInAnonymously} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+const app=initializeApp({"apiKey":"AIzaSyCRgqYP8xB0Ftgd3TDCZE6yFBQiKzqWubg","authDomain":"man-cave-left-right.firebaseapp.com","databaseURL":"https://man-cave-left-right-default-rtdb.firebaseio.com","projectId":"man-cave-left-right","appId":"1:841015373865:web:8967640063e0af3f332c38"});export const db=getDatabase(app),auth=getAuth(app);export {ref,set,onValue,signInWithEmailAndPassword,onAuthStateChanged,signOut,signInAnonymously};
