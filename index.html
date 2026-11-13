@@ -62,7 +62,7 @@ try {
 const leagues=[['nhl','hockey/nhl'],['nba','basketball/nba'],['nfl','football/nfl'],['mlb','baseball/mlb'],['wnba','basketball/wnba'],['cfb','football/college-football'],['cbb','basketball/mens-college-basketball']];
 const fallback=Array.from(document.getElementById('game').options).map(o=>({value:o.value,text:o.textContent}));
 const fav=['Boston Bruins','Boston Celtics','Denver Broncos','Boston Red Sox','Indiana Fever','Arizona Wildcats'];
-function day(d){return d.toLocaleDateString('en-CA',{timeZone:'America/New_York'}).replace(/-/g,'');}
+function day(d){const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d).map(x=>[x.type,x.value]));return p.year+p.month+p.day;}
 async function refresh(){
  const status=document.getElementById('scheduleStatus'),sel=document.getElementById('game');
  status.textContent='Checking league schedules…';
