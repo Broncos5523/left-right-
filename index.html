@@ -72,7 +72,7 @@ async function refresh(){
   const data=await r.json();
   return (data.events||[]).map(e=>{const comp=e.competitions?.[0],teams=comp?.competitors||[];
    if(teams.length!==2)return null;
-   const ordered=[teams.find(t=>t.homeAway==='away'),teams.find(t=>t.homeAway==='home')];if(ordered.some(t=>!t))return null;const names=ordered.map(t=>t.team?.displayName||t.team?.name).filter(Boolean);
+   const ordered=[teams.find(t=>t.homeAway==='away'),teams.find(t=>t.homeAway==='home')];if(ordered.some(t=>!t))return null;const names=[ordered[1],ordered[0]].map(t=>t.team?.displayName||t.team?.name).filter(Boolean);
    if(names.length!==2)return null;
    const state=e.status?.type?.state||'pre';
    return {key,id:String(e.id),names,state,date:e.date,priority:names.some(n=>fav.includes(n))?1:0};
