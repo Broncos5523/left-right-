@@ -5,4 +5,46 @@ const conf={nba:['ON COURT',5,'#00a65a',['PTS','REB','AST']],wnba:['ON COURT',5,
 const app=document.getElementById('app');app.style.setProperty('--accent',conf[2]);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 app.innerHTML='<div class="header"><div class="team"><div class="name">'+esc(team)+'</div><div class="meta">CURRENT GAME · DATA PENDING</div></div><div class="score">—</div></div><div class="band">'+conf[0]+'</div>'+Array.from({length:conf[1]},(_,i)=>'<div class="row"><div class="portrait">HEADSHOT<br>UNAVAILABLE</div><div class="player">PLAYER<br>UNVERIFIED</div><div class="stats">'+conf[3].map(x=>'<div><small>'+x+'</small><b>—</b></div>').join('')+'</div></div>').join('')+'<p class="note">Layout development preview only. No live lineup, player statistics, headshots, team record, or score have been verified. Approved artwork will be integrated separately.</p>';
+</script><script>
+if(sport==='nhl'){
+ const meta=app.querySelector('.meta'),score=app.querySelector('.score'),band=app.querySelector('.band');
+ band.textContent='GAME PARTICIPANTS';meta.textContent='LOOKING UP NHL GAME…';
+ const abbr=team.includes('Bruins')?'BOS':team.includes('Canadiens')?'MTL':null;
+ const get=async url=>{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('NHL HTTP '+r.status);return r.json()};
+ const plain=v=>typeof v==='object'?(v?.default||v?.en||''):v||'';
+ const date=d=>{const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d).map(p=>[p.type,p.value]));return parts.year+'-'+parts.month+'-'+parts.day};
+ async function update(){
+ try{
+ const days=[date(new Date()),date(new Date(Date.now()-86400000))];
+ const scoreboards=await Promise.all(days.map(d=>get('https://api-web.nhle.com/v1/score/'+d).catch(()=>({games:[]}))));
+ const matches=scoreboards.flatMap(d=>d.games||[]);
+ const game=matches.find(g=>[g.awayTeam,g.homeTeam].some(t=>plain(t?.abbrev)===abbr||team.toLowerCase().includes(String(plain(t?.name)).toLowerCase())));
+ if(!game){meta.textContent='NHL GAME NOT FOUND · RETRYING';return}
+ const isHome=plain(game.homeTeam?.abbrev)===abbr;const side=isHome?'home':'away';
+ score.textContent=String((isHome?game.homeTeam:game.awayTeam)?.score??'—');
+ const box=await get('https://api-web.nhle.com/v1/gamecenter/'+game.id+'/boxscore');
+ const stats=box.playerByGameStats?.[side]||{};
+ const skaters=[...(stats.forwards||[]),...(stats.defense||[])];
+ const goalie=stats.goalies?.[0];
+ const rows=skaters.sort((a,b)=>(b.toi||'').localeCompare(a.toi||'')).slice(0,5);
+ if(goalie)rows.push(goalie);
+ const nodes=app.querySelectorAll('.row');
+ nodes.forEach((node,i)=>{
+  const player=rows[i],photo=node.querySelector('.portrait'),name=node.querySelector('.player'),labels=node.querySelectorAll('.stats small'),vals=node.querySelectorAll('.stats b');
+  if(!player){photo.textContent='—';name.textContent='NO VERIFIED PLAYER';vals.forEach(v=>v.textContent='—');return}
+  name.textContent=[plain(player.firstName),plain(player.lastName)].filter(Boolean).join(' ')||'PLAYER';
+  photo.textContent='';
+  if(typeof player.headshot==='string' && /^https:\/\//.test(player.headshot)){const img=document.createElement('img');img.src=player.headshot;img.alt='';img.style.cssText='height:10vh;max-width:100%;object-fit:contain';img.onerror=()=>{photo.textContent='HEADSHOT UNAVAILABLE'};photo.appendChild(img)}else photo.textContent='HEADSHOT UNAVAILABLE';
+  const isGoalie=player===goalie;
+  const names=isGoalie?['SV','SA','SV%']:['G','A','+/-'];
+  const values=isGoalie?[player.saves,player.shotsAgainst,player.savePctg]:[player.goals,player.assists,player.plusMinus];
+  labels.forEach((v,j)=>v.textContent=names[j]);vals.forEach((v,j)=>v.textContent=values[j]??'—');
+ });
+ const state=game.gameState||'';
+ meta.textContent=(state==='LIVE'||state==='CRIT'?'LIVE · ':'NHL · ')+plain((isHome?game.homeTeam:game.awayTeam)?.abbrev)+' · VERIFIED GAME STATS';
+ const note=app.querySelector('.note');note.textContent='NHL game box-score participants, not confirmed current on-ice shifts. Stats update periodically; live data may be delayed. Original approved artwork remains pending.';
+ }catch(e){meta.textContent='NHL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='NHL feed request failed; existing data retained. '+e.message}
+ }
+ update();setInterval(update,45000);
+}
 </script></body></html>
