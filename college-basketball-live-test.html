@@ -37,7 +37,7 @@ strong{color:#f4f7ff}code{color:#cce3ff;overflow-wrap:anywhere}
 </div>
 <div class="card">
 <h2>Evidence checks</h2>
-<div id="evidence" class="muted">No samples recorded.</div>
+<div id="evidence" class="muted">No samples recorded.</div><h2 style="margin-top:14px">Live substitution correlation</h2><div id="correlation" class="muted">Waiting for consecutive samples during gameplay.</div><div id="changeLog" class="muted"></div>
 <details><summary>Raw data summary (diagnostic only)</summary><pre id="debug" style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px">—</pre></details>
 </div>
 <div class="card">
@@ -51,7 +51,7 @@ const $=id=>document.getElementById(id);
 const root='https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/';
 const arr=x=>Array.isArray(x)?x:[];
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-let currentId='',timer=null,inFlight=false,observations=[],currentNames={};
+let currentId='',timer=null,inFlight=false,observations=[],currentNames={},changes=[];
 const dt=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
 function today(){const p=Object.fromEntries(dt.formatToParts(new Date()).map(x=>[x.type,x.value]));return p.year+p.month+p.day;}
 function message(s,problem=false){$('status').textContent=s;$('status').className=problem?'bad':'muted'}
@@ -113,6 +113,39 @@ const intro=document.createElement('p');intro.className='muted';intro.textConten
 if(!players.length){const p=document.createElement('p');p.textContent='No five-player group verified.';element.append(p);return}
 for(const x of players){const row=document.createElement('div');row.className='player';row.textContent=x.name+(x.starter?' · starter':'');element.append(row)}
 }
+function compareSamples(teams,rosters,active,playCount,subCount){
+ const previous=observations.filter(x=>x.id===currentId).at(-1);
+ if(!previous)return;
+ const newSubs=Math.max(0,subCount-previous.subs),newPlays=Math.max(0,playCount-previous.plays);
+ const shifts=[];
+ for(const t of teams){
+  const old=new Set(previous.active[t.id]||[]),now=new Set(active[t.id]||[]);
+  const added=[...now].filter(id=>!old.has(id));
+  const removed=[...old].filter(id=>!now.has(id));
+  if(!added.length&&!removed.length)continue;
+  const lookup=new Map(rosters[t.id].map(x=>[x.id,x.name]));
+  shifts.push({team:t.name,added:added.map(id=>lookup.get(id)||id),removed:removed.map(id=>lookup.get(id)||id)});
+ }
+ const record={time:new Date().toLocaleTimeString(),substitutions:newSubs,plays:newPlays,shifts,
+   correlated:newSubs>0&&shifts.length>0,unexplained:newSubs===0&&shifts.length>0};
+ changes.push(record);changes=changes.slice(-30);
+ const matched=changes.filter(x=>x.correlated).length;
+ const unexplained=changes.filter(x=>x.unexplained).length;
+ const changed=changes.filter(x=>x.shifts.length).length;
+ $('correlation').textContent='Sample intervals: '+changes.length+
+  ' · Lineup-change intervals: '+changed+
+  ' · Change intervals with new substitution records: '+matched+
+  ' · Changes without new substitutions: '+unexplained+
+  '\n'+(matched>=2&&unexplained===0?'Promising: repeated lineup changes coincide with newly recorded substitutions. Still not independent on-court verification.':matched?'Encouraging: a lineup change coincided with recorded substitutions; more samples needed.':'Waiting to observe a lineup change alongside a recorded substitution.');
+ const latest=changes.filter(x=>x.shifts.length).slice(-5).reverse();
+ const log=$('changeLog');log.replaceChildren();
+ for(const x of latest){
+  const item=document.createElement('div');item.className='box';
+  const text=x.shifts.map(s=>s.team+': IN '+(s.added.join(', ')||'—')+' · OUT '+(s.removed.join(', ')||'—')).join(' | ');
+  item.textContent=x.time+' · '+text+' · '+x.substitutions+' new substitution records'+(x.correlated?' (same sample window)':'');
+  log.append(item);
+ }
+}
 function recentHistory(id){
 const latest=observations.filter(x=>x.id===id);
 if(latest.length<2)return 'Waiting for a second sample to compare player changes.';
@@ -147,6 +180,7 @@ try{
  const rosters=Object.fromEntries(teams.map(x=>[x.id,boxscore(data,x.id)]));
  const plays=allPlays(data),subs=subEvents(plays),lineups=reconstructed(teams,rosters,subs);
  const active=Object.fromEntries(teams.map(x=>[x.id,rosters[x.id].filter(y=>y.active).map(y=>y.id)]));
+ compareSamples(teams,rosters,active,plays.length,subs.length);
  observations.push({id:currentId,time:new Date().toISOString(),active,plays:plays.length,subs:subs.length});
  observations=observations.slice(-60);
  const count=observations.filter(x=>x.id===currentId).length;
@@ -168,7 +202,7 @@ finally{inFlight=false}
 }
 function inspect(id){
 if(!/^\d{7,15}$/.test(String(id))){message('Enter a valid numeric ESPN game ID.',true);return}
-currentId=String(id);observations=[];if(timer)clearInterval(timer);
+currentId=String(id);observations=[];changes=[];$('correlation').textContent='Waiting for consecutive samples during gameplay.';$('changeLog').replaceChildren();if(timer)clearInterval(timer);
 sample();timer=setInterval(sample,15000);
 }
 $('refresh').addEventListener('click',loadGames);
