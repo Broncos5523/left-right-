@@ -7,4 +7,8 @@ const board=document.getElementById('board'),fallback=document.getElementById('f
 const urls={upcoming:'https://caveup.pages.dev/',live:'https://testcave.pages.dev/'};
 function display(value){const url=urls[value];if(!url){board.classList.add('hidden');fallback.classList.remove('hidden');board.removeAttribute('src');return}if(board.getAttribute('src')!==url)board.setAttribute('src',url);board.classList.remove('hidden');fallback.classList.add('hidden')}
 const params=new URLSearchParams(location.search);display(params.get('board')||'');
+</script><script type="module">
+import {db,auth,ref,onValue,signInAnonymously} from './firebase.js';
+const fallback=document.getElementById('fallback');
+try{await signInAnonymously(auth);onValue(ref(db,'screens/right'),snapshot=>{const value=snapshot.val();if(!value)return;if(value.type==='upcoming'||value.type==='live')display(value.type);else{display(null);fallback.querySelector('h1').textContent=value.team||'RIGHT TV';fallback.querySelectorAll('p')[1].textContent='Team board integration pending';}},error=>{fallback.querySelectorAll('p')[1].textContent='Remote connection: '+error.code})}catch(error){fallback.querySelectorAll('p')[1].textContent='Authentication setup required'}
 </script></body></html>
