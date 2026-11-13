@@ -27,7 +27,7 @@ if(sport==='cbb'){
 if(sport==='nhl'){
  const meta=app.querySelector('.meta'),score=app.querySelector('.score'),band=app.querySelector('.band');
  band.textContent='GAME PARTICIPANTS';meta.textContent='LOOKING UP NHL GAME…';
- const abbr=team.includes('Bruins')?'BOS':team.includes('Canadiens')?'MTL':null;
+ const abbr=null; // ESPN event ID is authoritative; no hardcoded NHL team matching
  const get=async url=>{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('NHL HTTP '+r.status);return r.json()};
  const setRecord=(value)=>{app.querySelector('.team-record').textContent=value||''};const plain=v=>typeof v==='object'?(v?.default||v?.en||''):v||'';
  const date=d=>{const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d).map(p=>[p.type,p.value]));return parts.year+'-'+parts.month+'-'+parts.day};
@@ -35,9 +35,9 @@ if(sport==='nhl'){
  const id=p.get('eventId');if(!id){meta.textContent='NHL MATCH NOT FOUND · MISSING GAME ID';return}
  const summary=await get('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/summary?event='+encodeURIComponent(id));
  const competitors=summary.header?.competitions?.[0]?.competitors||[];
- const match=competitors.find(x=>x.team?.displayName===team||x.team?.abbreviation===abbr);
+ const match=competitors.find(x=>String(x.team?.displayName||'').toLowerCase()===team.toLowerCase()||(abbr&&x.team?.abbreviation===abbr));
  if(!match){meta.textContent='NHL GAME ID DID NOT MATCH TEAM';return}setHeader(match);
- setScore(match.score??'—');setRecord(match.records?.find(r=>r.type==='total')?.summary||match.records?.[0]?.summary||'');const logo=app.querySelector('.logo');const logoSrc=match.team?.logo||match.team?.logos?.[0]?.href||(match.team?.id?'https://a.espncdn.com/i/teamlogos/ncaa/500/'+match.team.id+'.png':'');if(logoSrc){logo.src=logoSrc;logo.hidden=false}
+ setScore(match.score??'—');setRecord(match.records?.find?.(r=>r.type==='total')?.summary||match.records?.[0]?.summary||match.record?.[0]?.summary||'');const logo=app.querySelector('.logo');const logoSrc=match.team?.logo||match.team?.logos?.[0]?.href||(match.team?.abbreviation?'https://a.espncdn.com/i/teamlogos/nhl/500/'+match.team.abbreviation.toLowerCase()+'.png':'');if(logoSrc){logo.src=logoSrc;logo.hidden=false}
  const side=summary.boxscore?.players?.find(x=>x.team?.abbreviation===match.team?.abbreviation);
  const athletes=(side?.statistics||[]).flatMap(group=>(group.athletes||[]).map(a=>({a,labels:group.labels||[],keys:group.keys||[]}))).slice(0,6);
  const nodes=app.querySelectorAll('.row');
@@ -52,40 +52,20 @@ if(sport==='nhl'){
  const wanted=isGoalie?[['SV',['saves'],['sv']],['SA',['shotsagainst'],['sa']],['SV%',['savepct','savepercentage'],['sv%']]]:[['G',['goals'],['g']],['A',['assists'],['a']],['+/-',['plusminus'],['+/-']]];
  labels.forEach((v,j)=>v.textContent=wanted[j][0]);vals.forEach((v,j)=>v.textContent=pick(wanted[j][1],wanted[j][2]));
  });
- meta.textContent='ESPN BACKUP · VERIFIED GAME PARTICIPANTS';
- app.querySelector('.note').textContent='ESPN current-game box score fallback. Listed players are game participants, not verified players currently on ice. Data may be delayed.';
+ meta.textContent='ESPN · VERIFIED GAME PARTICIPANTS';
+ app.querySelector('.note').textContent='ESPN selected-game box score. Listed players are game participants, not verified players currently on ice. Data may be delayed.';
  }
  async function update(){
- try{
- const days=[date(new Date()),date(new Date(Date.now()-86400000))];
- const scoreboards=await Promise.all(days.map(d=>get('https://api-web.nhle.com/v1/score/'+d).catch(()=>({games:[]}))));
- const matches=scoreboards.flatMap(d=>d.games||[]);
- const game=matches.find(g=>[g.awayTeam,g.homeTeam].some(t=>plain(t?.abbrev)===abbr||team.toLowerCase().includes(String(plain(t?.name)).toLowerCase())));
- if(!game){await espnFallback();return}
- const isHome=plain(game.homeTeam?.abbrev)===abbr;setHeader({homeAway:isHome?'home':'away',team:{abbreviation:abbr||plain((isHome?game.homeTeam:game.awayTeam)?.abbrev)}});const side=isHome?'home':'away';
- setScore(String((isHome?game.homeTeam:game.awayTeam)?.score??'—'));const recordTeam=isHome?game.homeTeam:game.awayTeam;setRecord(recordTeam?.record||recordTeam?.seasonRecord||'');const logo=app.querySelector('.logo');const logoUrl=(isHome?game.homeTeam:game.awayTeam)?.logo;if(logoUrl){logo.src=logoUrl;logo.hidden=false}
- const box=await get('https://api-web.nhle.com/v1/gamecenter/'+game.id+'/boxscore');
- const stats=box.playerByGameStats?.[side]||{};
- const skaters=[...(stats.forwards||[]),...(stats.defense||[])];
- const goalie=stats.goalies?.[0];
- const rows=skaters.sort((a,b)=>(b.toi||'').localeCompare(a.toi||'')).slice(0,5);
- if(goalie)rows.push(goalie);
- const nodes=app.querySelectorAll('.row');
- nodes.forEach((node,i)=>{
-  const player=rows[i],photo=node.querySelector('.portrait'),name=node.querySelector('.player'),labels=node.querySelectorAll('.stats small'),vals=node.querySelectorAll('.stats b');
-  if(!player){photo.textContent='—';name.textContent='NO VERIFIED PLAYER';vals.forEach(v=>v.textContent='—');return}
-  name.textContent=[plain(player.firstName),plain(player.lastName)].filter(Boolean).join(' ')||'PLAYER';name.style.fontSize=(name.textContent.length>17?'clamp(11px,2.6vw,16px)':'');
-  photo.textContent='';
-  if(typeof player.headshot==='string' && /^https:\/\//.test(player.headshot)){const img=document.createElement('img');img.src=player.headshot;img.alt='';img.style.cssText='height:10vh;max-width:100%;object-fit:contain';img.onerror=()=>{photo.textContent='HEADSHOT UNAVAILABLE'};photo.appendChild(img)}else photo.textContent='HEADSHOT UNAVAILABLE';
-  const isGoalie=player===goalie;
-  const names=isGoalie?['SV','SA','SV%']:['G','A','+/-'];
-  const values=isGoalie?[player.saves,player.shotsAgainst,player.savePctg]:[player.goals,player.assists,player.plusMinus];
-  labels.forEach((v,j)=>v.textContent=names[j]);vals.forEach((v,j)=>v.textContent=values[j]??'—');
- });
- const state=game.gameState||'';
- meta.textContent=(state==='LIVE'||state==='CRIT'?'LIVE · ':'NHL · ')+plain((isHome?game.homeTeam:game.awayTeam)?.abbrev)+' · VERIFIED GAME STATS';
- const note=app.querySelector('.note');note.textContent='NHL game box-score participants, not confirmed current on-ice shifts. Stats update periodically; live data may be delayed. Original approved artwork remains pending.';
- }catch(e){try{await espnFallback();return}catch(ignore){}meta.textContent='NHL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='NHL feed request failed; existing data retained. '+e.message}
+  if(!p.get('eventId')){
+   meta.textContent='CHOOSE A REAL NHL GAME';
+   app.querySelector('.note').textContent='Demo team selections cannot be matched to verified game data. Choose a live or completed NHL game in the controller.';
+   return;
+  }
+  try{await espnFallback();}
+  catch(e){
+   meta.textContent='NHL GAME DATA UNAVAILABLE · RETRYING';
+   app.querySelector('.note').textContent='Unable to update selected NHL event: '+e.message+'. Previously loaded game data is retained.';
+  }
  }
  update();setInterval(update,45000);
 }
