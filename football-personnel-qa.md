@@ -40,3 +40,16 @@
 - Historical finalized games may require event-dated depth charts and availability rather than today's roster.
 
 **Next:** validate one real selected NFL event and one CFB event using actual returned JSON, then correct schema gaps before a consolidated visual review. No API subscription has been purchased or required.
+
+## Offline replay diagnostic prepared (2026-11-13)
+
+`football-replay.html` is an independent development-only browser page. It uses two known archived ESPN event IDs:
+
+- NFL, Broncos @ Texans, November 2, 2025: `401772870`
+- NCAA, Arizona @ Houston, October 18, 2025: `401756925`
+
+It fetches the game summary, collects unique play records, lets the tester step forward/backward, and measures whether structured participant IDs are present. When a play lacks participant IDs it explicitly shows the previously confirmed IDs instead of inventing participation. It does not use final-game totals as simulated live stats and does not send TV commands.
+
+**Validation status:** Replay page JavaScript passed a syntax check. Browser access to actual ESPN summary responses and the participant-ID coverage numbers have **not** been verified from this environment. A stored archived game is not sufficient to verify live-feed delay, 2026 game-day inactives, or correct historical depth charts.
+
+This page is on the feature branch only; GitHub Pages production continues to serve the existing main branch.
