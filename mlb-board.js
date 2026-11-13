@@ -162,6 +162,7 @@ async function update(){
   const scoredHits=item=>{const v=Number(stat(item,['hits'],['h']));return Number.isFinite(v)?v:0};
   const scoredHR=item=>{const v=Number(stat(item,['homeruns'],['hr']));return Number.isFinite(v)?v:0};
   const batters=[...own.batting].sort((a,b)=>(scoredHits(b)-scoredHits(a))||(scoredHR(b)-scoredHR(a)));
+  if(!selected.some(x=>x.item.category==='pitching'))add(own.pitching[0],'TEAM PITCHER');
   batters.forEach(x=>add(x,'TEAM BATTER'));
   own.pitching.forEach(x=>add(x,'TEAM PITCHER'));
   rows.forEach((row,i)=>drawPlayer(row,selected[i]?.item,selected[i]?.role||''));
