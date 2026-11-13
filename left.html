@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEFT RIGHT | LEFT TV</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080c14;color:white;font-family:Arial,sans-serif}iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.fallback{position:absolute;inset:0;display:grid;place-content:center;text-align:center;background:#080c14;padding:20px}.fallback h1{font-size:8vw;margin:0}.fallback p{color:#b4c2d7}.hidden{display:none}</style></head><body>
+<div id="fallback" class="fallback"><h1>LEFT TV</h1><p>MAN CAVE SPORTS BOOK · Player ready</p><p>Waiting for remote control setup</p></div><iframe id="board" class="hidden" title="Sports board" allowfullscreen></iframe>
+<script>
+const board=document.getElementById('board'),fallback=document.getElementById('fallback');
+const urls={upcoming:'https://caveup.pages.dev/',live:'https://testcave.pages.dev/'};
+function display(value){const url=urls[value];if(!url){board.classList.add('hidden');fallback.classList.remove('hidden');board.removeAttribute('src');return}if(board.getAttribute('src')!==url)board.setAttribute('src',url);board.classList.remove('hidden');fallback.classList.add('hidden')}
+const params=new URLSearchParams(location.search);display(params.get('board')||'');
+</script></body></html>
