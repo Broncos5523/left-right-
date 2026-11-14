@@ -47,7 +47,7 @@ function elem(tag,cl,txt){var e=document.createElement(tag);if(cl)e.className=cl
 function dateKey(d){var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);var p={};parts.forEach(function(x){p[x.type]=x.value});return p.year+p.month+p.day}
 function dates(){return [-1,0,1].map(function(n){return dateKey(new Date(Date.now()+n*86400000))})}
 function team(c){var t=c.team||{};return {id:String(t.id||''),name:t.displayName||t.name||'Unknown team',ab:t.abbreviation||t.shortDisplayName||'TEAM',logo:t.logo||t.logos?.[0]?.href||'',color:/^[\da-f]{6}$/i.test(t.color||'')?'#'+t.color:'#526f9b',score:c.score==null?'':String(c.score),side:c.homeAway||''}}
-function safeScore(g,idx){return g.state==='pre'?'–':g.teams[idx].score||'0'}
+function safeScore(g,idx){return g.state==='pre'?'–':(g.teams[idx].score!==''?g.teams[idx].score:'–')}
 function timeString(d){try{return new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'}).format(new Date(d))+' ET'}catch(e){return 'Time TBA'}}
 function isFav(g){return g.teams.some(function(t){return favorites.includes(t.name)})}
 function stateLabel(g){if(g.state==='in')return '● LIVE · '+(g.detail||'IN PROGRESS');if(g.state==='post')return 'FINAL';return timeString(g.date)}
