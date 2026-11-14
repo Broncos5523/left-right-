@@ -1,0 +1,157 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEFT RIGHT · NHL ESPN On-Ice Preview</title>
+<style>
+:root{color-scheme:dark;font:15px/1.48 system-ui,-apple-system,Arial,sans-serif;background:#0a0e17;color:#eef4ff}
+*{box-sizing:border-box}body{margin:0}main{max-width:1000px;margin:0 auto;padding:17px 14px 45px}
+h1{font-size:1.48rem;line-height:1.18;margin:4px 0 7px}h2{font-size:1.12rem;margin:0 0 9px}
+p{margin:8px 0 11px}small,.muted{color:#b7c6d7}
+.card{background:#172033;border:1px solid #36465f;border-radius:13px;padding:14px;margin:12px 0}
+label{display:block;font-weight:700;font-size:.9rem;margin:12px 0 6px}
+select,input,button{font:inherit;color:#fff;background:#263850;border:1px solid #58708d;border-radius:9px;padding:11px;width:100%;min-width:0}
+button{cursor:pointer;font-weight:700}.primary{background:#1265c3;border-color:#4185e8}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frame{display:block;width:100%;max-width:440px;aspect-ratio:9/16;margin:auto;border:1px solid #415570;background:#000}
+.names{white-space:pre-wrap;line-height:1.6;color:#c9d8ea}
+.caption{font-size:.85rem;color:#b4bfd3}
+#status,#metrics{white-space:pre-wrap;overflow-wrap:anywhere}
+.warn{color:#f6c878}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.frame{max-width:385px}}
+</style></head><body><main>
+<small>MAN CAVE SPORTS BOOK · LEFT RIGHT · READ-ONLY NHL DEVELOPMENT</small>
+<h1>NHL · ESPN On-Ice Preview</h1>
+<p class="muted">Two real team boards showing the <strong>six players ESPN reports as on ice</strong>. The approved 9:16 portrait design is unchanged. This page cannot control either TV.</p>
+<div class="card">
+<label for="match">Choose NHL game</label>
+<select id="match"><option value="401892706">Rangers @ Canucks · Nov 13 (reference)</option><option value="401892696">Canadiens @ Bruins · Nov 12 (reference)</option></select>
+<div class="actions">
+<button type="button" class="primary" id="load">View selected game</button>
+<button type="button" id="refresh">Refresh NHL games</button>
+</div>
+<details style="margin-top:13px"><summary>Use an ESPN NHL event ID</summary>
+<label for="manual">ESPN game ID</label><input id="manual" inputmode="numeric" pattern="[0-9]*" placeholder="e.g., 401892696">
+<button type="button" id="manualBtn" style="margin-top:8px">Open ESPN event ID</button>
+</details>
+<p id="status" role="status" class="muted">Loading NHL games and their reported on-ice players…</p>
+</div>
+<div class="card">
+<h2>ESPN-reported six-player groups</h2>
+<p class="caption">Player order is for readable display; positional mixes can vary during penalties, power plays, and empty-net situations. Goalie stats use SV / SA / SV%; skaters use G / A / +/-.</p>
+<div class="grid">
+<section>
+<h2 id="awayName">LEFT · AWAY</h2>
+<iframe id="leftPreview" class="frame" title="LEFT NHL on-ice preview" loading="lazy"></iframe>
+<div id="awaySix" class="names">Waiting for game data…</div>
+</section>
+<section>
+<h2 id="homeName">RIGHT · HOME</h2>
+<iframe id="rightPreview" class="frame" title="RIGHT NHL on-ice preview" loading="lazy"></iframe>
+<div id="homeSix" class="names">Waiting for game data…</div>
+</section>
+</div>
+</div>
+<div class="card">
+<h2>Source diagnostics</h2>
+<div id="metrics" class="muted">Awaiting ESPN selected-game summary…</div>
+<p class="caption">ESPN updates its on-ice feed on its own schedule. Polling every 20 seconds does not guarantee instant substitutions or independently prove which players were physically on the ice at each second. Missing or incomplete groups are held, not guessed.</p>
+</div>
+<p class="caption">NHL-only preview: no Firebase assignment, TV controller, production renderer, football/basketball engines, or approved scoreboard CSS are changed.</p>
+</main><script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id),list=x=>Array.isArray(x)?x:[],base='https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/';
+const examples=[
+ {id:'401892706',name:'Rangers @ Canucks · Nov 13 (reference)',rank:3},
+ {id:'401892696',name:'Canadiens @ Bruins · Nov 12 (reference)',rank:4}
+];
+let selected='',loading=false,timer=null,lastSummary=null,refreshes=0;
+const say=(s,bad=false)=>{$('status').textContent=s;$('status').className=bad?'warn':'muted'};
+async function get(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('ESPN NHL HTTP '+r.status);return r.json()}
+function dateKey(delta=0){
+ const d=new Date(Date.now()+delta*86400000);
+ const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d).map(x=>[x.type,x.value]));
+ return p.year+p.month+p.day;
+}
+function matchTeams(summary){
+ const teams=list(summary.header?.competitions?.[0]?.competitors);
+ const away=teams.find(x=>x.homeAway==='away')||teams[0],home=teams.find(x=>x.homeAway==='home')||teams[1];
+ if(!away?.team?.id||!home?.team?.id)throw Error('No two verified teams returned for event');
+ return [{id:String(away.team.id),name:away.team.displayName,side:'left',score:away.score},
+         {id:String(home.team.id),name:home.team.displayName,side:'right',score:home.score}];
+}
+function launchBoards(teams){
+ for(const [t,id,heading] of [[teams[0],'leftPreview','awayName'],[teams[1],'rightPreview','homeName']]){
+  $(heading).textContent=(t.side==='left'?'LEFT · ':'RIGHT · ')+t.name;
+  const params=new URLSearchParams({sport:'nhl',team:t.name,eventId:selected,side:t.side,nhlPreview:'onice',previewVersion:'nhl-onice-v1'});
+  const src='./nhl-onice-preview-board.html?'+params.toString();
+  if($(id).getAttribute('src')!==src)$(id).setAttribute('src',src);
+ }
+}
+function namesFor(summary,teamId){
+ const group=list(summary.onIce).find(x=>String(x.teamId)===String(teamId));
+ const six=list(group?.entries).filter(x=>x?.whereabouts?.name==='ROSTER_WHEREABOUTS_IN_PLAY'||/in play/i.test(x?.whereabouts?.description||''));
+ if(six.length!==6||new Set(six.map(x=>String(x.athleteid))).size!==6)return null;
+ const side=list(summary.boxscore?.players).find(x=>String(x.team?.id)===String(teamId));
+ const athletes=new Map();
+ for(const section of list(side?.statistics))for(const x of list(section.athletes)){
+  const a=x.athlete||{};if(a.id)athletes.set(String(a.id),{name:a.displayName,pos:a.position?.abbreviation||'?'});
+ }
+ return six.map(e=>{const x=athletes.get(String(e.athleteid));return(x?.name||'Unresolved ESPN ID '+e.athleteid)+' · '+(x?.pos||'?')});
+}
+async function sample(){
+ if(loading||!selected)return;loading=true;
+ try{
+  const summary=await get(base+'summary?event='+encodeURIComponent(selected));
+  const teams=matchTeams(summary),state=summary.header?.competitions?.[0]?.status?.type?.state||'unknown';
+  if(!lastSummary)launchBoards(teams);
+  const groups=[namesFor(summary,teams[0].id),namesFor(summary,teams[1].id)];
+  if(groups[0])$('awaySix').textContent=groups[0].map((s,i)=>(i+1)+'. '+s).join('\n');
+  else if(!$('awaySix').textContent.includes('1.'))$('awaySix').textContent='No complete verified six-player report yet';
+  if(groups[1])$('homeSix').textContent=groups[1].map((s,i)=>(i+1)+'. '+s).join('\n');
+  else if(!$('homeSix').textContent.includes('1.'))$('homeSix').textContent='No complete verified six-player report yet';
+  lastSummary=summary;refreshes++;
+  $('metrics').textContent='ESPN event: '+selected+' · State: '+state+
+   '\n'+teams.map(x=>x.name+' '+(x.score??'—')).join(' · ')+
+   '\nComplete on-ice groups: '+groups.filter(Boolean).length+'/2'+
+   '\nRecorded plays: '+list(summary.plays).length+
+   '\nSuccessful samples: '+refreshes+
+   '\nLast refresh: '+new Date().toLocaleTimeString();
+  say('ESPN reported on-ice data loaded. Sampled every 20 seconds; boards update independently.');
+ }catch(e){say('NHL feed temporarily unavailable: '+e.message+'. Last reported groups remain.',true)}
+ finally{loading=false}
+}
+function inspect(id){
+ if(!/^\d{7,15}$/.test(String(id))){say('Enter a valid numeric ESPN NHL event ID.',true);return}
+ if(timer)clearInterval(timer);selected=String(id);lastSummary=null;refreshes=0;
+ $('leftPreview').removeAttribute('src');$('rightPreview').removeAttribute('src');
+ $('awaySix').textContent='Loading verified NHL group…';$('homeSix').textContent='Loading verified NHL group…';
+ sample();timer=setInterval(sample,20000);
+}
+async function schedule(){
+ const results=new Map(examples.map(x=>[x.id,x]));
+ const dates=[dateKey(),dateKey(-1)];
+ for(const d of dates){
+  try{
+   const summary=await get(base+'scoreboard?dates='+d+'&limit=60');
+   for(const event of list(summary.events)){
+    const cs=list(event.competitions?.[0]?.competitors),away=cs.find(x=>x.homeAway==='away'),home=cs.find(x=>x.homeAway==='home');
+    if(!away?.team||!home?.team)continue;
+    const state=event.status?.type?.state||'pre',rank=state==='in'?0:state==='pre'?1:2;
+    const label=(state==='in'?'LIVE':state==='post'?'FINAL':'UPCOMING')+' · '+(away.team.shortDisplayName||away.team.displayName)+' @ '+(home.team.shortDisplayName||home.team.displayName);
+    results.set(String(event.id),{id:String(event.id),name:label,rank});
+   }
+  }catch(e){say('ESPN NHL schedule unavailable; the reference games remain selectable.',true)}
+ }
+ const select=$('match'),old=select.value;select.replaceChildren();
+ const sorted=[...results.values()].sort((a,b)=>(a.rank??4)-(b.rank??4)||a.name.localeCompare(b.name));
+ for(const x of sorted){const o=document.createElement('option');o.value=x.id;o.textContent=x.name;select.appendChild(o)}
+ const live=sorted.find(x=>x.rank===0);
+ select.value=selected&&results.has(old)?old:live?.id||'401892696';
+ if(!selected)inspect(select.value);
+}
+$('load').addEventListener('click',()=>inspect($('match').value));
+$('refresh').addEventListener('click',schedule);
+$('manualBtn').addEventListener('click',()=>inspect($('manual').value.trim()));
+schedule().catch(e=>{say(e.message,true);inspect('401892696')});
+})();
+</script></body></html>
