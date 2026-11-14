@@ -82,7 +82,7 @@ function matchTeams(summary){
 function launchBoards(teams){
  for(const [t,id,heading] of [[teams[0],'leftPreview','awayName'],[teams[1],'rightPreview','homeName']]){
   $(heading).textContent=(t.side==='left'?'LEFT · ':'RIGHT · ')+t.name;
-  const params=new URLSearchParams({sport:'nhl',team:t.name,eventId:selected,side:t.side,nhlPreview:'onice',previewVersion:'nhl-onice-v1'});
+  const params=new URLSearchParams({sport:'nhl',team:t.name,eventId:selected,side:t.side,nhlPreview:'onice',previewVersion:'nhl-onice-v2'});
   const src='./nhl-onice-preview-board.html?'+params.toString();
   if($(id).getAttribute('src')!==src)$(id).setAttribute('src',src);
  }
