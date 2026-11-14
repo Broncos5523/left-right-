@@ -227,7 +227,7 @@ function assignBoards(teams){
  $('homeName').textContent='RIGHT · '+home.name;
  const pairs=[['leftPreview',away,'left'],['rightPreview',home,'right']];
  for(const [target,t,side] of pairs){
-   const q=new URLSearchParams({sport:'nfl',team:t.name,eventId:selected,side,previewMode:$('mode').value,previewVersion:'nfl-six-v1'});
+   const q=new URLSearchParams({sport:'nfl',team:t.name,eventId:selected,side,previewMode:$('mode').value,previewVersion:'nfl-six-v2'});
    const path='./football-personnel-nfl-preview-board.html?'+q.toString();
    if($(target).getAttribute('src')!==path)$(target).setAttribute('src',path);
  }
