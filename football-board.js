@@ -9,7 +9,7 @@
   const eventId=p.get('eventId'), norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const rows=[...app.querySelectorAll('.row')],band=app.querySelector('.band'),note=app.querySelector('.note');
   const roles=['QB','RB','WR','TE','CB','S','EDGE','LB'];
-  const teamCache={id:null,stamp:0,depth:null,roster:null,injuries:null};
+  const teamCache={id:null,stamp:0,depth:null,roster:null};
   let impactIds=[];const impactKey='lr-football-impact-v1:'+sport+':'+eventId+':'+norm(team);
   let lastPlayId='',rbStatMode={},busy=false,receivingPbp=new Map(),usedPbpFallback=false;let observedPlayKeys=new Set();
   const creditedReceptions=new Map(); // event-scoped receipts, keyed by ESPN play ID
@@ -39,17 +39,12 @@
   async function getTeamContext(teamId){
     if(teamCache.id===String(teamId)&&Date.now()-teamCache.stamp<600000)return teamCache;
     const root=base+'teams/'+encodeURIComponent(teamId);
-    const responses=await Promise.allSettled([get(root+'/depthcharts'),get(root+'/roster'),get(root+'/injuries')]);
-    let [depth,roster,injuries]=responses.map(x=>x.status==='fulfilled'?x.value:null);
-    if(!Array.isArray(injuries?.injuries)||injuries.injuries.length===0){
-      try{injuries=await get(base+'injuries')}catch(e){injuries=null}
-    }
-    // A missing injury report is UNKNOWN availability, not proof of good health.
-    const differentTeam=teamCache.id!==String(teamId);
-    if(differentTeam){teamCache.depth=null;teamCache.roster=null;teamCache.injuries=null}
+    const responses=await Promise.allSettled([get(root+'/depthcharts'),get(root+'/roster')]);
+    const [depth,roster]=responses.map(x=>x.status==='fulfilled'?x.value:null);
+    if(teamCache.id!==String(teamId)){teamCache.depth=null;teamCache.roster=null}
     teamCache.id=String(teamId);teamCache.stamp=Date.now();
-    if(depth)teamCache.depth=depth;if(roster)teamCache.roster=roster;
-    if(injuries)teamCache.injuries=injuries;
+    if(depth)teamCache.depth=depth;
+    if(roster)teamCache.roster=roster;
     return teamCache;
   }
   function candidatePool(depth,roster,injuries,side,teamId,activeGame,eventDate){
@@ -449,7 +444,7 @@
     vals.forEach((x,i)=>x.textContent=s.values[i]??'—');
   }
   async function update(){
-    if(!eventId){band.textContent='AWAITING GAME';note.textContent='Select an actual football game from LEFT RIGHT.';return}
+    if(!eventId){band.textContent='AWAITING GAME';note.textContent='Select a football game to see its key contributors.';return}
     if(busy)return;busy=true;
     try{
       const data=await get(base+'summary?event='+encodeURIComponent(eventId));
@@ -469,7 +464,7 @@
       const state=competition.status?.type?.state||data.header?.competitions?.[0]?.status?.type?.state||'pre';
       const context=await getTeamContext(tid);
       const side=arr(data.boxscore?.players).find(x=>String(x.team?.id)===String(tid)||norm(x.team?.displayName)===norm(team));
-      const pool=candidatePool(context.depth,context.roster,context.injuries,side,tid,false,data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
+      const pool=candidatePool(context.depth,context.roster,null,side,tid,false,data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
       const play=recentPlay(data);
       receivingPbp=receivingFromPlays(data,pool,tid);
       // Prefer a RB's latest individually credited action for stat format.
@@ -496,14 +491,14 @@
       rows.forEach((row,i)=>renderRow(row,shown[i]));
       band.textContent='GAME IMPACT PLAYERS';
       const missing=Math.max(0,6-shown.length);
-      note.textContent='Six key contributors selected from this game’s box score and individually credited plays, not live on-field personnel. '+
+      note.textContent='Six key contributors selected by current-game statistics and credited play-by-play events, not on-field personnel. '+
         (selection.source==='final-hold'?'Final game group held. ':'')+
         (usedPbpFallback?'Receiving totals provisionally recovered from named plays; official totals take priority. ':'')+
         (missing?missing+' slots still awaiting game-participant data. ':'')+
         'Player roles and headshots may be unavailable or delayed.';
     }catch(e){
-      band.textContent='PERSONNEL FEED RETRYING';
-      note.textContent='Football personnel update unavailable: '+e.message+'. Previously received player data is retained where possible.';
+      band.textContent='GAME STATS RETRYING';
+      note.textContent='Game impact refresh unavailable: '+e.message+'. Previously displayed player names and current-game stats are retained.';
     }finally{busy=false}
   }
   update();setInterval(update,30000);
