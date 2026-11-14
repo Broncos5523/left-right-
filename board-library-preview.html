@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05080f">
+<title>MAN CAVE SPORTS BOOK | 28 Team Boards — Library Preview</title>
+<style>
+:root{color-scheme:dark;--bg:#070a10;--panel:#111a28;--line:#36445a;--gold:#f7c65e;--dim:#a8b5c9;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;color:#f5f8ff;background:radial-gradient(ellipse at 45% -15%,#19334e 0,transparent 40%),var(--bg);min-height:100vh}button{color:inherit;font:inherit;cursor:pointer}button:focus-visible{outline:3px solid #40d6ef;outline-offset:2px}.shell{max-width:880px;margin:auto;padding:16px 12px calc(70px + env(safe-area-inset-bottom))}
+.hero{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 4px 20px}.eyebrow{font-size:10px;font-weight:950;letter-spacing:.21em;color:var(--gold)}h1{font-size:clamp(35px,8.6vw,62px);line-height:.94;letter-spacing:-.055em;margin:8px 0;font-weight:1000;text-transform:uppercase}h1 em{font-style:normal;color:var(--gold)}.subtitle{font-size:12px;color:#b0c1da;font-weight:650}.pill{display:inline-flex;align-items:center;justify-content:center;background:#2c2010;border:1px solid #8e7242;color:#ffe0a0;border-radius:100px;padding:8px 10px;font-size:10px;font-weight:850;letter-spacing:.04em;text-align:center}
+.panel{border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:15px;background:linear-gradient(140deg,#17263a,#0d141e);box-shadow:0 12px 29px #0004}.panel-head{border-bottom:1px solid #34445b;background:#1a2a40;padding:13px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between}.panel-head h2{margin:0;font-size:16px}.panel-head small{font-size:11px;color:#bcc9db}.inset{padding:14px}.mode-tabs{display:flex;gap:7px;margin-bottom:13px}.mode{flex:1;padding:9px 7px;border:1px solid #4c5b70;background:#172335;border-radius:9px;font-weight:900;font-size:11px}.mode.selected{background:#efd08b;color:#15202d;border-color:#f6dc9e}.tvrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tv{background:#07121f;border:1px solid #3b4c62;border-top:3px solid #39d5f6;border-radius:12px;min-height:104px;padding:13px}.tv.right{border-top-color:#fa639c}.tv label{display:block;color:#b3c3d9;font-size:11px;font-weight:900;letter-spacing:.12em;margin-bottom:8px}.tv b{display:block;font-size:16px;min-height:22px}.tv span{display:block;color:#a5b9d2;font-size:11px;margin-top:5px}.muted{color:var(--dim);font-size:12px;line-height:1.5}.note{margin:10px 0 0;color:#ffd18c;font-size:11px}.filterline{display:flex;align-items:center;justify-content:space-between;gap:10px}.filterline span{color:#a7bbd5;font-size:11px}.teams{display:grid;gap:10px;padding:13px}.club{border:1px solid #344458;border-left:4px solid var(--team,#e8e8e8);border-radius:12px;padding:12px;background:#08111d}.club-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px}.club-title{display:flex;align-items:center;gap:9px}.mark{width:43px;height:43px;border:1px solid #2d4057;border-radius:10px;background:#17263a;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:950}.name{font-size:15px;font-weight:950}.sport{font-size:10px;color:#aebed3;text-transform:uppercase;margin-top:3px;letter-spacing:.09em;font-weight:800}.locked{border:1px solid #506074;border-radius:100px;padding:5px 7px;color:#bbc9db;font-size:9px;font-weight:900;white-space:nowrap}.pages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.page{border:1px solid #4e617b;border-radius:9px;background:#182a41;padding:12px 0;font-weight:950;font-size:12px}.page:hover,.page:focus-visible{background:#273e59}.cycles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:8px}.cycle{border:1px solid #a3874b;border-radius:9px;padding:9px 5px;color:#ffe1a1;background:#3b301a;font-size:11px;font-weight:850}.btn{border:1px solid #647690;border-radius:9px;background:#142336;padding:10px;font-size:12px;font-weight:800}.secondary-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}.footnote{font-size:11px;color:#94a9c4;line-height:1.45;margin:18px 3px}.highlight{color:#ffda8f;font-weight:800}.hint{margin:0 0 8px;font-size:11px;color:#acbdd4}.error{padding:22px;color:#ffd4d4}@media (min-width:680px){.teams{grid-template-columns:1fr 1fr}.shell{padding-top:25px}.hero{padding-bottom:26px}.tv{min-height:110px}}
+</style>
+</head>
+<body><main class="shell">
+  <header class="hero"><div><div class="eyebrow">MAN CAVE SPORTS BOOK</div><h1>TEAM BOARD<br><em>LIBRARY</em></h1><div class="subtitle">28 locked boards · 7 sports · 4 pages each</div></div><span class="pill">DEVELOPMENT<br>PREVIEW</span></header>
+  <section class="panel"><div class="panel-head"><h2>LEFT / RIGHT ASSIGNMENTS</h2><small>Local preview only</small></div><div class="inset">
+   <div class="mode-tabs"><button id="chooseLeft" class="mode selected" type="button">ASSIGN LEFT</button><button id="chooseRight" class="mode" type="button">ASSIGN RIGHT</button><button id="chooseBoth" class="mode" type="button">ASSIGN BOTH</button></div>
+   <div class="tvrow"><div class="tv"><label>LEFT TV</label><b id="leftTitle">No board selected</b><span id="leftDetail">Choose a page below</span></div><div class="tv right"><label>RIGHT TV</label><b id="rightTitle">No board selected</b><span id="rightDetail">Choose a page below</span></div></div>
+   <div class="secondary-row"><button class="btn" id="clear" type="button">RESET PREVIEW</button><span class="muted">Never sends to Firebase</span></div>
+   <p class="note">The real 28-page artwork is NOT hosted yet. This page previews the selection controls only; tapping pages does not change a TV.</p>
+  </div></section>
+  <section class="panel"><div class="panel-head"><h2>28 APPROVED PAGES</h2><small>Original designs preserved</small></div>
+   <div class="teams" id="teams"><div class="muted">Loading source-grounded board list…</div></div>
+  </section>
+  <section class="panel"><div class="panel-head"><h2>FULL ROTATION</h2><small>28 × 30 seconds</small></div><div class="inset">
+   <p class="hint">The production system already uses 30-second board slots, with 7-second Page 4 player spotlights. These preview buttons simulate assignments only.</p>
+   <button class="cycle" id="all28" style="width:100%" type="button">SELECT ALL 28 · 14-MINUTE ROTATION</button>
+   <p class="muted" style="margin-bottom:0">Future web hosting will keep each team's original four pages together and preserve the existing spotlight rules. The live-game controller and Fire TV receivers are unaffected by this preview.</p>
+  </div></section>
+  <div class="footnote"><span class="highlight">MIGRATION STATUS:</span> Original v8l production source identified and archived. Web-hosted pages, remote commands, and browser persistence are not yet implemented.<p><a href="./controller-gamewall-live.html" style="color:#d6e4fd">Return to the working Game Wall Controller</a></p></div>
+</main>
+<script>
+(function(){
+ const colors={nfl:'#FB4F14',nba:'#007A33',nhl:'#FFB81C',mlb:'#BD3039',wnba:'#E03A3E',cfb:'#AB0520',cbb:'#AB0520'};
+ const codes={nfl:'DEN',nba:'BOS',nhl:'BOS',mlb:'BOS',wnba:'IND',cfb:'ARIZ',cbb:'ARIZ'};
+ let mode='left',teams=[];
+ const $=id=>document.getElementById(id);
+ const assign={left:null,right:null};
+ function setMode(next){mode=next;[['chooseLeft','left'],['chooseRight','right'],['chooseBoth','both']].forEach(pair=>$(pair[0]).classList.toggle('selected',pair[1]===mode))}
+ ['left','right','both'].forEach(v=>$('choose'+v[0].toUpperCase()+v.slice(1)).addEventListener('click',()=>setMode(v)));
+ function display(){['left','right'].forEach(side=>{const v=assign[side];$(side+'Title').textContent=v?v.title:'No board selected';$(side+'Detail').textContent=v?v.detail:'Choose a page below'})}
+ function choose(t,page){
+  const title=t.label;
+  const detail=page==='team'?'Rotate Pages 1–4 · 30 sec each':page==='all'?'Rotate all 28 · 30 sec each':'Page '+page+' · Hold until changed';
+  const picked={title:page==='all'?'All 28 Team Boards':title,detail};
+  if(mode==='left'||mode==='both')assign.left=picked;
+  if(mode==='right'||mode==='both')assign.right=picked;
+  display();
+  window.scrollTo({top:0,behavior:'smooth'});
+ }
+ function make(tag,cls,text){const e=document.createElement(tag);e.className=cls||'';if(text!=null)e.textContent=text;return e}
+ function render(list){
+  const root=$('teams');root.replaceChildren();
+  list.forEach(t=>{
+   const club=make('article','club');club.style.setProperty('--team',colors[t.key]||'#AAA');
+   const top=make('div','club-top'),title=make('div','club-title'),mark=make('div','mark',codes[t.key]||'?'),info=make('div','');
+   info.append(make('div','name',t.label),make('div','sport',t.sport));title.append(mark,info);
+   top.append(title,make('span','locked','APPROVED'));club.appendChild(top);
+   const pages=make('div','pages');
+   t.pages.forEach(n=>{const b=make('button','page','PAGE '+n);b.type='button';b.addEventListener('click',()=>choose(t,n));pages.appendChild(b)});
+   club.appendChild(pages);
+   const cycles=make('div','cycles'),rotate=make('button','cycle','ROTATE PAGES 1–4'),hold=make('button','cycle','HOLD PAGE 1');
+   rotate.type=hold.type='button';rotate.addEventListener('click',()=>choose(t,'team'));hold.addEventListener('click',()=>choose(t,1));cycles.append(rotate,hold);club.appendChild(cycles);
+   root.appendChild(club);
+  });
+ }
+ $('all28').addEventListener('click',()=>choose({label:''},'all'));
+ $('clear').addEventListener('click',()=>{assign.left=assign.right=null;display()});
+ fetch('./28-board-library-manifest.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Manifest HTTP '+r.status);return r.json()}).then(data=>{
+  if(!Array.isArray(data.teams)||data.teams.length!==7||data.teams.some(x=>x.pages.length!==4))throw Error('Source board list mismatch');
+  teams=data.teams;render(teams);
+ }).catch(error=>{$('teams').replaceChildren(make('p','error','Unable to load the verified library list: '+error.message))});
+})();
+</script></body></html>
