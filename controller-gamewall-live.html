@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05080f">
+<title>LEFT RIGHT | Game Wall Controller</title>
+<style>
+:root{color-scheme:dark;--bg:#060a11;--panel:#101827;--ink:#f4f8ff;--muted:#9baabe;--gold:#f7c65e;--cyan:#39d5f6;--pink:#fa639c;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1a3048 0,transparent 46%),var(--bg);color:var(--ink);min-height:100vh}button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,.game:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.shell{max-width:820px;margin:auto;padding:0 13px calc(80px + env(safe-area-inset-bottom))}
+.hero{position:relative;padding:25px 5px 23px;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-13%;top:0;width:70%;height:80%;transform:skewX(-28deg);pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 14px,#fff1 14px 15px);opacity:.3}
+.kicker{font-size:11px;letter-spacing:.22em;font-weight:950;color:var(--gold)}h1{font-size:clamp(34px,7.6vw,58px);letter-spacing:-.055em;line-height:.96;margin:10px 0 6px;font-weight:1000;font-stretch:condensed;text-transform:uppercase}h1 em{font-style:normal;color:var(--gold)}.strap{font-weight:700;color:#aab9d0;font-size:12px;letter-spacing:.07em;text-transform:uppercase}.eyebrow{font-weight:950;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.brace{display:flex;justify-content:space-between;align-items:center;gap:10px}.chip{font-size:11px;border:1px solid #45556c;border-radius:99px;padding:6px 10px;color:#d4dff0;background:#141e2b;white-space:nowrap}.chip.preview{border-color:#78623a;color:#ffda82;background:#332712}
+.panel{background:linear-gradient(145deg,#142035,#0e1520 64%);border:1px solid #31415a;border-radius:17px;overflow:hidden;box-shadow:0 14px 35px #0005;margin-bottom:18px}.panel .head{padding:13px 15px;background:#1b273a;border-bottom:1px solid #34465e;display:flex;justify-content:space-between;gap:8px;align-items:center}.head h2{margin:0;font-size:16px;letter-spacing:-.025em}.head small{font-size:11px;color:var(--muted)}.selection{padding:15px}.selected{border:1px solid #44546b;border-radius:13px;padding:14px;background:#07111f;min-height:70px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center;font-weight:900}.selected img{width:43px;height:43px;object-fit:contain}.selected .versus{color:#7d8fa8;font-size:12px}.selected .team-name{font-size:clamp(13px,3.7vw,19px)}.selected .state{display:block;font-weight:600;color:#9aaec6;font-size:11px;margin-top:3px}
+.outputs{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px}.output{min-width:0;position:relative;border:1px solid #34445b;border-radius:13px;background:#08111d;padding:12px}.output.left{border-top:3px solid var(--cyan)}.output.right{border-top:3px solid var(--pink)}.output h3{margin:0 0 10px;font-size:11px;letter-spacing:.13em}.output h3 span{font-weight:600;color:#9baabe}.chosen{display:flex;align-items:center;gap:8px;min-height:44px}.chosen img{width:44px;height:44px;object-fit:contain;flex-shrink:0}.chosen b{font-size:13px;overflow-wrap:anywhere;line-height:1.15}.option-line{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#9bb0c9;margin:8px 0 5px;font-weight:800}.pick{width:100%;border:1px solid #50647e;background:#192942;color:#f6faff;border-radius:9px;padding:10px 23px 10px 8px;appearance:auto;font-size:12px;min-width:0}
+.bar{display:flex;gap:9px;margin-top:12px}.action{border:1px solid #5b7092;border-radius:10px;background:#1c2d44;padding:11px 12px;font-weight:850;font-size:12px;flex:1}.action.gold{background:linear-gradient(90deg,#f2b74e,#ffe49a);color:#10141b;border-color:#f3d48a}.status{color:#9baabe;font-size:11px;line-height:1.5;margin:10px 0 0}.status strong{color:#e8f2ff}
+.wall-head{display:flex;justify-content:space-between;align-items:end;gap:8px;margin:20px 3px 9px}.wall-head h2{margin:0;font-size:27px;letter-spacing:-.06em}.wall-head .count{color:var(--gold);font-size:13px;font-weight:900}.toolbar{display:flex;gap:6px;overflow:auto;scrollbar-width:none;padding:3px 2px 12px}.toolbar::-webkit-scrollbar{display:none}.filter{white-space:nowrap;flex:0 0 auto;border:1px solid #3e516e;background:#122137;border-radius:99px;font-size:12px;font-weight:850;padding:8px 12px}.filter.active{background:#f4c66a;border-color:#f4c66a;color:#12151b}.mini-actions{display:flex;gap:8px;align-items:center}.refresh{border:1px solid #455975;background:#172840;border-radius:9px;padding:8px 10px;font-weight:800;font-size:12px}
+.wall{display:grid;gap:9px}.game{position:relative;overflow:hidden;display:block;text-align:left;width:100%;background:linear-gradient(115deg,#172339,#101724);border:1px solid #33445e;border-left:4px solid var(--edge,#d8b25e);border-right:4px solid var(--home-edge,#d8b25e);border-radius:12px;padding:12px;box-shadow:0 6px 16px #0003;transition:transform .12s,background .12s,border-color .12s}.game:active{transform:scale(.99)}.game.active{border-color:#f6d17e;border-left-color:var(--edge,#d8b25e);border-right-color:var(--home-edge,#d8b25e);background:linear-gradient(120deg,#3a2f1d,#142035);box-shadow:0 0 0 1px #edbf53,0 8px 24px #0006}.game-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}.league{font-size:10px;font-weight:950;color:#bfcee3;letter-spacing:.14em}.game-status{font-size:10px;font-weight:950;color:#a9bad0;letter-spacing:.04em}.game-status.live{color:#54ecc4}.game-status.live:before{content:"";display:inline-block;width:6px;height:6px;background:#54ecc4;border-radius:50%;margin-right:5px;box-shadow:0 0 9px #54ecc4}.game-body{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:4px}.club{display:flex;align-items:center;gap:7px;min-width:0}.club.home{flex-direction:row-reverse;text-align:right}.club img{width:clamp(40px,13vw,58px);height:clamp(40px,13vw,58px);object-fit:contain;flex-shrink:0;filter:drop-shadow(0 3px 7px #0009)}.club .abbr{display:block;font-size:17px;line-height:1;font-weight:1000;white-space:nowrap}.club .full{display:block;font-size:10px;font-weight:650;color:#b7c8db;line-height:1.2;margin-top:5px;overflow:hidden;text-overflow:ellipsis;max-width:112px;white-space:nowrap}.scoreboard{display:flex;justify-content:center;align-items:center;min-width:68px;gap:5px;font-size:22px;font-weight:1000;font-variant-numeric:tabular-nums;letter-spacing:-.04em}.scoreboard .mid{font-size:11px;color:#8298ad;letter-spacing:0}.game-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px solid #ffffff18;padding-top:8px;font-size:10px;color:#92a5bd}.game-foot .tap{color:var(--gold);font-weight:950;letter-spacing:.06em}.empty{padding:25px 16px;border:1px dashed #53627c;border-radius:12px;text-align:center;background:#101827;color:#b9c9df;font-size:13px;line-height:1.5}.bottom-note{padding:14px 4px;color:#92a7c0;font-size:11px;line-height:1.5}.divider{border:0;border-top:1px solid #2d4057;margin:12px 0}
+@media(min-width:690px){.wall{grid-template-columns:1fr 1fr}.game{min-height:145px}.selected .team-name{font-size:19px}.club .full{max-width:140px}}
+@media(max-width:350px){.shell{padding-left:9px;padding-right:9px}.game{padding:9px}.club{gap:3px}.club .abbr{font-size:14px}.club img{width:37px;height:37px}.scoreboard{font-size:18px;min-width:54px}.output{padding:8px}.chosen img{width:35px;height:35px}}
+.remote-auth{border-top:1px solid #34465e;margin-top:13px;padding-top:11px}.remote-auth summary{font-size:11px;font-weight:950;letter-spacing:.09em;color:var(--gold);cursor:pointer;list-style-position:inside}.remote-auth label{display:block;font-size:11px;font-weight:800;color:#b9c9df;margin:11px 0 5px}.remote-auth input{display:block;width:100%;background:#0a1422;color:#fff;border:1px solid #4a5f7b;border-radius:9px;padding:11px;font:inherit;font-size:14px}.remote-auth input:focus-visible{outline:2px solid var(--gold)}.remote-auth .action[hidden]{display:none}.remote-auth .action:disabled{opacity:.55;cursor:wait}.chip.connected{background:#11372c;color:#89f7d4;border-color:#298d6e}
+</style>
+</head>
+<body><main class="shell">
+<header class="hero"><div class="brace"><span class="kicker">MAN CAVE SPORTS BOOK</span><span class="chip preview" id="remoteChip">REMOTE · SIGN IN</span></div><h1>GAME <em>WALL</em></h1><div class="strap">LEFT / RIGHT · Broadcast Command Center</div></header>
+<section id="assignment" class="panel">
+<div class="head"><h2>TV Assignments</h2><small>Authenticated control · LEFT + RIGHT</small></div>
+<div class="selection"><div class="eyebrow" style="margin-bottom:10px">Selected matchup</div><div id="selected" class="selected">Tap any game below to select it</div>
+<div class="outputs"><div class="output left"><h3>● LEFT <span>FIRE TV</span></h3><div class="chosen" id="leftChosen">Awaiting game</div><div class="option-line">Display on LEFT</div><select id="leftPick" class="pick" aria-label="LEFT television assignment"></select></div><div class="output right"><h3>● RIGHT <span>FIRE TV</span></h3><div class="chosen" id="rightChosen">Awaiting game</div><div class="option-line">Display on RIGHT</div><select id="rightPick" class="pick" aria-label="RIGHT television assignment"></select></div></div>
+<div class="bar"><button class="action" id="swap" type="button">⇄ SWAP TEAMS</button><button class="action gold" id="review" type="button">SEND TO BOTH TVS</button></div>
+<p class="status" id="assignmentStatus" role="status">Sign in below, then tap any game to send it to both TVs. No commands are sent by simply opening this page.</p>
+<details class="remote-auth" id="remoteAuth"><summary id="remoteSummary">CONNECT FIREBASE REMOTE</summary>
+<form id="remoteLogin" autocomplete="on"><label for="remoteEmail">Controller email</label><input id="remoteEmail" type="email" autocomplete="username" placeholder="Email address" required><label for="remotePassword">Password</label><input id="remotePassword" type="password" autocomplete="current-password" required><div class="bar"><button type="submit" id="remoteConnect" class="action gold" disabled>CONNECT</button><button type="button" id="remoteLogout" class="action" hidden>SIGN OUT</button></div></form>
+<p class="status" id="remoteStatus" role="status">Loading secure Firebase connection…</p>
+<p class="status" id="remoteActivity"></p></details></div></section>
+<div class="wall-head"><div><div class="eyebrow">LIVE SCHEDULE FEED</div><h2>All Games <span id="gameCount" class="count">· …</span></h2></div><div class="mini-actions"><button id="refresh" class="refresh" type="button">↻ Refresh</button></div></div>
+<div class="toolbar" id="filters" aria-label="Filter matchups"><button class="filter active" data-filter="all" type="button">ALL</button><button class="filter" data-filter="live" type="button">● LIVE</button><button class="filter" data-filter="upcoming" type="button">UPCOMING</button><button class="filter" data-filter="final" type="button">FINALS</button><button class="filter" data-filter="favorites" type="button">★ FAVORITES</button></div>
+<p id="feedStatus" class="status" style="margin:0 4px 12px" role="status">Loading ESPN matchups across all seven sports…</p>
+<div id="wall" class="wall"><div class="empty">Loading today's games, tomorrow's matchups, and recent finals…</div></div>
+<div class="bottom-note">Matchups and scores are sourced from ESPN when available and may be delayed. This controller uses your existing Firebase LEFT/RIGHT commands. The approved 9:16 player boards and Upcoming/Live websites remain unchanged.</div>
+</main>
+<script>
+(function(){
+'use strict';
+var leagues=[['NFL','football/nfl'],['NBA','basketball/nba'],['NHL','hockey/nhl'],['MLB','baseball/mlb'],['WNBA','basketball/wnba'],['CFB','football/college-football'],['CBB','basketball/mens-college-basketball']];
+var favorites=['Boston Bruins','Boston Celtics','Denver Broncos','Boston Red Sox','Indiana Fever','Arizona Wildcats'];
+var all=[],selected=null,filter='all',left='away',right='home';
+var $=function(id){return document.getElementById(id)};
+function elem(tag,cl,txt){var e=document.createElement(tag);if(cl)e.className=cl;if(txt!==undefined)e.textContent=txt;return e}
+function dateKey(d){var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);var p={};parts.forEach(function(x){p[x.type]=x.value});return p.year+p.month+p.day}
+function dates(){return [-1,0,1].map(function(n){return dateKey(new Date(Date.now()+n*86400000))})}
+function team(c){var t=c.team||{};return {id:String(t.id||''),name:t.displayName||t.name||'Unknown team',ab:t.abbreviation||t.shortDisplayName||'TEAM',logo:t.logo||t.logos?.[0]?.href||'',color:/^[\da-f]{6}$/i.test(t.color||'')?'#'+t.color:'#526f9b',alternateColor:/^[\da-f]{6}$/i.test(t.alternateColor||'')?'#'+t.alternateColor:'',score:c.score==null?'':String(c.score),side:c.homeAway||''}}
+/* For dark home uniforms (e.g. Boston black / Arizona navy), use a recognizable light-enough team color. */
+function homeEdgeColor(t){
+ var known={'Boston Bruins':'#FFB81C','Arizona Wildcats':'#AB0520','Auburn Tigers':'#F56600','SMU Mustangs':'#CC0035','Wake Forest Demon Deacons':'#B79658','Ohio State Buckeyes':'#BB0000'};
+ function contrast(h){if(!h)return 0;var v=h.replace('#',''),rgb=[0,2,4].map(function(i){var n=parseInt(v.slice(i,i+2),16)/255;return n<=.04045?n/12.92:Math.pow((n+.055)/1.055,2.4)});var l=rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;return (l+.05)/(.015+.05)}
+ var primary=t.color||'#526f9b',extra=known[t.name]||t.alternateColor;
+ if(contrast(primary)>=2.6)return primary;
+ if(extra&&contrast(extra)>=2.6)return extra;
+ var pick=extra&&contrast(extra)>contrast(primary)?extra:primary;
+ /* Do not let a navy/black home edge vanish against the dark card. */
+ for(var amount=.12;amount<=.7;amount+=.12){var hex=pick.replace('#','');var rgb=[0,2,4].map(function(i){return Math.round(parseInt(hex.slice(i,i+2),16)*(1-amount)+255*amount)});var candidate='#'+rgb.map(function(n){return n.toString(16).padStart(2,'0')}).join('');if(contrast(candidate)>=2.6)return candidate}
+ return pick;
+}
+function safeScore(g,idx){return g.state==='pre'?'–':(g.teams[idx].score!==''?g.teams[idx].score:'–')}
+function timeString(d){try{return new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'}).format(new Date(d))+' ET'}catch(e){return 'Time TBA'}}
+function isFav(g){return g.teams.some(function(t){return favorites.includes(t.name)})}
+function stateLabel(g){if(g.state==='in')return '● LIVE · '+(g.detail||'IN PROGRESS');if(g.state==='post')return 'FINAL';return timeString(g.date)}
+function fromESPN(key,e){var c=e.competitions?.[0];if(!c)return null;var comps=c.competitors||[];var away=comps.find(function(x){return x.homeAway==='away'}),home=comps.find(function(x){return x.homeAway==='home'});if(!away||!home)return null;return {key:key,id:String(e.id),teams:[team(away),team(home)],state:e.status?.type?.state||'pre',detail:e.status?.type?.shortDetail||e.status?.type?.detail||'',date:e.date||'',favorite:false}}
+function compact(el){while(el.firstChild)el.removeChild(el.firstChild)}
+function img(t){var x=elem('img');x.alt=t.name+' logo';x.loading='lazy';x.referrerPolicy='no-referrer';if(t.logo)x.src=t.logo;else x.style.display='none';x.onerror=function(){x.style.display='none'};return x}
+function optionText(choice){if(choice==='upcoming')return 'Upcoming Matchups';if(choice==='liveboard')return 'Live Games / Results';if(!selected)return 'Select matchup';return selected.teams[choice==='away'?0:1].name}
+function currentLogo(choice){if(!selected||choice==='upcoming'||choice==='liveboard')return null;return selected.teams[choice==='away'?0:1]}
+function drawAssignments(){var s=$('selected');compact(s);if(!selected){s.textContent='Tap any game below to select it'}else{var a=selected.teams[0],b=selected.teams[1];s.appendChild(img(a));var x=elem('div');x.appendChild(elem('div','team-name',a.ab+'  vs  '+b.ab));x.appendChild(elem('span','state',selected.key+' · '+stateLabel(selected)));s.appendChild(x);s.appendChild(img(b))}
+['left','right'].forEach(function(side){var value=side==='left'?left:right,el=$(side+'Chosen'),picker=$(side+'Pick');compact(el);var t=currentLogo(value);if(t)el.appendChild(img(t));el.appendChild(elem('b','',optionText(value)));compact(picker);[['away',selected?selected.teams[0].name:'Away team'],['home',selected?selected.teams[1].name:'Home team'],['upcoming','Upcoming Matchups'],['liveboard','Live Games / Results']].forEach(function(x){var o=document.createElement('option');o.value=x[0];o.textContent=x[1];picker.appendChild(o)});picker.value=value;picker.disabled=false;if(!selected)Array.from(picker.options).forEach(function(o){if(o.value==='away'||o.value==='home')o.disabled=true})})}
+function choose(g){selected=g;left='away';right='home';drawAssignments();$('assignmentStatus').textContent='Matchup selected. LEFT defaults to away; RIGHT defaults to home.';drawWall();$('assignment').scrollIntoView({behavior:'smooth',block:'start'});if(window.GameWallRemote)window.GameWallRemote.send('game tap')}
+function smallTeam(t,home){var e=elem('div','club'+(home?' home':''));e.appendChild(img(t));var names=elem('div');names.appendChild(elem('span','abbr',t.ab));names.appendChild(elem('span','full',t.name));e.appendChild(names);return e}
+function scoreFor(g){var e=elem('div','scoreboard');e.appendChild(elem('span','',safeScore(g,0)));e.appendChild(elem('span','mid',g.state==='pre'?'VS':'–'));e.appendChild(elem('span','',safeScore(g,1)));return e}
+function drawWall(){var items=all.filter(function(g){return filter==='all'||(filter==='favorites'&&isFav(g))||(filter==='live'&&g.state==='in')||(filter==='upcoming'&&g.state==='pre')||(filter==='final'&&g.state==='post')});$('gameCount').textContent='· '+items.length;var wall=$('wall');compact(wall);if(!items.length){wall.appendChild(elem('div','empty',all.length?'No games match this filter. Choose ALL to see every available game.':'No games received. Tap Refresh to retry the ESPN schedule feed.'));return}
+var frag=document.createDocumentFragment();items.forEach(function(g){var btn=elem('button','game'+(selected&&selected.key===g.key&&selected.id===g.id?' active':''));btn.type='button';btn.style.setProperty('--edge',g.teams[0].color);btn.style.setProperty('--home-edge',homeEdgeColor(g.teams[1]));btn.setAttribute('aria-label',g.key+': '+g.teams[0].name+' versus '+g.teams[1].name+', '+stateLabel(g)+'. Select game');var top=elem('div','game-top');top.appendChild(elem('div','league',g.key+(isFav(g)?' · ★ FAVORITE':'')));top.appendChild(elem('div','game-status'+(g.state==='in'?' live':''),stateLabel(g)));var mid=elem('div','game-body');mid.appendChild(smallTeam(g.teams[0],false));mid.appendChild(scoreFor(g));mid.appendChild(smallTeam(g.teams[1],true));var foot=elem('div','game-foot');foot.appendChild(elem('span','',g.state==='pre'?'Scheduled '+timeString(g.date):g.state==='post'?'Completed game':'ESPN live game feed'));foot.appendChild(elem('span','tap',selected&&selected.id===g.id&&selected.key===g.key?'✓ SELECTED':'TAP TO CONTROL ›'));btn.appendChild(top);btn.appendChild(mid);btn.appendChild(foot);btn.addEventListener('click',function(){choose(g)});frag.appendChild(btn)});wall.appendChild(frag)}
+function sortGames(){var rank={in:0,pre:1,post:2};all.sort(function(a,b){return Number(isFav(b))-Number(isFav(a))||(rank[a.state]??3)-(rank[b.state]??3)||new Date(a.date)-new Date(b.date)||a.key.localeCompare(b.key)})}
+async function fetchScores(){var jobs=[],days=dates();leagues.forEach(function(l){days.forEach(function(d){jobs.push((async function(){var r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+l[1]+'/scoreboard?dates='+d,{cache:'no-store'});if(!r.ok)throw Error(l[0]+' '+r.status);var data=await r.json();return (data.events||[]).map(function(e){return fromESPN(l[0],e)}).filter(Boolean)})())})});var answers=await Promise.allSettled(jobs),unique=new Map(),ok=0;answers.forEach(function(r){if(r.status==='fulfilled'){ok++;r.value.forEach(function(g){unique.set(g.key+':'+g.id,g)})}});if(!ok)throw Error('ESPN is currently unavailable');all=Array.from(unique.values());sortGames();if(selected){var found=all.find(function(g){return g.key===selected.key&&g.id===selected.id});if(found)selected=found;else all.unshift(selected)}drawAssignments();drawWall();$('feedStatus').textContent=all.length+' matchups from '+ok+'/'+jobs.length+' successful ESPN date/league requests. All seven leagues shown by default · favorites first · yesterday through tomorrow (Eastern). Scores may be delayed.'}
+function loading(){var b=$('refresh');b.disabled=true;b.textContent='Loading…';$('feedStatus').textContent='Refreshing ESPN game wall…';fetchScores().catch(function(e){$('feedStatus').textContent='Schedule refresh failed: '+e.message+'. Existing matches remain available.';drawWall()}).finally(function(){b.disabled=false;b.textContent='↻ Refresh'})}
+$('refresh').addEventListener('click',loading);
+$('filters').addEventListener('click',function(e){var btn=e.target.closest('button[data-filter]');if(!btn)return;filter=btn.dataset.filter;Array.from($('filters').children).forEach(function(c){c.classList.toggle('active',c===btn)});drawWall()});
+['left','right'].forEach(function(s){$(s+'Pick').addEventListener('change',function(e){var v=e.target.value;if(s==='left')left=v;else right=v;if((left==='away'||left==='home')&&left===right){if(s==='left')right=left==='away'?'home':'away';else left=right==='away'?'home':'away'}drawAssignments();if(window.GameWallRemote)window.GameWallRemote.send('assignment change')})});
+$('swap').addEventListener('click',function(){if(!selected)return;var x=left;left=right;right=x;drawAssignments();$('assignmentStatus').textContent='TV assignments swapped.';if(window.GameWallRemote)window.GameWallRemote.send('swap')});
+$('review').addEventListener('click',function(){if(window.GameWallRemote)window.GameWallRemote.send('manual send');else $('assignmentStatus').textContent='Remote module is loading; please try again.'});
+window.GameWallBridge={
+ snapshot:function(){
+  var sides={left:left,right:right},needsTeam=Object.values(sides).some(function(c){return c==='away'||c==='home'});
+  if(needsTeam&&!selected)return null;
+  var gameKey=selected?selected.key.toLowerCase()+'-'+selected.id:'',time=Date.now(),out={};
+  Object.keys(sides).forEach(function(side){
+   var choice=sides[side],isTeam=choice==='away'||choice==='home',t=isTeam?selected.teams[choice==='away'?0:1]:null;
+   out[side]={type:isTeam?'team':choice==='liveboard'?'live':'upcoming',game:gameKey,eventId:selected?selected.id:'',team:t?t.name:null,updatedAt:time};
+  });
+  return out;
+ },
+ status:function(message){$('assignmentStatus').textContent=message},
+ labels:function(){return {left:optionText(left),right:optionText(right)}}
+};
+drawAssignments();loading();
+})();
+</script><script type="module">
+/* Remote feature layer only. Approved Game Wall layout and TV board receivers are unchanged. */
+const authPanel=document.getElementById('remoteAuth');
+const remoteStatus=document.getElementById('remoteStatus');
+const remoteChip=document.getElementById('remoteChip');
+const remoteSummary=document.getElementById('remoteSummary');
+const connect=document.getElementById('remoteConnect');
+const logout=document.getElementById('remoteLogout');
+const signInForm=document.getElementById('remoteLogin');
+const bridge=window.GameWallBridge;
+let loggedIn=false,queue=Promise.resolve(),requestNumber=0;
+function info(message){remoteStatus.textContent=message;}
+function connected(user){
+ loggedIn=!!user;
+ remoteChip.textContent=loggedIn?'REMOTE · CONNECTED':'REMOTE · SIGN IN';
+ remoteChip.classList.toggle('connected',loggedIn);
+ remoteSummary.textContent=loggedIn?'REMOTE CONNECTED · ACCOUNT':'CONNECT FIREBASE REMOTE';
+ logout.hidden=!loggedIn;
+ signInForm.querySelector('#remoteEmail').disabled=loggedIn;
+ signInForm.querySelector('#remotePassword').disabled=loggedIn;
+ connect.hidden=loggedIn;
+ if(!loggedIn)info('Sign in to activate one-tap game switching.');
+ else info('Signed in. Tap a matchup to switch both TVs, or use Send to Both TVs.');
+}
+function requireAuth(){
+ if(loggedIn)return true;
+ authPanel.open=true;
+ info('Sign in with your Firebase controller account. No TV commands have been sent.');
+ bridge.status('Sign in before controlling LEFT / RIGHT.');
+ return false;
+}
+async function send(cause){
+ const payload=bridge.snapshot();
+ if(!payload){bridge.status('Select a real ESPN matchup first, or assign an existing board to BOTH TVs.');return;}
+ if(!requireAuth())return;
+ const number=++requestNumber,labels=bridge.labels();
+ bridge.status('Sending '+cause+' · LEFT: '+labels.left+' · RIGHT: '+labels.right+'…');
+ const task=queue.catch(()=>{}).then(async()=>{
+  if(!auth.currentUser)throw new Error('Firebase sign-in expired');
+  await set(ref(db,'screens'),payload);
+ });
+ queue=task;
+ try{
+  await task;
+  if(number===requestNumber)bridge.status('Saved to Firebase · LEFT: '+labels.left+' · RIGHT: '+labels.right+'. The TVs update when connected; TV playback is not independently verified.');
+ }catch(error){
+  if(number===requestNumber){bridge.status('Send failed · '+(error.code||error.message||'Unknown Firebase error'));info('Firebase did not save the assignment. Check your connection and database rules.');}
+ }
+}
+window.GameWallRemote={send};
+let auth,db,ref,set;
+try{
+ const sdk=await import('./firebase.js');
+ ({auth,db,ref,set}=sdk);
+ connect.disabled=false;
+ sdk.onAuthStateChanged(auth,connected,error=>info('Firebase authentication error · '+(error.code||error.message)));
+ sdk.onValue(ref(db,'screens'),snapshot=>{
+  const data=snapshot.val();
+  if(!data)return;
+  function brief(v){return v?.type==='team'?(v.team||'Team'):v?.type==='upcoming'?'Upcoming Matchups':v?.type==='live'?'Live Games / Results':'Unassigned';}
+  document.getElementById('remoteActivity').textContent='Firebase currently holds · LEFT: '+brief(data.left)+' · RIGHT: '+brief(data.right)+'. This confirms database state, not TV playback.';
+ },error=>{document.getElementById('remoteActivity').textContent='Assignment read unavailable · '+(error.code||error.message);});
+ signInForm.addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(connect.disabled||loggedIn)return;
+  connect.disabled=true;info('Signing in…');
+  try{
+   await sdk.signInWithEmailAndPassword(auth,document.getElementById('remoteEmail').value.trim(),document.getElementById('remotePassword').value);
+   document.getElementById('remotePassword').value='';
+   authPanel.open=false;
+  }catch(error){info('Sign in failed · '+(error.code||error.message));}
+  finally{connect.disabled=false;}
+ });
+ logout.addEventListener('click',async()=>{
+  try{await sdk.signOut(auth);bridge.status('Signed out. No changes made to TVs.');}
+  catch(error){info('Sign out failed · '+(error.code||error.message));}
+ });
+}catch(error){
+ info('Remote unavailable · '+(error.code||error.message||'Firebase module could not load'));
+ bridge.status('Firebase failed to load. No commands were sent.');
+}
+</script></body></html>
