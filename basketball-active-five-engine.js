@@ -1,6 +1,7 @@
 /* MAN CAVE SPORTS BOOK — LEFT RIGHT shared basketball player-selection engine.
- * NCAA CBB: use an exact five-player ESPN active=true group when available.
- * NBA/WNBA: active=true is NOT verified as on-court; retain box-score presentation.
+ * NCAA CBB and NBA: use an exact five-player ESPN active=true group during live games.
+ * Real-game visual cross-checks: UNA-Miami (CBB) and Knicks-Pacers (NBA), Nov 13, 2026.
+ * WNBA remains participant-only pending its own live on-court validation.
  * Uses the existing APPROVED scoreboard and five player rows without CSS changes.
  * Official live on-court status is not guaranteed by ESPN's unofficial Site API.
  */
@@ -66,7 +67,7 @@
     const held=previous.map(id=>byId.get(id)).filter(Boolean);
     const starters=items.filter(x=>x.starter);
 
-    if(league==='cbb'&&state==='in'&&active.length===5){
+    if((league==='cbb'||league==='nba')&&state==='in'&&active.length===5){
       return {players:stableSort(active,previous),source:'active-five',activeCount:5};
     }
     if(held.length===5){
@@ -171,17 +172,17 @@
         try{localStorage.setItem(key,JSON.stringify(heldIds))}catch(e){}
       }
       rows.forEach((row,i)=>renderRow(row,players[i]));
-      if(sport==='cbb'&&selection.source==='active-five'&&players.length===5){
+      if((sport==='cbb'||sport==='nba')&&selection.source==='active-five'&&players.length===5){
         band.textContent='ESPN ACTIVE FIVE';
-        note.textContent='ESPN identifies five active players for this game. Tested against the North Alabama–Miami broadcast, but not independently verified for every college game. Current-game points, rebounds and assists shown; updates may lag substitutions.';
-      }else if(selection.source==='held'&&sport==='cbb'){
+        note.textContent='Five distinct ESPN active players are displayed. Live visual confirmation exists for one NBA and one NCAA game; other matchups may differ. Current-game PTS, REB and AST update independently; substitutions may be delayed.';
+      }else if(selection.source==='held'&&(sport==='cbb'||sport==='nba')){
         band.textContent='LAST KNOWN FIVE';
-        note.textContent='Holding the last selected five because the current feed did not provide a complete five-player group. This is not a confirmed live lineup. Current-game statistics may be delayed.';
+        note.textContent='Holding the last displayed five because the feed did not provide a complete active-player group. This is NOT a confirmed live lineup. Current-game statistics may be delayed.';
       }else{
         band.textContent='GAME PARTICIPANTS';
-        note.textContent=(sport==='nba'||sport==='wnba'
-          ?'Current-game ESPN participants. The active flag is not yet verified as on-court for this league.'
-          :'No complete ESPN active five is available. Showing eligible player information; this is not a verified on-court lineup.')+
+        note.textContent=(sport==='wnba'
+          ?'WNBA active flags have not been validated as current on-court participation.'
+          :'No complete ESPN live active-five is available. Showing game participants, not a verified on-court lineup.')+
           ' Stats show current-game PTS, REB and AST where supplied.';
       }
       if(meta)meta.textContent='ESPN · '+selection.source.toUpperCase();
