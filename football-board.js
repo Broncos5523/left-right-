@@ -128,14 +128,24 @@
     labels.forEach((el,i)=>el.textContent=data.labels[i]||'—');
     values.forEach((el,i)=>el.textContent=data.values[i]??'—');
   }
+  // A refreshed feed must not overlap an earlier slow ESPN request, and the
+  // last good screen must remain visible if ESPN briefly fails.
+  const sync={eventId,lastAttempt:null,lastSuccess:null,lastError:null,players:[],scores:null};
+  window.__LR_FOOTBALL_SYNC__=sync;
+  let fetching=false;
   async function update(){
+    if(fetching)return;
     if(!eventId){
       band.textContent='ON FIELD';
       note.textContent='Choose an actual NFL or college football matchup in the LEFT RIGHT controller to show current-game statistics.';
       return;
     }
     try{
-      const response=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(eventId),{cache:'no-store'});
+      fetching=true;
+      sync.lastAttempt=new Date().toISOString();
+      const cacheKey=Math.floor(Date.now()/20000);
+      const source='https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(eventId)+'&_='+cacheKey;
+      const response=await fetch(source,{cache:'no-store'});
       if(!response.ok)throw Error('ESPN HTTP '+response.status);
       const data=await response.json();
       const competitors=data.header?.competitions?.[0]?.competitors||[];
@@ -154,14 +164,25 @@
       const players=selectPlayers(side);
       rows.forEach((row,i)=>renderPlayer(row,players[i]));
       setGamePhaseHeading(data);
+      sync.lastSuccess=new Date().toISOString();
+      sync.lastError=null;
+      sync.players=players.map(x=>x.athlete.displayName||x.athlete.name||'');
+      sync.scores={team:match.team?.displayName||team,score:match.score,state:data.header?.competitions?.[0]?.status?.type?.state};
       note.textContent=players.length
         ?'Current-game ESPN offensive box-score contributors. These are not verified players on the field. QB: pass yards/completions-attempts/TD; RB: carries/rush yards/TD; WR/TE: catches/receiving yards/TD. Feed may be delayed.'
         :'No verified offensive game statistics yet. Player rows will populate when box-score data becomes available.';
     }catch(e){
       /* Keep the most recent game-phase heading during ESPN outages. */
+      sync.lastError=String(e.message||e);
       note.textContent='Could not update the selected football game: '+e.message+'. Previously received scoreboard data is retained where possible.';
+    }finally{
+      fetching=false;
     }
   }
   update();
-  setInterval(update,45000);
+  setInterval(update,20000);
+  // Returning to a suspended Silk tab also triggers a fresh read.
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+  window.addEventListener('focus',update);
+  window.addEventListener('online',update);
 })();
