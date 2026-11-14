@@ -118,6 +118,7 @@
       const n=norm(g.name||g.displayName||g.type||g.title);
       if(n.includes('passing'))return 'passing';if(n.includes('rushing'))return 'rushing';
       if(n.includes('receiving'))return 'receiving';
+      if(n==='interceptions'||n.includes('interception'))return 'interceptions';
       if(n.includes('defensive')||n.includes('defense'))return 'defense';
       const labs=arr(g.labels).map(norm);
       if(labs.includes('rec'))return 'receiving';if(labs.includes('car'))return 'rushing';
