@@ -203,15 +203,29 @@
   }
   function tackleMentions(play){
     const text=String(play?.text||''),out=[],seen=new Set();
-    // ESPN commonly names tacklers in parentheses and also uses 'sacked by',
-    // 'intercepted by' and 'broken up by'; never treat offensive players as D.
-    const variants=[
-      /\(#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,2})\)/g,
-      /\b(?:tackled|sacked|intercepted|deflected|broken\s+up|forced\s+fumble)\s+by\s+#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,2})/gi
-    ];
-    for(const re of variants)for(const m of text.matchAll(re)){
-      const key=m[1]+':'+norm(m[2]);if(seen.has(key))continue;seen.add(key);
-      out.push({kind:'tackler',name:m[2].trim(),jersey:m[1]});
+    function add(jersey,name){
+      const clean=String(name||'').trim();
+      if(!clean)return;
+      const key=String(jersey)+':'+norm(clean);
+      if(seen.has(key))return;
+      seen.add(key);
+      out.push({kind:'tackler',name:clean,jersey:String(jersey)});
+    }
+    // ESPN uses both one tackler "(#12 C.Brookins)" and shared tackles
+    // "(#14 J.Guerrier; #3 S.Lee Jr.)". Each credit is a real named
+    // participant, but not a complete defensive snap roster.
+    for(const group of text.matchAll(/\(([^()]{1,180})\)/g)){
+      const inside=String(group[1]||'').trim();
+      if(!/^#\d{1,3}\s+/.test(inside))continue;
+      for(const part of inside.split(/\s*;\s*/)){
+        const m=part.match(/^#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,3})\s*$/);
+        if(m)add(m[1],m[2]);
+      }
+    }
+    // Explicit defensive actions outside parentheses. This will never
+    // parse a "to #xx Receiver" pass target as a defender.
+    for(const m of text.matchAll(/\b(?:tackled|sacked|intercepted|deflected|broken\s+up|forced\s+fumble)\s+by\s+#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,3}?)(?=\s*(?:[,;.()]|$))/gi)){
+      add(m[1],m[2]);
     }
     return out;
   }
