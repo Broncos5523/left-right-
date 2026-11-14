@@ -25,6 +25,7 @@
   function persistSlots(){try{localStorage.setItem(stateKey,JSON.stringify(slotState))}catch(e){}}
   let lastPlayId='',rbStatMode={},busy=false,receivingPbp=new Map(),rushingPbp=new Map(),usedPbpFallback=false;
   const creditedReceptions=new Map(); // event-scoped receipts, keyed by ESPN play ID
+  const creditedRushes=new Map(); // event-scoped rushing receipts (same dedupe and retention policy)
   const base='https://site.api.espn.com/apis/site/v2/sports/'+path+'/';
   const arr=x=>Array.isArray(x)?x:[];
   const statusText=x=>String(typeof x==='string'?x:x?.displayName||x?.name||x?.type||x?.description||x?.abbreviation||'');
@@ -307,10 +308,7 @@
     if(role==='RB'){
       const type=slot==='rushLeader'?'rushing':rbStatMode[c.id]==='receiving'?'receiving':'rushing';
       return type==='receiving'?{labels:['REC','YDS','TD'],values:recoveredRecStats(c)}:
-        {labels:['ATT','YDS','TD'],values:[
-        pickStat(c,'rushing',['rushingattempts'],['car','att','rushatt']),
-        pickStat(c,'rushing',['rushingyards'],['yds','rushyds']),
-        pickStat(c,'rushing',['rushingtouchdowns'],['td'])]};
+        {labels:['ATT','YDS','TD'],values:recoveredRushStats(c)};
     }
     if(role==='WR'||role==='TE')return {labels:['REC','YDS','TD'],values:recoveredRecStats(c)};
     const def=(keys,labels)=>pickStat(c,'defense',keys,labels);
@@ -416,22 +414,44 @@
     return indexed.map(x=>x.play);
   }
   function rushingFromPlays(data,pool,teamId){
-    const result=new Map(),seen=new Set();
+    // Retain previously verified rushing plays when ESPN sends a partial log.
     for(const play of orderedPlays(data)){
       if(String(play?.team?.id||play?.teamId||play?.start?.team?.id||'')!==String(teamId))continue;
-      const a=creditedActors(play,pool,'offense').find(x=>x.kind==='rusher'&&x.role==='RB');
-      if(!a||seen.has(playKey(play)))continue;
-      seen.add(playKey(play));
-      const text=String(play.text||'');
+      const actor=creditedActors(play,pool,'offense').find(x=>x.kind==='rusher'&&x.role==='RB');
+      if(!actor)continue;
+      const key=playKey(play),previous=creditedRushes.get(key);
+      if(previous&&previous.id!==actor.id)continue;
+      const text=String(play?.text||'');
       const m=text.match(/\bfor\s+(-?\d+)\s+yards?\b/i);
       const yards=play.statYardage!==undefined&&play.statYardage!==null&&play.statYardage!==''?
         Number(play.statYardage):(m?Number(m[1]):null);
-      const item=result.get(a.id)||{attempts:0,yards:0};
-      item.attempts++;
-      if(Number.isFinite(yards))item.yards+=yards;
-      result.set(a.id,item);
+      creditedRushes.set(key,{id:actor.id,yards:Number.isFinite(yards)?yards:(previous?.yards??null),
+        td:/\btouchdown\b/i.test(text)||(previous?.td||false)});
+    }
+    const result=new Map();
+    for(const item of creditedRushes.values()){
+      const cur=result.get(item.id)||{attempts:0,yards:0,knownYards:0,unknownYards:0,td:0};
+      cur.attempts++;
+      if(item.yards!==null){cur.yards+=item.yards;cur.knownYards++}
+      else cur.unknownYards++;
+      if(item.td)cur.td++;
+      result.set(item.id,cur);
     }
     return result;
+  }
+  function recoveredRushStats(c){
+    const raw=[
+      pickStat(c,'rushing',['rushingattempts'],['car','att','rushatt']),
+      pickStat(c,'rushing',['rushingyards'],['yds','rushyds']),
+      pickStat(c,'rushing',['rushingtouchdowns'],['td'])
+    ];
+    const derived=rushingPbp.get(c.id);
+    const official=raw[0]!=='—'&&Number.isFinite(Number(raw[0]))?Number(raw[0]):null;
+    if(!derived||derived.attempts===0||official!==null&&official>=derived.attempts)return raw;
+    usedPbpFallback=true;
+    return [String(derived.attempts),derived.unknownYards===0?String(derived.yards):'—',
+      derived.td?String(Math.max(derived.td,Number(raw[2])||0)):
+      raw[2]!=='—'&&Number.isFinite(Number(raw[2]))?raw[2]:'—'];
   }
   function findPossession(data,competition,tid){
     const candidates=[
@@ -588,7 +608,7 @@
       note.textContent='Protected leaders from current-game stats; other positions change only after credited plays. '+
         (state==='post'?'Final game players held. ':'')+
         (missing?missing+' positions awaiting eligible depth-chart players. ':'')+
-        (usedPbpFallback?'Some receiving figures are provisional from ESPN play descriptions. ':'')+
+        (usedPbpFallback?'Some rushing/receiving figures are provisional from ESPN play descriptions. ':'')+
         'No duplicates, no timed rotation, no on-field personnel claim.';
     }catch(e){
       band.textContent='GAME STATS RETRYING';
