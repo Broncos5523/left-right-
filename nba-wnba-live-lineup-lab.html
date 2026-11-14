@@ -201,19 +201,68 @@ const shifts=Object.keys(now.active||{}).map(teamId=>{
 return shifts.join('\n');
 }
 async function loadGames(){
-try{
- const data=await get(root()+'scoreboard?dates='+today()+'&groups=50&limit=500');
- const games=arr(data.events).map(e=>{
-  const team=arr(e.competitions?.[0]?.competitors),away=team.find(x=>x.homeAway==='away'),home=team.find(x=>x.homeAway==='home');
-  if(!away||!home)return null;
-  return{id:String(e.id),label:(e.status?.type?.state==='in'?'LIVE':e.status?.type?.state==='post'?'FINAL':'UPCOMING')+' · '+(away.team?.shortDisplayName||away.team?.displayName)+' @ '+(home.team?.shortDisplayName||home.team?.displayName),
-   rank:e.status?.type?.state==='in'?0:e.status?.type?.state==='pre'?1:2};
- }).filter(Boolean).sort((a,b)=>a.rank-b.rank);
- const select=$('game'),old=select.value;select.replaceChildren();
- for(const game of games){const o=document.createElement('option');o.value=game.id;o.textContent=game.label;select.append(o)}
- if(games.some(x=>x.id===old))select.value=old;
- message(games.length+' games found · '+games.filter(x=>x.rank===0).length+' reporting live status. Select the match you are watching.');
-}catch(e){message('Could not load ESPN games for this date: '+e.message+'. You can still enter a game ID.',true)}
+ const league=$('league').value.toUpperCase(),date=today();
+ const status=$('status');
+ message('Finding '+league+' games for '+date+'…');
+ const base=root();
+ // groups=50 is specific to Division I college basketball. It must NOT be
+ // carried into NBA/WNBA requests or those leagues can return an empty slate.
+ const requests=[
+   base+'scoreboard?dates='+date+'&limit=100',
+   base+'scoreboard?dates='+date,
+   base+'scoreboard',
+   'https://site.web.api.espn.com/apis/site/v2/sports/basketball/'+$('league').value+'/scoreboard?dates='+date
+ ];
+ const attempts=[];
+ let found=[],success=false;
+ for(const url of requests){
+   try{
+     const data=await get(url);
+     const raw=arr(data.events);
+     attempts.push((new URL(url)).host+': '+raw.length+' events');
+     const parsed=raw.map(e=>{
+       const teams=arr(e.competitions?.[0]?.competitors);
+       const away=teams.find(x=>x.homeAway==='away');
+       const home=teams.find(x=>x.homeAway==='home');
+       if(!away?.team||!home?.team)return null;
+       const state=e.status?.type?.state||'pre';
+       return {
+         id:String(e.id),
+         label:(state==='in'?'LIVE':state==='post'?'FINAL':'UPCOMING')+
+           ' · '+(away.team.shortDisplayName||away.team.displayName||away.team.abbreviation||'Away')+
+           ' @ '+(home.team.shortDisplayName||home.team.displayName||home.team.abbreviation||'Home'),
+         rank:state==='in'?0:state==='pre'?1:2,
+         away:away.team.displayName||away.team.shortDisplayName,
+         home:home.team.displayName||home.team.shortDisplayName
+       };
+     }).filter(Boolean);
+     if(parsed.length){
+       found=parsed;
+       success=true;
+       break;
+     }
+   }catch(e){
+     attempts.push('Request '+(attempts.length+1)+': '+String(e.message||e));
+   }
+ }
+ const select=$('game'),previous=select.value;
+ select.replaceChildren();
+ if(!success){
+   const o=document.createElement('option');
+   o.value='';o.textContent='No NBA/WNBA games returned — try Refresh games';select.appendChild(o);
+   message('No games loaded for '+league+' on '+date+'. ESPN requests: '+attempts.join(' | ')+
+     '. Try Refresh games. You can also enter an ESPN event ID directly.',true);
+   return;
+ }
+ const unique=new Map(found.map(g=>[g.id,g]));
+ const games=[...unique.values()].sort((a,b)=>a.rank-b.rank);
+ for(const game of games){
+   const option=document.createElement('option');option.value=game.id;option.textContent=game.label;select.append(option);
+ }
+ if(games.some(g=>g.id===previous))select.value=previous;
+ const live=games.filter(g=>g.rank===0).length;
+ message(games.length+' '+league+' matchups found for '+date+
+   ' ('+live+' ESPN-labeled live). Choose a matchup and tap Inspect this game.');
 }
 async function sample(){
 if(!currentId||inFlight)return;inFlight=true;
