@@ -7,7 +7,39 @@
   const note=app.querySelector('.note');
   const norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const rows=[...app.querySelectorAll('.row')];
+  const personnel=window.ManCaveFootballPersonnel||null;
+  const rosterCache=new Map();
   band.textContent='ON FIELD';
+  async function rosterFor(teamId,season){
+    const key=String(teamId)+':'+String(season),cached=rosterCache.get(key);
+    if(cached&&Date.now()-cached.at<20*60*1000)return cached.promise;
+    const url='https://site.api.espn.com/apis/site/v2/sports/'+path+'/teams/'+encodeURIComponent(teamId)+'/roster?season='+encodeURIComponent(season);
+    const promise=(async()=>{
+      const r=await fetch(url,{cache:'no-store'});
+      if(!r.ok)throw Error('Roster HTTP '+r.status);
+      const data=await r.json();
+      if(!Array.isArray(data.athletes))throw Error('No official roster positions');
+      return data;
+    })().catch(error=>{rosterCache.delete(key);throw error;});
+    rosterCache.set(key,{at:Date.now(),promise});
+    return promise;
+  }
+  function easternDate(iso){
+    const date=new Date(iso);
+    if(!Number.isFinite(date.getTime()))return '';
+    const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{
+      timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'
+    }).formatToParts(date).map(x=>[x.type,x.value]));
+    return parts.year+parts.month+parts.day;
+  }
+  async function scoreboardFor(summary,cacheKey){
+    const date=easternDate(summary.header?.competitions?.[0]?.date);
+    if(!date)return null;
+    const url='https://site.api.espn.com/apis/site/v2/sports/'+path+'/scoreboard?dates='+date+'&limit=500&_='+cacheKey;
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok)throw Error('Scoreboard HTTP '+r.status);
+    return r.json();
+  }
 
   function logoFor(teamData){
     const t=teamData||{};
@@ -113,6 +145,28 @@
       portrait.textContent='—';name.textContent='NO VERIFIED PLAYER';name.style.fontSize='';
       values.forEach(v=>v.textContent='—');return;
     }
+    if((item.side==='offense'||item.side==='defense')&&personnel){
+      name.textContent=item.name||'PLAYER';
+      name.style.fontSize=name.textContent.length>17?'clamp(11px,2.6vw,16px)':'';
+      name.setAttribute('title',item.verified
+        ?'ESPN current-game contributor':'Official team roster, not confirmed on field');
+      portrait.textContent='';
+      const logoSrc=app.querySelector('.logo')?.src||'';
+      const headshot=typeof item.headshot==='string'?item.headshot:'';
+      if(headshot||logoSrc){
+        const img=document.createElement('img');img.src=headshot||logoSrc;img.alt='';
+        img.style.cssText='height:10vh;max-width:100%;object-fit:contain';
+        img.onerror=()=>{
+          if(img.src!==logoSrc&&logoSrc)img.src=logoSrc;
+          else portrait.textContent='HEADSHOT UNAVAILABLE';
+        };
+        portrait.appendChild(img);
+      }else portrait.textContent='HEADSHOT UNAVAILABLE';
+      const valuesFor=personnel.displayStats(item);
+      labels.forEach((el,i)=>el.textContent=valuesFor.labels[i]||'—');
+      values.forEach((el,i)=>el.textContent=valuesFor.values[i]??'—');
+      return;
+    }
     name.textContent=item.athlete.displayName||'PLAYER';
     name.style.fontSize=name.textContent.length>17?'clamp(11px,2.6vw,16px)':'';
     portrait.textContent='';
@@ -130,7 +184,8 @@
   }
   // A refreshed feed must not overlap an earlier slow ESPN request, and the
   // last good screen must remain visible if ESPN briefly fails.
-  const sync={eventId,lastAttempt:null,lastSuccess:null,lastError:null,players:[],scores:null};
+  const sync={eventId,lastAttempt:null,lastSuccess:null,lastError:null,players:[],scores:null,
+    mode:null,possessionTeamId:null,possessionSource:null,rosterFallbackCount:0,verifiedCount:0};
   window.__LR_FOOTBALL_SYNC__=sync;
   let fetching=false;
   async function update(){
@@ -161,16 +216,49 @@
       app.querySelector('.team-record').textContent=record;
       if(sport==='cfb')setRank(match.curatedRank?.current??match.team?.rank??match.rank);
       const side=data.boxscore?.players?.find(x=>(match.team?.id!=null&&x.team?.id!=null&&String(x.team.id)===String(match.team.id))||norm(x.team?.displayName)===norm(team)||norm(x.team?.abbreviation)===norm(match.team?.abbreviation));
-      const players=selectPlayers(side);
+      // Existing selected-game final board continues to show KEY PLAYERS.
+      // While live, college football uses possession to select the offense on
+      // one TV and the defense on the other. ESPN does not expose exact
+      // on-field six; official roster members may fill empty spots.
+      const isFinal=Boolean(data.header?.competitions?.[0]?.status?.type?.completed||
+        data.header?.competitions?.[0]?.status?.type?.state==='post');
+      let players=selectPlayers(side);
+      if(sport==='cfb'&&personnel&&!isFinal){
+        const season=Number(String(data.header?.competitions?.[0]?.date||'').slice(0,4))||new Date().getFullYear();
+        const results=await Promise.allSettled([
+          rosterFor(match.team.id,season),scoreboardFor(data,cacheKey)
+        ]);
+        const roster=results[0].status==='fulfilled'?results[0].value:null;
+        const scoreboard=results[1].status==='fulfilled'?results[1].value:null;
+        const current=personnel.possession(data,scoreboard,eventId,sync.possessionTeamId);
+        if(current.teamId)sync.possessionTeamId=current.teamId;
+        sync.possessionSource=current.source;
+        // When feeds temporarily omit possession, retain the last confirmed mode.
+        const mode=current.teamId?
+          (String(match.team.id)===current.teamId?'offense':'defense'):
+          (sync.mode||null);
+        if(mode==='offense'||mode==='defense'){
+          players=mode==='offense'?
+            personnel.selectOffense(side,roster):
+            personnel.selectDefense(side,roster);
+          sync.mode=mode;
+        }
+      }else if(isFinal){
+        sync.mode='final';
+      }
       rows.forEach((row,i)=>renderPlayer(row,players[i]));
       setGamePhaseHeading(data);
+      sync.rosterFallbackCount=players.filter(x=>x&&x.verified===false).length;
+      sync.verifiedCount=players.length-sync.rosterFallbackCount;
       sync.lastSuccess=new Date().toISOString();
       sync.lastError=null;
-      sync.players=players.map(x=>x.athlete.displayName||x.athlete.name||'');
+      sync.players=players.map(x=>x.name||x.athlete?.displayName||x.athlete?.name||'');
       sync.scores={team:match.team?.displayName||team,score:match.score,state:data.header?.competitions?.[0]?.status?.type?.state};
       note.textContent=players.length
-        ?'Current-game ESPN offensive box-score contributors. These are not verified players on the field. QB: pass yards/completions-attempts/TD; RB: carries/rush yards/TD; WR/TE: catches/receiving yards/TD. Feed may be delayed.'
-        :'No verified offensive game statistics yet. Player rows will populate when box-score data becomes available.';
+        ?(sync.mode==='defense'?'Defensive view: game contributors plus official roster fallback. Stats are current-game tackles, sacks, TFL, passes defended or interceptions. No exact on-field personnel guarantee.'
+          :sync.mode==='offense'?'Offensive view: game contributors plus official roster fallback. Missing player game stats show dashes; no exact on-field personnel guarantee.'
+          :'Final/other game contributors, based on verified ESPN box scores.')
+        :'No player data available from ESPN; retained last-known details when possible.';
     }catch(e){
       /* Keep the most recent game-phase heading during ESPN outages. */
       sync.lastError=String(e.message||e);
