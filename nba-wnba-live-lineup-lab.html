@@ -219,7 +219,7 @@ async function loadGames(){
    try{
      const data=await get(url);
      const raw=arr(data.events);
-     attempts.push((new URL(url)).host+': '+raw.length+' events');
+     attempts.push('ESPN response: '+raw.length+' events');
      const parsed=raw.map(e=>{
        const teams=arr(e.competitions?.[0]?.competitors);
        const away=teams.find(x=>x.homeAway==='away');
