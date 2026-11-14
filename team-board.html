@@ -84,7 +84,23 @@ if(['nba','wnba','cbb'].includes(sport)){
    const data=await get(),competitors=data.header?.competitions?.[0]?.competitors||[];
    const match=competitors.find(x=>norm(x.team?.displayName)===norm(team)||norm(x.team?.name)===norm(team));
    if(!match)throw Error('Team not in selected event');setHeader(match);
-   const logo=app.querySelector('.logo');if(match.team?.logo){logo.src=match.team.logo;logo.hidden=false}
+   const logo=app.querySelector('.logo');
+   const basketballLogoCandidates=[
+    match.team?.logo,
+    ...(Array.isArray(match.team?.logos)?match.team.logos.map(x=>x?.href):[]),
+    match.team?.id?'https://a.espncdn.com/i/teamlogos/'+(sport==='cbb'?'ncaa':'nba')+'/500/'+encodeURIComponent(match.team.id)+'.png':null
+   ].filter(x=>typeof x==='string'&&/^https:\/\//.test(x));
+   if(basketballLogoCandidates.length){
+    let logoIndex=0;
+    logo.onerror=()=>{
+     logoIndex++;
+     if(logoIndex<basketballLogoCandidates.length)logo.src=basketballLogoCandidates[logoIndex];
+     else{logo.hidden=true;logo.removeAttribute('src');}
+    };
+    logo.onload=()=>{logo.hidden=false};
+    if(logo.src!==basketballLogoCandidates[0])logo.src=basketballLogoCandidates[0];
+    if(logo.complete&&logo.naturalWidth>0)logo.hidden=false;
+   }
    setScore(match.score??'—');
    const record=match.record?.find?.(x=>x.type==='total')?.summary||match.record?.[0]?.summary||match.records?.[0]?.summary||'';
    app.querySelector('.team-record').textContent=record;
