@@ -114,7 +114,7 @@ function selectDefense(side,roster){
  const players=[...contributions.values()],taken=new Set(),chosen=[];
  const roles=['EDGE','EDGE','LB','CB','CB','S'];
  function matches(role,pos){
-   if(role==='EDGE')return ['EDGE','DE','LE','RE','OLB','DL'].includes(pos);
+   if(role==='EDGE')return ['EDGE','DE','LE','RE','OLB','DL','DT','NT'].includes(pos);
    if(role==='LB')return ['LB','MLB','ILB','OLB'].includes(pos);
    if(role==='CB')return ['CB','DB'].includes(pos);
    if(role==='S')return ['S','FS','SS','DB'].includes(pos);
