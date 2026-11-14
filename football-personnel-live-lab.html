@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LEFT RIGHT · Live Football Personnel Lab</title>
+<title>LEFT RIGHT · Football Game Impact Preview</title>
 <style>
 :root{color-scheme:dark;font:15px/1.48 system-ui,-apple-system,Arial,sans-serif;background:#0a0e17;color:#f1f4fb}
 *{box-sizing:border-box}body{margin:0}main{max-width:990px;margin:0 auto;padding:16px 14px 44px}
@@ -19,8 +19,8 @@ button{cursor:pointer;font-weight:700}.primary{background:#176ace;border-color:#
 @media(max-width:720px){.grid{grid-template-columns:1fr}.frame{max-width:390px}}
 </style></head><body><main>
 <small>MAN CAVE SPORTS BOOK · READ-ONLY DEVELOPMENT</small>
-<h1>Football Personnel · Live Test</h1>
-<p class="muted">ESPN can identify who was credited on a play, but its public feed may not list everyone on the field. Both six-player boards are explicitly <strong>probable</strong>, never certified live personnel. This test cannot control LEFT RIGHT TVs.</p>
+<h1>Football · Game Impact Preview</h1>
+<p class="muted">Every team board highlights six key players based on current-game statistics and credited plays. We are <strong>not</strong> attempting to identify the exact players on the field. This preview cannot control LEFT RIGHT TVs.</p>
 <div class="card">
 <label for="match">College football game · Friday, Nov 13</label>
 <select id="match"><option value="401858293" data-away="Florida State Seminoles" data-home="Pittsburgh Panthers">Florida State @ Pittsburgh · 7 PM ET (reference)</option></select>
@@ -34,23 +34,23 @@ button{cursor:pointer;font-weight:700}.primary{background:#176ace;border-color:#
 <p id="status" role="status" class="muted">Checking today's ESPN football schedule…</p>
 </div>
 <div class="card">
-<h2>Live evidence</h2>
-<div id="metrics" class="muted">Awaiting ESPN data.</div>
-<div id="latest" style="margin:12px 0">—</div>
-<strong>Credited players in latest scrimmage play</strong>
-<div id="lastIds" style="margin-top:7px"><small>No snap evidence yet.</small></div>
-<p class="note">A name here means credited in that play's data, <strong>not</strong> that the entire offense or defense is identified. The last snap's offense can differ from the current possession after a turnover.</p>
-<details><summary>Source availability and coverage</summary><div id="sourceStats" class="muted" style="padding:10px 0">Waiting for source inspection.</div></details>
-</div>
-<div class="card">
-<h2>Probable six-player portrait boards</h2>
-<p class="muted">Existing approved scoreboard CSS and player-row layout are reused exactly. The labels remain explicit about what is inferred.</p>
+<h2>GAME IMPACT · Six players per team</h2>
+<p class="muted">Six key contributors selected using current-game stats and credited play-by-play. Approved scoreboard and player-row design unchanged.</p>
 <div class="grid">
 <section><h2 id="awayName">LEFT · AWAY</h2><iframe id="leftPreview" class="frame" title="LEFT team preview" loading="lazy"></iframe></section>
 <section><h2 id="homeName">RIGHT · HOME</h2><iframe id="rightPreview" class="frame" title="RIGHT team preview" loading="lazy"></iframe></section>
 </div>
 </div>
-<p class="note">Live summaries sampled every 20 seconds, team personnel source checks when selecting a game. No Firebase, TV screen assignment, scoreboard CSS, or production football renderer is modified.</p>
+<div class="card">
+<h2>Game data & play-by-play evidence</h2>
+<div id="metrics" class="muted">Awaiting ESPN data.</div>
+<div id="latest" style="margin:12px 0">—</div>
+<strong>Credited players in latest scrimmage play</strong>
+<div id="lastIds" style="margin-top:7px"><small>No snap evidence yet.</small></div>
+<p class="note">These are individually credited plays, not a complete on-field lineup. They help rank game impact, while ESPN box-score totals remain our main source.</p>
+<details><summary>Source availability and coverage</summary><div id="sourceStats" class="muted" style="padding:10px 0">Waiting for source inspection.</div></details>
+</div>
+<p class="note">Live summaries sampled every 20 seconds, with roster/depth-chart checks for player names and headshots. No Firebase, TV screen assignment, scoreboard CSS, or production football renderer is modified.</p>
 </main><script>
 (()=>{
 'use strict';
