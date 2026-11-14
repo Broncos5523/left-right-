@@ -345,6 +345,9 @@
 
   // Position eligibility is strict for WR/TE/DB, with OLB as an EDGE fallback
   // for 3-4 defensive alignments and DE as an unused DL fallback if needed.
+  function amount(v){if(v===null||v===undefined||v==='—'||v==='')return 0;
+    const t=String(v).replace(/,/g,'').trim();return /^-?\d+(?:\.\d+)?$/.test(t)?Math.max(0,Number(t)):0}
+  function stat(c,type,keys,labels){return amount(pickStat(c,type,keys,labels))}
   const SLOT_ROLES={
     offense:['QB','RB','RB','WR','WR','TE'],
     defense:['EDGE','EDGE','LB','DL','S','CB']
@@ -523,8 +526,8 @@
     });
     const statics={qb:ranks[0]||null,rb:rushLeader(pool),wr:receptionLeader(pool)};
     const events=state==='post'&&slotState.processed.length?[]:creditEvents(data,pool,tid);
-    slotState.offense=chooseSix(pool,'offense',statics,events.filter(x=>x.mode==='offense'));
-    slotState.defense=chooseSix(pool,'defense',statics,events.filter(x=>x.mode==='defense'));
+    slotState.offense=chooseSix(pool,'offense',statics,events.filter(x=>x.mode==='offense')).map(x=>x?.id||null);
+    slotState.defense=chooseSix(pool,'defense',statics,events.filter(x=>x.mode==='defense')).map(x=>x?.id||null);
     for(const [id,action] of Object.entries(slotState.lastActionByRB))rbStatMode[id]=action;
     return {offense:slotState.offense.map(id=>id),defense:slotState.defense.map(id=>id),
       eventCredits:events.length,formerOffense,formerDefense};
