@@ -11,6 +11,7 @@
   const teamCache={id:null,stamp:0,depth:null,roster:null,injuries:null};
   const remembered={offense:[],defense:[]};
   let lastPlayId='',rbStatMode={},busy=false,receivingPbp=new Map(),usedPbpFallback=false;
+  const creditedReceptions=new Map(); // event-scoped receipts, keyed by ESPN play ID
   const base='https://site.api.espn.com/apis/site/v2/sports/'+path+'/';
   const arr=x=>Array.isArray(x)?x:[];
   const statusText=x=>String(typeof x==='string'?x:x?.displayName||x?.name||x?.type||x?.description||x?.abbreviation||'');
@@ -190,19 +191,34 @@
     return eligible.length===1?eligible[0]:null;
   }
   function receivingFromPlays(data,pool,teamId){
-    const totals=new Map();
     for(const play of uniquePlays(data)){
       const teamOfPlay=String(play?.team?.id||play?.teamId||play?.start?.team?.id||'');
       if(teamOfPlay&&teamOfPlay!==String(teamId))continue;
       const mention=receiverMention(play);
       const athlete=matchMention(mention,pool);
       if(!athlete)continue;
-      const prior=totals.get(athlete.id)||{rec:0,yards:0,knownYards:0,unknownYards:0,td:0,player:athlete};
+      const key=String(play?.id||play?.playId||play?.sequenceNumber||
+        String(play?.period?.number||'')+'|'+String(play?.clock?.displayValue||'')+
+        '|'+String(play?.text||''));
+      const old=creditedReceptions.get(key);
+      if(old&&old.id!==athlete.id)continue; // refuse disputed attribution
+      // A corrected ESPN play can supply yardage missed in an earlier sample.
+      creditedReceptions.set(key,{
+        id:athlete.id,player:athlete,
+        yards:mention.yards!==null?mention.yards:(old?.yards??null),
+        td:mention.td||(old?.td||false)
+      });
+    }
+    const totals=new Map();
+    for(const receipt of creditedReceptions.values()){
+      const prior=totals.get(receipt.id)||{
+        rec:0,yards:0,knownYards:0,unknownYards:0,td:0,player:receipt.player
+      };
       prior.rec++;
-      if(mention.yards!==null){prior.yards+=mention.yards;prior.knownYards++}
+      if(receipt.yards!==null){prior.yards+=receipt.yards;prior.knownYards++}
       else prior.unknownYards++;
-      if(mention.td)prior.td++;
-      totals.set(athlete.id,prior);
+      if(receipt.td)prior.td++;
+      totals.set(receipt.id,prior);
     }
     return totals;
   }
@@ -223,7 +239,7 @@
     return [
       String(derived.rec),
       derived.unknownYards===0?String(derived.yards):'—',
-      raw[2]!=='—'&&Number.isFinite(Number(raw[2]))?raw[2]:'—'
+      derived.td>0?String(Math.max(derived.td,Number(raw[2])||0)):(raw[2]!=='—'&&Number.isFinite(Number(raw[2]))?raw[2]:'—')
     ];
   }
   function pickStat(c,type,keys,labels){
@@ -368,14 +384,7 @@
         (play?String(play.period?.number||'')+'|'+String(play.clock?.displayValue||'')+'|'+String(play.text||''):''));
       const structuredIds=playIds(play);
       const confirmed=new Set(structuredIds);
-      const recoveredNow=receivingFromPlays(data,pool,tid);
-      // Summary feeds can temporarily omit old plays: do not regress known
-      // game-specific credited receptions to zero just because a payload shrank.
-      for(const [id,prior] of receivingPbp){
-        const next=recoveredNow.get(id);
-        if(!next||next.rec<prior.rec)recoveredNow.set(id,prior);
-      }
-      receivingPbp=recoveredNow;
+      receivingPbp=receivingFromPlays(data,pool,tid);
       const textReceiver=matchMention(receiverMention(play),pool);
       if(textReceiver)confirmed.add(textReceiver.id);
       const playTeamId=String(play?.team?.id||play?.teamId||play?.start?.team?.id||competition.situation?.possession||'');
