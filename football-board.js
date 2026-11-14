@@ -93,6 +93,12 @@
     add(byType.passing.filter(x=>x.position==='QB'),1);
     if(!selected.length)add(byType.passing,1);
     add(byType.rushing.filter(x=>['RB','FB','HB'].includes(x.position)),2);
+    // Live ESPN CFB box scores often omit athlete.position entirely.
+    // Before filling receivers, include actual rushing contributors who are
+    // not the QB. Never guess a name or fabricate a player's game statistics.
+    const passerIds=new Set(byType.passing.map(x=>x.id));
+    const rushSlots=2-selected.filter(x=>x.role==='RB').length;
+    if(rushSlots>0)add(byType.rushing.filter(x=>!passerIds.has(x.id)),rushSlots);
     add(byType.receiving.filter(x=>['WR','TE'].includes(x.position)),3);
     add(byType.receiving,6);
     add(byType.rushing,6);
