@@ -167,6 +167,7 @@ async function update(){
   own.pitching.forEach(x=>add(x,'TEAM PITCHER'));
   rows.forEach((row,i)=>drawPlayer(row,selected[i]?.item,selected[i]?.role||''));
   band.textContent=live?'LIVE GAME':'GAME CONTRIBUTORS';
+  setGamePhaseHeading(data);
   note.textContent=live
    ?'B/S/O, occupied bases, batter, pitcher, and last play appear only when the live feed supplies them. Batting numbers are current-game stats; pitchers show game IP/K and ERA when published. H/AB is used when plate appearances are unavailable.'
    :'Selected team box-score contributors. Final scores and game statistics remain displayed until you select another board. No live count, baserunners, or current batter/pitcher are claimed after the game ends.';
