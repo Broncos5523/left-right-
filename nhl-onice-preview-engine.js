@@ -10,7 +10,7 @@
  const meta=app.querySelector('.meta'),note=app.querySelector('.note'),band=app.querySelector('.band');
  const norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
  const stateKey='lr-nhl-onice-v1:'+eventId+':'+norm(team);
- let previous=null,busy=false,lastIds='';
+ let previous=null,busy=false,lastViewKey='';
  try{const saved=JSON.parse(localStorage.getItem(stateKey)||'null');
   if(saved&&Array.isArray(saved.players)&&saved.players.length===6&&saved.players.every(x=>x.id))previous=saved;
  }catch(e){}
@@ -109,10 +109,11 @@
    row.querySelectorAll('.stats b').forEach((x,i)=>x.textContent=stat.values[i]);
  }
  function draw(players,replaceAll=false){
-   const k=players.map(x=>x.id).join('|'),changed=replaceAll||k!==lastIds;
+   const k=players.map(x=>[x.id,x.name,x.position,x.headshot].join(':')).join('|');
+   const changed=replaceAll||k!==lastViewKey;
    // Avoid rebuilding headshots every 20 seconds when players have not changed.
    players.forEach((a,i)=>showPlayer(rows[i],a,changed));
-   lastIds=k;
+   lastViewKey=k;
  }
  if(previous){
    draw(previous.players,true);
