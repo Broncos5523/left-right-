@@ -9,11 +9,11 @@
   const path=sport==='nfl'?'football/nfl':'football/college-football';
   const eventId=p.get('eventId'), norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const rows=[...app.querySelectorAll('.row')],band=app.querySelector('.band'),note=app.querySelector('.note');
-  const roles=['QB','RB','WR','TE','CB','S','EDGE','DL','LB'];
+  const roles=['QB','RB','WR','TE','CB','S','DB','EDGE','DL','LB'];
   const teamCache={id:null,stamp:0,depth:null,roster:null};
   const stateKey='lr-six-slot-football-v1:'+sport+':'+eventId+':'+norm(team);
   let slotState={offense:[null,null,null,null,null,null],defense:[null,null,null,null,null,null],
-    processed:[],lastMode:'offense',lastActionByRB:{}};
+    processed:[],lastMode:'offense',lastActionByRB:{},lastDbSlot:5};
   try{
     const prev=JSON.parse(localStorage.getItem(stateKey)||'null');
     if(prev&&Array.isArray(prev.offense)&&Array.isArray(prev.defense)){
@@ -36,7 +36,7 @@
     const x=String(s||'').toUpperCase().replace(/[^A-Z]/g,'');
     if(x==='QB')return 'QB';if(['HB','FB','RB','TB'].includes(x))return 'RB';
     if(['WR','SE','FL','SLOT'].includes(x))return 'WR';if(['TE','H','Y'].includes(x))return 'TE';
-    if(['CB','DB','NB'].includes(x))return 'CB';
+    if(['CB','NB'].includes(x))return 'CB';if(x==='DB')return 'DB';
     if(['FS','SS','S','SAF'].includes(x))return 'S';
     if(['DE','EDGE','ED','LE','RE'].includes(x))return 'EDGE';
     if(['DT','NT','DL','NOSE','NG','TACKLE'].includes(x))return 'DL';
@@ -225,7 +225,7 @@
     for(const mention of mentions){
       const roles=mention.kind==='passer'?['QB']:
         mention.kind==='receiver'?['RB','WR','TE']:
-        mention.kind==='tackler'?['CB','S','EDGE','DL','LB']:['QB','RB','WR'];
+        mention.kind==='tackler'?['CB','S','DB','EDGE','DL','LB']:['QB','RB','WR'];
       const athlete=matchMention(mention,pool,roles);
       if(!athlete||used.has(athlete.id))continue;
       used.add(athlete.id);
@@ -359,13 +359,14 @@
     if(target==='EDGE')return c.role==='EDGE'||(relaxed&&c.role==='LB'&&/^(OLB|LOLB|ROLB)$/.test(position));
     if(target==='DL')return c.role==='DL'||(relaxed&&c.role==='EDGE');
     if(target==='LB')return c.role==='LB';
+    if((target==='S'||target==='CB')&&c.role==='DB')return relaxed;
     return c.role===target;
   }
   function playerPriority(a,b){return (a.rank??99)-(b.rank??99)||a.id.localeCompare(b.id)}
   function eligible(pool,mode,index,used){
     const available=pool.filter(c=>!used.has(c.id)&&roleFits(c,mode,index));
     if(available.length)return available.sort(playerPriority);
-    if(mode==='defense'&&(index===0||index===1||index===3)){
+    if(mode==='defense'&&(index===0||index===1||index===3||index===4||index===5)){
       return pool.filter(c=>!used.has(c.id)&&roleFits(c,mode,index,true)).sort(playerPriority);
     }
     return [];
@@ -488,15 +489,40 @@
     }
     const dynamic=mode==='offense'?[2,4,5]:[2,3,4,5];
     // First try newly credited players (in chronological order, last wins).
+    // A generic ESPN DB is *not* proof of S or CB. It can fill either position,
+    // but each credited play must choose ONE position, never both.
     const lastCredits=new Map();
     for(const credit of credits){
+      const c=get(credit.id);
+      if(!c||used.has(c.id))continue;
+      if(mode==='defense'&&c.role==='DB'){
+        // Use broad DB only when a precise S/CB role isn't available for that
+        // slot. When both are broad DB, alternate assignment on new credited
+        // plays; never use a clock/timer to rotate.
+        const prevSlot=[4,5].find(idx=>prev[idx]===c.id);
+        let target=prevSlot;
+        if(target===undefined){
+          const mayReplace=[4,5].filter(idx=>{
+            const existing=get(prev[idx]);
+            const exact=existing&&existing.role===SLOT_ROLES.defense[idx];
+            const hasExact=pool.some(x=>x.role===SLOT_ROLES.defense[idx]);
+            return !exact&&!hasExact;
+          });
+          const preferred=slotState.lastDbSlot===4?5:4;
+          target=mayReplace.includes(preferred)?preferred:mayReplace[0];
+        }
+        if(target!==undefined){
+          // A new DB replaces only the chosen generic DB slot.
+          lastCredits.set(target,c);
+          slotState.lastDbSlot=target;
+        }
+        continue;
+      }
       for(const idx of dynamic){
-        const c=get(credit.id);
-        if(c&&roleFits(c,mode,idx)&&!used.has(c.id))lastCredits.set(idx,c);
+        if(roleFits(c,mode,idx)&&!used.has(c.id))lastCredits.set(idx,c);
       }
     }
     for(const idx of dynamic){
-      // Avoid reacting to an event involving a protected leader.
       const next=lastCredits.get(idx);
       if(next)set(idx,next);
     }
