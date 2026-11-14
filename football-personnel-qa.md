@@ -71,3 +71,29 @@ Read-only lab shows:
 **Mock integration tests passed:** loading a sample scoreboard selects the intended game ID, both preview frames receive the exact correct team and side, play IDs/names are counted and displayed, last-snap offense is kept distinct from current possession, roster/depth/injury source counts render, JavaScript syntax compiles; approved CSS and player-row markup exactly match production; the live production football script reference and TV pages remain unchanged.
 
 **Not yet verified:** accessing live ESPN JSON from this environment; actual source coverage, game status, player-ID completeness, correct six-player identities, timely substitutions or accurate depth-chart/injury data. The user may visually compare the preview against the game, but the engine must continue to say **probable**, never confirmed all on-field participants.
+
+## Florida State–Pittsburgh live receiving-stat issue (Nov 13, 2026)
+
+**Firsthand evidence:** User monitored the live CFB game and observed RB receiving stat mode switch correctly after a reception, but the board displayed `REC 0 / YDS — / TD —`. Their screenshot showed ESPN play descriptions updating, with **0/31 scrimmage plays** exposing structured participant IDs. The most recent pass description explicitly credited receiver `#22 A.Thomas` with a completed pass and 16 yards.
+
+**Correction committed to feature branch, copied into isolated preview only:**
+- Inspect explicitly completed pass descriptions and resolve the named receiver to a unique eligible roster athlete (first initial + surname, cross-check jersey when supplied). Do not infer full eleven-player participation.
+- When ESPN receiving box score is stale/missing, recover **provisional, current-game receiving totals** from named play descriptions. Do **not** render a box-score zero that conflicts with positively credited receptions.
+- Count each ESPN reception **play ID once** in an in-memory per-game ledger, preserving credit through partial play-by-play responses.
+- Use official current-game ESPN receiving totals automatically when they catch up. Yards remain `—` if not explicitly supplied in a matched play; do not fabricate them.
+- Continue RB receiving/rushing stat-mode switching when the receiver was identified by text even if ESPN supplies zero structured participant IDs.
+- Add a clear **provisional receiving totals** note and distinguish structured IDs from text-only name recognition.
+- Show named completed-pass receivers in the read-only live lab even when the structured participant ID count is zero.
+- Keep the existing approved scoreboard CSS, player rows, production `team-board.html`, LEFT/RIGHT TV pages, Firebase and other sports untouched.
+
+**Mock integration regression checks — all PASS:**
+1. Box-score `0 / — / —` plus one named 16-yard catch produces `1 / 16 / —` with a provisional-source note.
+2. Repeated feed containing same play does not count it twice.
+3. Next response containing **only** a new 8-yard reception preserves the first and shows `2 / 24 / —`.
+4. Later full replay does not count already seen plays again.
+5. Official game stats `3 / 52 / 0` supersede provisional totals once available.
+6. Network outage retains previously displayed stat rows.
+7. Note truthfully reports zero structured IDs and one named play-text receiver, rather than claiming the entire on-field personnel is confirmed.
+8. JavaScript syntax and approved CSS equality checks PASS.
+
+**Open:** These pass mocked live ESPN fixtures, not independent browser verification of current game's specific receiving box-score schema or receiver roster attributes. A named receiver may be unmatched if roster names/jersey are unavailable or ambiguous; in that case use `—` instead of guessing. Full snap personnel still cannot be determined from a receiver's credited play.
