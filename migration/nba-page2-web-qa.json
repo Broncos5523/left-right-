@@ -1,0 +1,61 @@
+{
+  "status": "development-only static visual compatibility preview",
+  "date": "2026-11-14",
+  "original_source": {
+    "archive": "MAN_CAVE_28_BOARD_WINDOWS_PRODUCTION_v1_FROM_LOCKED_v8l_20261018.zip",
+    "html": {
+      "path": "approved_v8l/boards/page2_nba.html",
+      "sha256": "c78a13636d37f3307584718fcd079f169125f5be678688e69483b38adf04e141",
+      "git_blob": "2e3ad2f231c16add5dd7a8b89211121a321c404a",
+      "staged": "migration/source/boards/page2_nba.html",
+      "git_blob_verified": true
+    },
+    "javascript": {
+      "path": "approved_v8l/runtime_nba_p2_v7p.js",
+      "sha256": "d0f473bd377763b5ccead2f1c98c948cf7baafc949fe6d93ff167c7800498f0e",
+      "git_blob": "ef368631ace4bb940c2ff177c48581b93ad1fb04",
+      "staged": "migration/source/runtime_nba_p2_v7p.js",
+      "git_blob_verified": true
+    }
+  },
+  "static_preview": {
+    "host": "Floot existing Man Cave NBA Page 2 project, unmodified root page",
+    "development_only_path": "/__dev/nba-v8l",
+    "hosted_assets": {
+      "approved-backgrounds/basketball-arena-master.jpeg": {
+        "source_sha256": "5262a759b63626075bc968f0541f4b09fcfd7e2f2ae3e50363bb4496bbc48372",
+        "hosted_sha256": "5262a759b63626075bc968f0541f4b09fcfd7e2f2ae3e50363bb4496bbc48372",
+        "status": "exact-original"
+      },
+      "michael-jordan-trophy-no-shadow.png": {
+        "source_sha256": "9d3a5a87deeffe783f8239aa9a192aa83b320435b1ddb1961ac4b90238f10314",
+        "hosted_sha256": "9d3a5a87deeffe783f8239aa9a192aa83b320435b1ddb1961ac4b90238f10314",
+        "status": "exact-original"
+      },
+      "man-cave-sports-book-neon-transparent.png": {
+        "source_sha256": "9e5cdb34964ec5ce441e357ce8700972462ae1a2334db47f9f40f08ef967776c",
+        "status": "hosted as lossless WebP; all visible RGBA pixels identical and alpha identical; transparent RGB payload differs only under alpha=0"
+      },
+      "espn-wordmark.svg": {
+        "source_sha256": "945971e0bd0074581fa971c487eba22b7031b0e4e9cf77328f6bd5dd16a5d5ca",
+        "status": "original inline SVG data URL in preview"
+      }
+    },
+    "implementation": "pages/__dev.nba-v8l.tsx (dev-only)",
+    "typecheck": "passed",
+    "mobile_capture": "succeeded at 393x852 viewport",
+    "known_limits": [
+      "original live-data adapter disabled deliberately until API parity",
+      "cloud project root homepage preserved",
+      "no published Fire TV URL",
+      "external team logo/headshot sources not yet verified at live provider",
+      "no Firebase assignment writes"
+    ]
+  },
+  "release_gates": [
+    "verify all required visual images loaded on iPhone and portrait Fire TV Silk",
+    "port /api/board/page2_nba with original feed semantics or a verified equal replacement",
+    "validate data/update behavior and approved source parity",
+    "only after complete: enable cloud board URL in existing GitHub Game Wall"
+  ]
+}
