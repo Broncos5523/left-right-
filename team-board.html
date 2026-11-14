@@ -13,6 +13,8 @@
 .header.right-side .logo-group{grid-column:3;justify-self:end}
 .header.right-side .team{grid-column:2;align-items:center;padding:0}
 .header.right-side .score{grid-column:1;justify-self:start;text-align:left;padding:0 0 0 clamp(5px,1.4vw,12px)}
+/* Full-height portrait TV iframe: avoid the phone-only 540px width cap without changing approved component positions. */
+@media (orientation:portrait) and (min-width:541px){main{max-width:none}}
 </style></head><body><main id="app"></main><script>
 const p=new URLSearchParams(location.search),sport=p.get('sport')||'nba',team=p.get('team')||'Team awaiting assignment';
 const conf={nba:['ON COURT',5,'#00a65a',['PTS','REB','AST']],wnba:['ON COURT',5,'#ed174b',['PTS','REB','AST']],cbb:['ON COURT',5,'#cc0033',['PTS','REB','AST']],nhl:['ON ICE',6,'#ffb81c',['G','A','+/-']],nfl:['ON FIELD',6,'#fb4f14',['YDS','ATT','TD']],cfb:['ON FIELD',6,'#cc0033',['YDS','ATT','TD']],mlb:['AT THE PLATE',4,'#bd3039',['H','AB','HR']]}[sport]||['TEAM BOARD',5,'#777',['—','—','—']];
