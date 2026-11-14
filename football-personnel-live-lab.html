@@ -216,7 +216,7 @@ function assignBoards(teams){
  $('homeName').textContent='RIGHT · '+home.name;
  const pairs=[['leftPreview',away,'left'],['rightPreview',home,'right']];
  for(const [target,t,side] of pairs){
-   const q=new URLSearchParams({sport:'cfb',team:t.name,eventId:selected,side});
+   const q=new URLSearchParams({sport:'cfb',team:t.name,eventId:selected,side,previewVersion:'dl-edge-fallback-v1'});
    const path='./football-personnel-preview-board.html?'+q.toString();
    if($(target).getAttribute('src')!==path)$(target).setAttribute('src',path);
  }
