@@ -55,3 +55,18 @@ The branch contains the integrated runtime `team-board.html`, but GitHub Pages s
 **No production deployment without explicit user go-ahead.** At release, merge only the reviewed `team-board.html` and `football-six-slot-combined.js` to `main`, allow Pages deployment, validate a single NFL and college game (or a controlled replay with ESPN data), and confirm LEFT and RIGHT assignments/controller still work. Rollback by reverting the single script-reference change in `team-board.html`; keep a copy of the existing `football-board.js` unchanged.
 
 **Known limitations:** ESPN position nomenclature, missing headshots, attribution ambiguity, source delays, and NFL depth-chart data can vary per team. When an attribution is not reliable, hold the current player rather than guessing.
+
+## NHL approved integration addendum — Nov 13, 2026 ET
+
+The user visually confirmed that reported NHL on-ice players, their headshots, and current-game statistics update correctly in the iPhone preview. The approved NHL design is locked.
+
+**Development-only integration:**
+- Added `nhl-onice-engine.js` from the verified `nhl-onice-preview-engine.js`, modifying only its NHL-only preview guard so normal `sport=nhl` assignments can invoke it.
+- Added its standalone script include to development-branch `team-board.html`.
+- Disabled the old NHL fallback renderer by default on the development board to prevent simultaneous conflicting 45-second legacy and 20-second reported-on-ice updates. Legacy renderer remains available for explicit diagnostic mode `?nhlMode=legacy` on the development branch.
+- Kept the existing football combined engine, basketball/MLB scripts, controller, Firebase assignments, asset paths and all approved scoreboard markup/CSS intact.
+- Production `main` and GitHub Pages team board remain unchanged.
+
+**Revalidation:** ESPN games Rangers @ Canucks (`401892706`) and Canadiens @ Bruins (`401892696`): 4 teams × 6 players = 24 distinct on-ice IDs, correct team attribution, skater G/A/+/- or goalie SV/SA/SV% labels, no duplicates, one NHL refresh timer, stable refresh, outage hold, and no wrong sport endpoint. This test used real ESPN summaries with a simulated feed failure; it does not establish continuous real-world NHL change latency or TV hardware acceptance.
+
+**Release gate:** Do not merge or deploy these development changes to `main` without explicit authorization. NHL visual design is approved; development integration is not yet production deployed.
