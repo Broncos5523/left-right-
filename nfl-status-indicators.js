@@ -44,7 +44,7 @@ function timeoutValue(comp,side){
  const s=comp?.situation||{},key=side+'Timeouts',value=s[key];
  const team=comp?.competitors?.find(x=>x.homeAway===side);
  for(const candidate of [value,value?.timeoutsRemainingCurrent,value?.timeoutsRemaining,comp?.[key],
-  comp?.[key]?.timeoutsRemaining,team?.timeoutsRemaining,team?.timeouts]){
+  comp?.[key]?.timeoutsRemaining,team?.timeoutsRemaining]){
   const n=number(candidate);if(n!==null)return n;
  }
  return null;
