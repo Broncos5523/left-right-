@@ -53,3 +53,20 @@ The prior implementation assembled each box-score statistics group into a flat a
 - One periodic refresh callback registered, no mock controller/Firebase requests -> **PASS**.
 
 All tests above use mocked data and DOM nodes. They do not confirm ESPN API latency, live field semantics across other games, or Fire TV performance.
+
+## NBA live validation and development upgrade — Nov 13, 2026
+
+User watched New York Knicks at Indiana Pacers and confirmed that the diagnostic's five `active=true` players on both teams matched the five actually on court, including changing names during the game. This provides direct visual corroboration for **one NBA matchup**; it does not establish universal accuracy of ESPN's unofficial activity semantics.
+
+- Enabled NBA **and** NCAA `active-five` selection on the feature branch **only during `state==='in'`** with exactly five unique active IDs.
+- WNBA continues to show **game participants**, not an alleged live five.
+- On incomplete/failed live updates, hold previous five without claiming verification.
+- When game ends, hold last known five in that browser session rather than claiming a live lineup.
+- The isolated main-branch **preview-only** engine and visual preview are updated to allow NBA, NCAA, and gated WNBA inspection; **production** `team-board.html`, `left.html`, `right.html`, Firebase controller and approved scoreboard CSS have **not been modified**.
+- The NBA/WNBA lineup lab now deduplicates its exact substitution count by unique ESPN event key and team; earlier report of 8 matches may have included repeated detections and should not be treated as eight independent substitution events.
+
+### Mock engine gates tested
+NBA live exact five → active-five PASS; NCAA live exact five → active-five PASS; WNBA live exact five → game-participants PASS; NBA postgame with held five → held PASS; NBA incomplete flags → held PASS; JavaScript parses PASS.
+
+### Remaining validation
+Additional NBA matchups, refreshing after final, and WNBA in season. User visually verified first NBA game; no independent provider-side live API playback was conducted in this environment.
