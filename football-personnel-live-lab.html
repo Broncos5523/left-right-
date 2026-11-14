@@ -104,6 +104,13 @@ function playerIds(play){
  for(const x of p){const id=ident(x.athlete||x.player||x);if(id)ids.add(id)}
  return [...ids];
 }
+
+function playTextReceiver(play){
+ const text=String(play?.text||'');
+ if(!/\bpass\s+complete\b/i.test(text))return '';
+ const match=text.match(/\bpass\s+complete\b[\s\S]{0,130}?\bto\s+(?:#(\d{1,3})\s+)?(.+?)(?=\s+(?:caught\b|for\b|at\b|out\b|tackled\b|pushed\b|touchdown\b)|[,;()]|$)/i);
+ return match?(match[1]?'#'+match[1]+' ':'')+String(match[2]||'').trim():'';
+}
 function participantNames(s){
  const map=new Map();
  for(const side of arr(s.boxscore?.players))for(const group of arr(side.statistics))for(const row of arr(group.athletes)){
@@ -126,6 +133,8 @@ function render(s){
  const playKey=String(latest?.id||latest?.sequenceNumber||latest?.text||'');
  if(playKey&&playKey!==lastSeen)lastSeen=playKey;
  const withIds=scrimmage.filter(x=>playerIds(x).length>0).length;
+ const namedReceivers=scrimmage.filter(x=>!!playTextReceiver(x)).length;
+ const latestNamed=playTextReceiver(latest);
  const counted=scrimmage.reduce((sum,x)=>sum+playerIds(x).length,0);
  const playOffense=nameById[snapTeam]|| (snapTeam?'ID '+snapTeam:'unknown');
  const possessionName=nameById[possession]|| (possession?'ID '+possession:'not provided');
@@ -136,7 +145,8 @@ function render(s){
   ' · Potential scrimmage plays: '+scrimmage.length+
   '\nScrimmage plays with any structured participant IDs: '+withIds+'/'+scrimmage.length+
   ' ('+(scrimmage.length?Math.round(100*withIds/scrimmage.length):0)+'%)'+
-  '\nTotal credited IDs across scrimmage plays: '+counted+
+  '\nTotal structured credited IDs across scrimmage plays: '+counted+
+  '\nNamed completed-pass receivers in play descriptions: '+namedReceivers+
   '\nLast-snap offense: '+playOffense+
   ' · Current possession: '+possessionName;
  $('latest').textContent='Latest candidate snap: '+(latest?.text||'No classified scrimmage play yet')+
@@ -149,7 +159,7 @@ function render(s){
   }
  }else{
   const text=document.createElement('span');text.className='warn';
-  text.textContent='No structured athlete IDs found in the latest candidate snap. The engine must infer personnel, not claim confirmed participation.';
+  text.textContent='No structured athlete IDs in latest candidate snap. '+(latestNamed?'Completed-pass text credits '+latestNamed+'; this identifies only that receiver, NOT the other on-field players.':'No receiver was unambiguously credited in the latest play text; full personnel remains inferred.');
   container.append(text);
  }
  return teams;
