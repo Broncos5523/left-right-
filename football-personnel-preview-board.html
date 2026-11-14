@@ -1,0 +1,111 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEFT RIGHT | Team board renderer</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@500;700;800;900&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box}html,body{margin:0;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}main{width:100%;max-width:540px;min-height:100vh;margin:auto;padding:2.7vh 4vw 4vh;background:#000}.header{display:flex;align-items:center;justify-content:flex-start;gap:0;width:100%;border-bottom:3px solid var(--accent);padding-bottom:7px;min-height:100px}.header.right-side{flex-direction:row-reverse}.logo{width:100%;max-width:130px;aspect-ratio:1;object-fit:contain;flex-shrink:0}.logo-wrap{position:relative;width:100%;min-height:60px;display:flex;align-items:center;justify-content:center}.rank-badge{position:absolute;left:0;top:7px;background:transparent;color:#fff;border:0;border-radius:0;font-size:clamp(13px,3.2vw,19px);font-weight:900;padding:0;z-index:1;text-shadow:0 1px 3px #000}.logo-group{width:27%;max-width:none;display:flex;flex-direction:column;align-items:center;flex-shrink:0;gap:3px}.logo-group .logo{width:100%;max-width:125px}.team-record{font-family:'Roboto Condensed','Arial Narrow',Arial,sans-serif;font-size:clamp(12px,2.7vw,16px);font-weight:800;color:#e6e6e6;white-space:nowrap;min-height:1em}.header .team{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:0 0 26%;min-width:0;margin:0;padding-left:clamp(7px,1.8vw,13px)}.header.right-side .team{align-items:flex-end;padding-left:0;padding-right:clamp(7px,1.8vw,13px)}.side-label{font-family:'Roboto Condensed','Arial Narrow',Arial,sans-serif;font-size:clamp(10px,2.4vw,14px);font-weight:900;letter-spacing:.1em;color:#aebce0}.team-abbr{font-size:clamp(40px,10.5vw,65px);font-family:'Roboto Condensed','Arial Narrow',Impact,Arial,sans-serif;font-stretch:condensed;font-weight:900;letter-spacing:-1.5px;line-height:.98}.header .name{display:none}.header .meta{display:none}.team{flex:1;min-width:0}.name{font-size:clamp(19px,5vw,32px);font-weight:900;text-transform:uppercase;line-height:1}.meta{color:#bbb;font-weight:bold;margin-top:7px}.score{flex:1 1 47%;font-size:clamp(76px,19vw,118px);font-family:'Roboto Condensed','Arial Narrow',Impact,Arial,sans-serif;font-weight:900;letter-spacing:-2px;line-height:.95;text-align:right;padding-left:clamp(12px,3vw,22px);padding-right:clamp(12px,3vw,22px);min-width:0}.header.right-side .score{text-align:left;padding-left:clamp(12px,3vw,22px);padding-right:clamp(12px,3vw,22px)}.band{font-size:clamp(23px,7vw,42px);font-weight:900;font-style:italic;text-align:center;border-top:3px solid var(--accent);border-bottom:3px solid var(--accent);padding:5px;margin:9px 0 0;text-transform:uppercase}.row{display:grid;grid-template-columns:30% 30% 40%;min-height:12vh;align-items:center;border-bottom:1px solid #777}.portrait{height:10vh;display:grid;place-items:center;color:#888;font-size:12px;text-align:center}.player{font-weight:900;text-transform:uppercase;font-size:clamp(13px,3.4vw,21px);min-width:0;overflow-wrap:normal;word-break:normal;line-height:1.12;padding-right:7px;letter-spacing:-.4px}.stats{border-left:2px solid var(--accent);padding-left:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;text-align:center}.stats small{display:block;color:#bbb;font-size:clamp(10px,2.5vw,14px)}.stats b{font-size:clamp(20px,6vw,36px)}.note{color:#aeb3bd;font-size:13px;line-height:1.5;margin-top:22px}.diamond{width:75%;aspect-ratio:1;margin:35px auto;border:2px solid var(--accent);transform:rotate(45deg);display:grid;place-items:center}.diamond span{transform:rotate(-45deg);text-align:center}.placeholder{border-bottom:1px solid #666;padding:16px 0;color:#bbb} 
+/* Broadcast scoreboard: scale the actual content to fill the width, not the empty score column. */
+.header{display:grid;grid-template-columns:30% 26% 44%;align-items:center;column-gap:0;min-height:0;padding-bottom:10px}
+.header .logo-group{grid-column:1;grid-row:1;width:100%;max-width:none;justify-self:start}
+.header .logo-wrap{width:100%;min-height:0}
+.header .logo-group .logo{max-width:none;width:96%;height:auto;object-fit:contain}
+.header .team{grid-column:2;grid-row:1;display:flex;align-items:center;justify-content:center;flex:none;min-width:0;padding:0}
+.header .team-abbr{font-size:clamp(46px,12.4vw,74px);letter-spacing:-.04em;line-height:.96}
+.header .score{grid-column:3;grid-row:1;flex:none;justify-self:end;align-self:center;font-size:clamp(96px,29vw,152px);line-height:.90;letter-spacing:-.04em;text-align:right;white-space:nowrap;padding:0 clamp(5px,1.4vw,12px) 0 0;min-width:0}
+.header .score.triple{font-size:clamp(78px,23vw,124px)}
+.header.right-side{grid-template-columns:44% 26% 30%}
+.header.right-side .logo-group{grid-column:3;justify-self:end}
+.header.right-side .team{grid-column:2;align-items:center;padding:0}
+.header.right-side .score{grid-column:1;justify-self:start;text-align:left;padding:0 0 0 clamp(5px,1.4vw,12px)}
+</style></head><body><main id="app"></main><script>
+const p=new URLSearchParams(location.search),sport=p.get('sport')||'nba',team=p.get('team')||'Team awaiting assignment';
+const conf={nba:['ON COURT',5,'#00a65a',['PTS','REB','AST']],wnba:['ON COURT',5,'#ed174b',['PTS','REB','AST']],cbb:['ON COURT',5,'#cc0033',['PTS','REB','AST']],nhl:['ON ICE',6,'#ffb81c',['G','A','+/-']],nfl:['ON OFFENSE',6,'#fb4f14',['YDS','ATT','TD']],cfb:['ON OFFENSE',6,'#cc0033',['YDS','ATT','TD']],mlb:['AT THE PLATE',4,'#bd3039',['H','AB','HR']]}[sport]||['TEAM BOARD',5,'#777',['—','—','—']];
+const sidePosition=p.get('side')==='right'?'right':'left';const app=document.getElementById('app');app.style.setProperty('--accent',conf[2]);
+function setScore(value){const el=app.querySelector('.score');el.textContent=value;el.classList.toggle('triple',String(value??'').replace(/[^0-9]/g,'').length>=3)}function setHeader(match){if(!match)return;const t=match.team||{};const abbr=t.abbreviation||t.shortDisplayName||String(team).split(' ').map(x=>x[0]).join('').slice(0,4);app.querySelector('.team-abbr').textContent=String(abbr).toUpperCase();if(match.homeAway)app.querySelector('.side-label').textContent=match.homeAway.toUpperCase()}function setRank(rank){const el=app.querySelector('.rank-badge');const n=Number(rank);el.hidden=!(sport==='cfb'||sport==='cbb')||!Number.isInteger(n)||n<1||n>25;if(!el.hidden)el.textContent='#'+n}const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+app.innerHTML='<div class="header '+(sidePosition==='right'?'right-side':'')+'"><div class="logo-group"><div class="logo-wrap"><span class="rank-badge" hidden></span><img class="logo" alt="Team logo" hidden></div></div><div class="team"><div class="side-label">'+(sidePosition==='right'?'HOME':'AWAY')+'</div><div class="team-abbr">TEAM</div><div class="team-record"></div><div class="name">'+esc(team)+'</div><div class="meta">CURRENT GAME · DATA PENDING</div></div><div class="score">—</div></div><div class="band">'+conf[0]+'</div>'+Array.from({length:conf[1]},(_,i)=>'<div class="row"><div class="portrait">HEADSHOT<br>UNAVAILABLE</div><div class="player">PLAYER<br>UNVERIFIED</div><div class="stats">'+conf[3].map(x=>'<div><small>'+x+'</small><b>—</b></div>').join('')+'</div></div>').join('')+'<p class="note">Layout development preview only. No live lineup, player statistics, headshots, team record, or score have been verified. Approved artwork will be integrated separately.</p>';
+</script><script>
+if(sport==='cbb'){
+ const id=p.get('eventId');if(id){const path=sport==='cfb'?'football/college-football':'basketball/mens-college-basketball';fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(id),{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(data=>{const match=data.header?.competitions?.[0]?.competitors?.find(x=>x.team?.displayName===team);if(!match)return;setHeader(match);const logo=app.querySelector('.logo');const logoSrc=match.team?.logo||match.team?.logos?.[0]?.href||(match.team?.id?'https://a.espncdn.com/i/teamlogos/'+(sport==='cfb'?'ncaa/500':sport==='cbb'?'ncaa/500':'nhl/500')+'/'+match.team.id+'.png':'');if(logoSrc){logo.src=logoSrc;logo.hidden=false}const rec=match.record?.find?.(x=>x.type==='total')?.summary||match.record?.[0]?.summary||match.records?.[0]?.summary||'';app.querySelector('.team-record').textContent=rec;const rank=match.curatedRank?.current??match.team?.rank??match.rank;setRank(rank);setScore(match.score??'—')}).catch(()=>{});}
+}
+</script><script>
+if(sport==='nhl'){
+ const meta=app.querySelector('.meta'),score=app.querySelector('.score'),band=app.querySelector('.band');
+ band.textContent='GAME PARTICIPANTS';meta.textContent='LOOKING UP NHL GAME…';
+ const abbr=null; // ESPN event ID is authoritative; no hardcoded NHL team matching
+ const get=async url=>{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('NHL HTTP '+r.status);return r.json()};
+ const setRecord=(value)=>{app.querySelector('.team-record').textContent=value||''};const plain=v=>typeof v==='object'?(v?.default||v?.en||''):v||'';
+ const date=d=>{const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d).map(p=>[p.type,p.value]));return parts.year+'-'+parts.month+'-'+parts.day};
+ async function espnFallback(){
+ const id=p.get('eventId');if(!id){meta.textContent='NHL MATCH NOT FOUND · MISSING GAME ID';return}
+ const summary=await get('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/summary?event='+encodeURIComponent(id));
+ const competitors=summary.header?.competitions?.[0]?.competitors||[];
+ const match=competitors.find(x=>String(x.team?.displayName||'').toLowerCase()===team.toLowerCase()||(abbr&&x.team?.abbreviation===abbr));
+ if(!match){meta.textContent='NHL GAME ID DID NOT MATCH TEAM';return}setHeader(match);
+ setScore(match.score??'—');setRecord(match.records?.find?.(r=>r.type==='total')?.summary||match.records?.[0]?.summary||match.record?.[0]?.summary||'');const logo=app.querySelector('.logo');const logoSrc=match.team?.logo||match.team?.logos?.[0]?.href||(match.team?.abbreviation?'https://a.espncdn.com/i/teamlogos/nhl/500/'+match.team.abbreviation.toLowerCase()+'.png':'');if(logoSrc){logo.src=logoSrc;logo.hidden=false}
+ const side=summary.boxscore?.players?.find(x=>x.team?.abbreviation===match.team?.abbreviation);
+ const athletes=(side?.statistics||[]).flatMap(group=>(group.athletes||[]).map(a=>({a,labels:group.labels||[],keys:group.keys||[]}))).slice(0,6);
+ const nodes=app.querySelectorAll('.row');
+ nodes.forEach((node,i)=>{
+ const data=athletes[i],photo=node.querySelector('.portrait'),name=node.querySelector('.player'),labels=node.querySelectorAll('.stats small'),vals=node.querySelectorAll('.stats b');
+ if(!data){name.textContent='NO VERIFIED PLAYER';photo.textContent='—';vals.forEach(v=>v.textContent='—');return}
+ const athlete=data.a.athlete||{};name.textContent=athlete.displayName||'PLAYER';name.style.fontSize=(name.textContent.length>17?'clamp(11px,2.6vw,16px)':'');
+ photo.textContent='';if(athlete.headshot?.href){const img=document.createElement('img');img.src=athlete.headshot.href;img.alt='';img.style.cssText='height:10vh;max-width:100%;object-fit:contain';photo.appendChild(img)}else photo.textContent='HEADSHOT UNAVAILABLE';
+ const keys=data.keys.map(x=>String(x).toLowerCase()),headers=data.labels.map(x=>String(x).toLowerCase());
+ const pick=(keyNames,labelNames)=>{let k=keys.findIndex(k=>keyNames.includes(k));if(k<0)k=headers.findIndex(k=>labelNames.includes(k));return k>=0?data.a.stats?.[k]??'—':'—'};
+ const isGoalie=/goalie/i.test(athlete.position?.displayName||athlete.position?.name||'');
+ const wanted=isGoalie?[['SV',['saves'],['sv']],['SA',['shotsagainst'],['sa']],['SV%',['savepct','savepercentage'],['sv%']]]:[['G',['goals'],['g']],['A',['assists'],['a']],['+/-',['plusminus'],['+/-']]];
+ labels.forEach((v,j)=>v.textContent=wanted[j][0]);vals.forEach((v,j)=>v.textContent=pick(wanted[j][1],wanted[j][2]));
+ });
+ meta.textContent='ESPN · VERIFIED GAME PARTICIPANTS';
+ app.querySelector('.note').textContent='ESPN selected-game box score. Listed players are game participants, not verified players currently on ice. Data may be delayed.';
+ }
+ async function update(){
+  if(!p.get('eventId')){
+   meta.textContent='CHOOSE A REAL NHL GAME';
+   app.querySelector('.note').textContent='Demo team selections cannot be matched to verified game data. Choose a live or completed NHL game in the controller.';
+   return;
+  }
+  try{await espnFallback();}
+  catch(e){
+   meta.textContent='NHL GAME DATA UNAVAILABLE · RETRYING';
+   app.querySelector('.note').textContent='Unable to update selected NHL event: '+e.message+'. Previously loaded game data is retained.';
+  }
+ }
+ update();setInterval(update,45000);
+}
+</script>
+<script>
+if(['nba','wnba','cbb'].includes(sport)){
+ const path={nba:'basketball/nba',wnba:'basketball/wnba',cbb:'basketball/mens-college-basketball'}[sport];
+ const id=p.get('eventId'),meta=app.querySelector('.meta'),band=app.querySelector('.band');
+ band.textContent='GAME PARTICIPANTS';
+ const get=async()=>{const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(id),{cache:'no-store'});if(!r.ok)throw Error('ESPN HTTP '+r.status);return r.json()};
+ const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const pick=(data,keys,labels)=>{const idx=data.keys.findIndex(x=>keys.includes(norm(x)));const j=idx<0?data.labels.findIndex(x=>labels.includes(norm(x))):idx;return j<0?'—':data.a.stats?.[j]??'—'};
+ async function update(){
+  if(!id){meta.textContent='SELECT A LIVE GAME TO LOAD STATS';return}
+  try{
+   const data=await get(),competitors=data.header?.competitions?.[0]?.competitors||[];
+   const match=competitors.find(x=>norm(x.team?.displayName)===norm(team)||norm(x.team?.name)===norm(team));
+   if(!match)throw Error('Team not in selected event');setHeader(match);
+   const logo=app.querySelector('.logo');if(match.team?.logo){logo.src=match.team.logo;logo.hidden=false}
+   setScore(match.score??'—');
+   const record=match.record?.find?.(x=>x.type==='total')?.summary||match.record?.[0]?.summary||match.records?.[0]?.summary||'';
+   app.querySelector('.team-record').textContent=record;
+   if(sport==='cbb')setRank(match.curatedRank?.current??match.team?.rank??match.rank);
+   const side=data.boxscore?.players?.find(x=>norm(x.team?.id)===norm(match.team?.id)||norm(x.team?.displayName)===norm(team));
+   const players=(side?.statistics||[]).flatMap(g=>(g.athletes||[]).filter(a=>!a.didNotPlay&&!a.athlete?.didNotPlay).map(a=>({a,keys:(g.keys||[]).map(norm),labels:(g.labels||[]).map(norm)})));
+   const active=players.filter(x=>x.a.active===true||x.a.athlete?.active===true);
+   const ranked=(active.length===5?active:players).slice(0,5);
+   app.querySelectorAll('.row').forEach((row,i)=>{
+    const item=ranked[i],portrait=row.querySelector('.portrait'),name=row.querySelector('.player'),labels=row.querySelectorAll('.stats small'),values=row.querySelectorAll('.stats b');
+    if(!item){portrait.textContent='—';name.textContent='NO VERIFIED PLAYER';values.forEach(v=>v.textContent='—');return}
+    const a=item.a.athlete||{};name.textContent=a.displayName||'PLAYER';name.style.fontSize=name.textContent.length>17?'clamp(11px,2.6vw,16px)':'';
+    portrait.textContent='';if(a.headshot?.href){const img=document.createElement('img');img.src=a.headshot.href;img.alt='';img.style.cssText='height:10vh;max-width:100%;object-fit:contain';img.onerror=()=>{portrait.textContent='HEADSHOT UNAVAILABLE'};portrait.appendChild(img)}else portrait.textContent='HEADSHOT UNAVAILABLE';
+    const stats=[pick(item,['points'],['pts']),pick(item,['rebounds','totalrebounds'],['reb']),pick(item,['assists'],['ast'])];
+    labels.forEach((el,j)=>el.textContent=['PTS','REB','AST'][j]);values.forEach((el,j)=>el.textContent=stats[j]);
+   });
+   meta.textContent='ESPN · VERIFIED CURRENT-GAME STATS';
+   app.querySelector('.note').textContent='Players shown are current-game box-score participants, not confirmed five players presently on court. Live stats may be delayed.';
+  }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
+ }
+ update();setInterval(update,45000);
+}
+</script>
+<script src="./football-personnel-preview-engine.js?v=96c59eeb"></script><script src="./mlb-board.js?v=855be639"></script></body></html>
