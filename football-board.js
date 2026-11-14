@@ -364,9 +364,18 @@
       const context=await getTeamContext(tid);
       const side=arr(data.boxscore?.players).find(x=>String(x.team?.id)===String(tid)||norm(x.team?.displayName)===norm(team));
       const pool=candidatePool(context.depth,context.roster,context.injuries,side,tid,state!=='post',data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
-      const play=recentPlay(data),pid=String(play?.id||play?.playId||play?.sequenceNumber||'');
-      const confirmed=playIds(play);
-      receivingPbp=receivingFromPlays(data,pool,tid);
+      const play=recentPlay(data),pid=String(play?.id||play?.playId||play?.sequenceNumber||
+        (play?String(play.period?.number||'')+'|'+String(play.clock?.displayValue||'')+'|'+String(play.text||''):''));
+      const structuredIds=playIds(play);
+      const confirmed=new Set(structuredIds);
+      const recoveredNow=receivingFromPlays(data,pool,tid);
+      // Summary feeds can temporarily omit old plays: do not regress known
+      // game-specific credited receptions to zero just because a payload shrank.
+      for(const [id,prior] of receivingPbp){
+        const next=recoveredNow.get(id);
+        if(!next||next.rec<prior.rec)recoveredNow.set(id,prior);
+      }
+      receivingPbp=recoveredNow;
       const textReceiver=matchMention(receiverMention(play),pool);
       if(textReceiver)confirmed.add(textReceiver.id);
       const playTeamId=String(play?.team?.id||play?.teamId||play?.start?.team?.id||competition.situation?.possession||'');
@@ -396,7 +405,7 @@
       band.textContent=selected.length?'PROBABLE '+mode.toUpperCase():'PERSONNEL DATA PENDING';
       const missing=6-selected.length;
       note.textContent=selected.length
-        ?'Probable last-snap personnel, not an official on-field feed. Eligible depth-chart/roster players and ESPN current-game stats. '+(confirmed.size?confirmed.size+' participants identified in latest available play. ':'No usable participant IDs in latest play; last eligible lineup retained. ')+(missing?missing+' roster slots lack verified player data. ':'')+(usedPbpFallback?'Receiving totals marked provisional: ESPN play descriptions identified catches before box-score totals updated. ':'')+'Data and availability may be delayed.'
+        ?'Probable last-snap personnel, not an official on-field feed. Eligible depth-chart/roster players and ESPN current-game stats. '+(structuredIds.size?structuredIds.size+' structured player IDs credited in latest play. ':'No structured player IDs in latest play. ')+(textReceiver?'One receiver matched by name in play text; other personnel remain inferred. ':'')+(missing?missing+' roster slots lack verified player data. ':'')+(usedPbpFallback?'Receiving totals marked provisional: ESPN play descriptions identified catches before box-score totals updated. ':'')+'Data and availability may be delayed.'
         :'ESPN returned neither usable team depth-chart/roster data nor current-game player details. The board will retry; no players have been invented.';
     }catch(e){
       band.textContent='PERSONNEL FEED RETRYING';
