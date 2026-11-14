@@ -37,7 +37,7 @@ button{cursor:pointer;font-weight:700}.primary{background:#176ace;border-color:#
 <h2>Live evidence</h2>
 <div id="metrics" class="muted">Awaiting ESPN data.</div>
 <div id="latest" style="margin:12px 0">—</div>
-<strong>Structured player IDs in latest scrimmage play</strong>
+<strong>Credited players in latest scrimmage play</strong>
 <div id="lastIds" style="margin-top:7px"><small>No snap evidence yet.</small></div>
 <p class="note">A name here means credited in that play's data, <strong>not</strong> that the entire offense or defense is identified. The last snap's offense can differ from the current possession after a turnover.</p>
 <details><summary>Source availability and coverage</summary><div id="sourceStats" class="muted" style="padding:10px 0">Waiting for source inspection.</div></details>
@@ -111,6 +111,19 @@ function playTextReceiver(play){
  const match=text.match(/\bpass\s+complete\b[\s\S]{0,130}?\bto\s+(?:#(\d{1,3})\s+)?(.+?)(?=\s+(?:caught\b|for\b|at\b|out\b|tackled\b|pushed\b|touchdown\b)|[,;()]|$)/i);
  return match?(match[1]?'#'+match[1]+' ':'')+String(match[2]||'').trim():'';
 }
+
+function creditedFromText(play){
+ const text=String(play?.text||'');
+ const found=[],seen=new Set();
+ const actor=text.match(/#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,2}?)\s+(pass(?:es|ed)?|rush(?:es|ed)?|ran|scrambl(?:es|ed|ing))(?=\s|$)/i);
+ if(actor)found.push({kind:/^pass/i.test(actor[3])?'Passer':'Rusher',
+  label:'#'+actor[1]+' '+actor[2]});
+ const receiver=playTextReceiver(play);
+ if(receiver)found.push({kind:'Receiver',label:receiver});
+ for(const m of text.matchAll(/\(#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,2})\)/g))
+   found.push({kind:'Tackler',label:'#'+m[1]+' '+m[2]});
+ return found.filter(x=>{const key=x.kind+'|'+x.label;if(seen.has(key))return false;seen.add(key);return true});
+}
 function participantNames(s){
  const map=new Map();
  for(const side of arr(s.boxscore?.players))for(const group of arr(side.statistics))for(const row of arr(group.athletes)){
@@ -134,7 +147,9 @@ function render(s){
  if(playKey&&playKey!==lastSeen)lastSeen=playKey;
  const withIds=scrimmage.filter(x=>playerIds(x).length>0).length;
  const namedReceivers=scrimmage.filter(x=>!!playTextReceiver(x)).length;
- const latestNamed=playTextReceiver(latest);
+ const namedRushPass=scrimmage.filter(x=>creditedFromText(x).some(p=>p.kind==='Rusher'||p.kind==='Passer')).length;
+ const namedTackles=scrimmage.filter(x=>creditedFromText(x).some(p=>p.kind==='Tackler')).length;
+ const latestActors=creditedFromText(latest);
  const counted=scrimmage.reduce((sum,x)=>sum+playerIds(x).length,0);
  const playOffense=nameById[snapTeam]|| (snapTeam?'ID '+snapTeam:'unknown');
  const possessionName=nameById[possession]|| (possession?'ID '+possession:'not provided');
@@ -147,6 +162,8 @@ function render(s){
   ' ('+(scrimmage.length?Math.round(100*withIds/scrimmage.length):0)+'%)'+
   '\nTotal structured credited IDs across scrimmage plays: '+counted+
   '\nNamed completed-pass receivers in play descriptions: '+namedReceivers+
+  '\nPlays with a named passer/rusher: '+namedRushPass+
+  '\nPlays with named tacklers: '+namedTackles+
   '\nLast-snap offense: '+playOffense+
   ' · Current possession: '+possessionName;
  $('latest').textContent='Latest candidate snap: '+(latest?.text||'No classified scrimmage play yet')+
@@ -157,10 +174,23 @@ function render(s){
    const chip=document.createElement('span');chip.className='chip';
    chip.textContent=(names.get(id)||'Athlete ID '+id)+' ['+id+']';container.append(chip);
   }
- }else{
+ }
+ if(latestActors.length){
+  for(const x of latestActors){
+   const chip=document.createElement('span');chip.className='chip';
+   chip.textContent=x.kind+' · '+x.label+' (play text; no verified athlete ID)';
+   container.append(chip);
+  }
+ }
+ if(!ids.length&&!latestActors.length){
   const text=document.createElement('span');text.className='warn';
-  text.textContent='No structured athlete IDs in latest candidate snap. '+(latestNamed?'Completed-pass text credits '+latestNamed+'; this identifies only that receiver, NOT the other on-field players.':'No receiver was unambiguously credited in the latest play text; full personnel remains inferred.');
+  text.textContent='No structured participant IDs or confidently parsed player names on this play. Personnel remains inferred.';
   container.append(text);
+ }
+ if(latestActors.length){
+  const info=document.createElement('span');info.className='warn';
+  info.textContent='Text names are individual play credits, not proof of the complete on-field lineup.';
+  container.append(info);
  }
  return teams;
 }
