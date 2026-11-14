@@ -78,3 +78,9 @@ Proposed position-specific stat lines, implemented in isolated preview:
 - Fixed the parser to detect both players in semicolon-delimited shared tackles and common named defensive actions. Validated the specific ESPN players against actual roster IDs.
 - New source published to development branch and isolated main-branch preview file `football-personnel-preview-engine.js`; preview HTML query version `c5d015db`. This is **not** a production TV deployment.
 - GitHub Pages publication for the latest parser commit was still running at last check; do not claim the new source is being served before verification.
+
+## Approved final EDGE fallback — November 13, 2026 (late evening ET)
+- User approved using generic **DL** roster positions as the **last-resort EDGE display fallback** when ESPN offers no specific EDGE/DE/RE/LE. The scoreboard may continue labeling the two protected rows EDGE. Such labels are presentation conventions, not verified statements about on-field alignment.
+- Prefer available current-game box-score participants for DL-to-EDGE fallback, then tackles/sacks/TFL and deterministic depth/roster ordering. Select **two distinct** athletes, keep them protected, never duplicate either in the dynamic DL row.
+- Real Pittsburgh vs Florida State ESPN feed test used actual roster and score data. Pittsburgh protected EDGE slots selected **Zach Crothers** and **Nick James** (both roster-labeled DL), while **Isaiah Neal** appeared as the distinct dynamic DL. All six defensive slot IDs populated, distinct IDs, and EDGE assignments held on refresh in the test.
+- The isolated preview engine now incorporates this amendment, at query version `dl-edge-fallback-v1`. Locked production TV dashboard `team-board.html`, Firebase assignment, and CSS remain unchanged.
