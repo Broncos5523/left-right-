@@ -15,7 +15,7 @@
 .header.right-side .score{grid-column:1;justify-self:start;text-align:left;padding:0 0 0 clamp(5px,1.4vw,12px)}
 </style></head><body><main id="app"></main><script>
 const p=new URLSearchParams(location.search),sport=p.get('sport')||'nba',team=p.get('team')||'Team awaiting assignment';
-const conf={nba:['ON COURT',5,'#00a65a',['PTS','REB','AST']],wnba:['ON COURT',5,'#ed174b',['PTS','REB','AST']],cbb:['ON COURT',5,'#cc0033',['PTS','REB','AST']],nhl:['ON ICE',6,'#ffb81c',['G','A','+/-']],nfl:['ON OFFENSE',6,'#fb4f14',['YDS','ATT','TD']],cfb:['ON OFFENSE',6,'#cc0033',['YDS','ATT','TD']],mlb:['AT THE PLATE',4,'#bd3039',['H','AB','HR']]}[sport]||['TEAM BOARD',5,'#777',['—','—','—']];
+const conf={nba:['ON COURT',5,'#00a65a',['PTS','REB','AST']],wnba:['ON COURT',5,'#ed174b',['PTS','REB','AST']],cbb:['ON COURT',5,'#cc0033',['PTS','REB','AST']],nhl:['ON ICE',6,'#ffb81c',['G','A','+/-']],nfl:['ON FIELD',6,'#fb4f14',['YDS','ATT','TD']],cfb:['ON FIELD',6,'#cc0033',['YDS','ATT','TD']],mlb:['AT THE PLATE',4,'#bd3039',['H','AB','HR']]}[sport]||['TEAM BOARD',5,'#777',['—','—','—']];
 const sidePosition=p.get('side')==='right'?'right':'left';const app=document.getElementById('app');
 
 /*
@@ -74,6 +74,24 @@ function teamAccent(data){
 }
 app.style.setProperty('--accent',teamAccent({displayName:team}));
 
+/* LOCKED BROADCAST BAND LABELS: presentation only, not an assertion of
+   physical on-field/on-ice/on-court tracking.
+   Final status is based on ESPN's selected-event status. */
+function setGamePhaseHeading(data){
+ const band=app.querySelector('.band');
+ if(!band)return false;
+ const comp=data?.header?.competitions?.[0]||{};
+ const status=comp.status||data?.header?.status||data?.status||{};
+ const state=String(status.type?.state||status.state||'').toLowerCase();
+ const completed=status.type?.completed===true||status.completed===true||state==='post';
+ const liveLabels={nba:'ON COURT',wnba:'ON COURT',cbb:'ON COURT',
+                   nfl:'ON FIELD',cfb:'ON FIELD',nhl:'ON ICE'};
+ if(completed)band.textContent='KEY PLAYERS';
+ else if(liveLabels[sport])band.textContent=liveLabels[sport];
+ return completed;
+}
+
+
 function setScore(value){const el=app.querySelector('.score');el.textContent=value;el.classList.toggle('triple',String(value??'').replace(/[^0-9]/g,'').length>=3)}function setHeader(match){if(!match)return;const t=match.team||{};app.style.setProperty('--accent',teamAccent(t));const abbr=t.abbreviation||t.shortDisplayName||String(team).split(' ').map(x=>x[0]).join('').slice(0,4);app.querySelector('.team-abbr').textContent=String(abbr).toUpperCase();if(match.homeAway)app.querySelector('.side-label').textContent=match.homeAway.toUpperCase()}function setRank(rank){const el=app.querySelector('.rank-badge');const n=Number(rank);el.hidden=!(sport==='cfb'||sport==='cbb')||!Number.isInteger(n)||n<1||n>25;if(!el.hidden)el.textContent='#'+n}const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 app.innerHTML='<div class="header '+(sidePosition==='right'?'right-side':'')+'"><div class="logo-group"><div class="logo-wrap"><span class="rank-badge" hidden></span><img class="logo" alt="Team logo" hidden></div></div><div class="team"><div class="side-label">'+(sidePosition==='right'?'HOME':'AWAY')+'</div><div class="team-abbr">TEAM</div><div class="team-record"></div><div class="name">'+esc(team)+'</div><div class="meta">CURRENT GAME · DATA PENDING</div></div><div class="score">—</div></div><div class="band">'+conf[0]+'</div>'+Array.from({length:conf[1]},(_,i)=>'<div class="row"><div class="portrait">HEADSHOT<br>UNAVAILABLE</div><div class="player">PLAYER<br>UNVERIFIED</div><div class="stats">'+conf[3].map(x=>'<div><small>'+x+'</small><b>—</b></div>').join('')+'</div></div>').join('')+'<p class="note" hidden aria-hidden="true"></p>';
 </script><script>
@@ -83,7 +101,7 @@ if(sport==='cbb'){
 </script><script>
 if(sport==='nhl'){
  const meta=app.querySelector('.meta'),score=app.querySelector('.score'),band=app.querySelector('.band');
- band.textContent='GAME PARTICIPANTS';meta.textContent='LOOKING UP NHL GAME…';
+ band.textContent='ON ICE';meta.textContent='LOOKING UP NHL GAME…';
  const abbr=null; // ESPN event ID is authoritative; no hardcoded NHL team matching
  const get=async url=>{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('NHL HTTP '+r.status);return r.json()};
  const setRecord=(value)=>{app.querySelector('.team-record').textContent=value||''};const plain=v=>typeof v==='object'?(v?.default||v?.en||''):v||'';
@@ -109,6 +127,7 @@ if(sport==='nhl'){
  const wanted=isGoalie?[['SV',['saves'],['sv']],['SA',['shotsagainst'],['sa']],['SV%',['savepct','savepercentage'],['sv%']]]:[['G',['goals'],['g']],['A',['assists'],['a']],['+/-',['plusminus'],['+/-']]];
  labels.forEach((v,j)=>v.textContent=wanted[j][0]);vals.forEach((v,j)=>v.textContent=pick(wanted[j][1],wanted[j][2]));
  });
+ setGamePhaseHeading(summary);
  meta.textContent='ESPN · VERIFIED GAME PARTICIPANTS';
  app.querySelector('.note').textContent='ESPN selected-game box score. Listed players are game participants, not verified players currently on ice. Data may be delayed.';
  }
@@ -131,7 +150,7 @@ if(sport==='nhl'){
 if(['nba','wnba','cbb'].includes(sport)){
  const path={nba:'basketball/nba',wnba:'basketball/wnba',cbb:'basketball/mens-college-basketball'}[sport];
  const id=p.get('eventId'),meta=app.querySelector('.meta'),band=app.querySelector('.band');
- band.textContent='GAME PARTICIPANTS';
+ band.textContent='ON COURT';
  const get=async()=>{const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(id),{cache:'no-store'});if(!r.ok)throw Error('ESPN HTTP '+r.status);return r.json()};
  const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
  const pick=(data,keys,labels)=>{const idx=data.keys.findIndex(x=>keys.includes(norm(x)));const j=idx<0?data.labels.findIndex(x=>labels.includes(norm(x))):idx;return j<0?'—':data.a.stats?.[j]??'—'};
@@ -174,6 +193,7 @@ if(['nba','wnba','cbb'].includes(sport)){
     const stats=[pick(item,['points'],['pts']),pick(item,['rebounds','totalrebounds'],['reb']),pick(item,['assists'],['ast'])];
     labels.forEach((el,j)=>el.textContent=['PTS','REB','AST'][j]);values.forEach((el,j)=>el.textContent=stats[j]);
    });
+   setGamePhaseHeading(data);
    meta.textContent='ESPN · VERIFIED CURRENT-GAME STATS';
    app.querySelector('.note').textContent='Players shown are current-game box-score participants, not confirmed five players presently on court. Live stats may be delayed.';
   }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
