@@ -114,7 +114,7 @@ const connect=document.getElementById('remoteConnect');
 const logout=document.getElementById('remoteLogout');
 const signInForm=document.getElementById('remoteLogin');
 const bridge=window.GameWallBridge;
-let loggedIn=false,queue=Promise.resolve(),requestNumber=0;
+let loggedIn=false,queue=Promise.resolve(),requestNumber=0,unsubscribeScreens=null,firebaseSdk=null;
 function info(message){remoteStatus.textContent=message;}
 function connected(user){
  loggedIn=!!user;
@@ -125,7 +125,16 @@ function connected(user){
  signInForm.querySelector('#remoteEmail').disabled=loggedIn;
  signInForm.querySelector('#remotePassword').disabled=loggedIn;
  connect.hidden=loggedIn;
- if(!loggedIn)info('Sign in to activate one-tap game switching.');
+ if(unsubscribeScreens){unsubscribeScreens();unsubscribeScreens=null;}
+ if(loggedIn&&firebaseSdk){
+  unsubscribeScreens=firebaseSdk.onValue(ref(db,'screens'),snapshot=>{
+   const data=snapshot.val();
+   if(!data)return;
+   function brief(v){return v?.type==='team'?(v.team||'Team'):v?.type==='upcoming'?'Upcoming Matchups':v?.type==='live'?'Live Games / Results':'Unassigned';}
+   document.getElementById('remoteActivity').textContent='Firebase currently holds · LEFT: '+brief(data.left)+' · RIGHT: '+brief(data.right)+'. This confirms database state, not TV playback.';
+  },error=>{document.getElementById('remoteActivity').textContent='Assignment read unavailable · '+(error.code||error.message);});
+ }
+ if(!loggedIn){info('Sign in to activate one-tap game switching.');document.getElementById('remoteActivity').textContent='';}
  else info('Signed in. Tap a matchup to switch both TVs, or use Send to Both TVs.');
 }
 function requireAuth(){
@@ -157,15 +166,10 @@ window.GameWallRemote={send};
 let auth,db,ref,set;
 try{
  const sdk=await import('./firebase.js');
+ firebaseSdk=sdk;
  ({auth,db,ref,set}=sdk);
  connect.disabled=false;
  sdk.onAuthStateChanged(auth,connected,error=>info('Firebase authentication error · '+(error.code||error.message)));
- sdk.onValue(ref(db,'screens'),snapshot=>{
-  const data=snapshot.val();
-  if(!data)return;
-  function brief(v){return v?.type==='team'?(v.team||'Team'):v?.type==='upcoming'?'Upcoming Matchups':v?.type==='live'?'Live Games / Results':'Unassigned';}
-  document.getElementById('remoteActivity').textContent='Firebase currently holds · LEFT: '+brief(data.left)+' · RIGHT: '+brief(data.right)+'. This confirms database state, not TV playback.';
- },error=>{document.getElementById('remoteActivity').textContent='Assignment read unavailable · '+(error.code||error.message);});
  signInForm.addEventListener('submit',async event=>{
   event.preventDefault();
   if(connect.disabled||loggedIn)return;
