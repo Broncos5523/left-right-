@@ -53,3 +53,21 @@ It fetches the game summary, collects unique play records, lets the tester step 
 **Validation status:** Replay page JavaScript passed a syntax check. Browser access to actual ESPN summary responses and the participant-ID coverage numbers have **not** been verified from this environment. A stored archived game is not sufficient to verify live-feed delay, 2026 game-day inactives, or correct historical depth charts.
 
 This page is on the feature branch only; GitHub Pages production continues to serve the existing main branch.
+
+## College football Friday live diagnostic — Nov 13, 2026
+
+A separate **read-only** GitHub Pages lab was committed on `main` at `football-personnel-live-lab.html` together with isolated assets `football-personnel-preview-board.html` and `football-personnel-preview-engine.js`. This is **not** a promotion of the actual production football board. There are **no** changes to `team-board.html`, the locked scoreboard CSS, `left.html`, `right.html`, controller, Firebase, or other sports.
+
+**Initial target:** Florida State @ Pittsburgh, Nov 13 at 7 p.m. ET, ESPN game ID `401858293` (ESPN-style game listing reported by third-party mirrored page). The lab checks that the fetched game summary contains Florida State and Pittsburgh before showing the pair of previews. Schedule discovery can replace the default. If the exact event cannot be validated, it shows an error instead of loading a different game.
+
+Read-only lab shows:
+- Last ESPN play classified as potential scrimmage play, its team and any credited athlete IDs.
+- Difference between **offense on last credited snap** and **current possession** (important after turnovers).
+- Total and percentage of candidate scrimmage plays with structured participant IDs — NOT the percentage of the eleven personnel identified.
+- Depth-chart, roster and injury endpoint availability, using counts but never assuming completeness or game-day clearance.
+- Two independent preview-only portrait iframes, with the approved scoreboard styling reused exactly, showing probable six-player choices from the feature engine.
+- Twenty-second ESPN summary sampling; team context requests on first successful game selection. No background automation, persistent monitoring or TV control.
+
+**Mock integration tests passed:** loading a sample scoreboard selects the intended game ID, both preview frames receive the exact correct team and side, play IDs/names are counted and displayed, last-snap offense is kept distinct from current possession, roster/depth/injury source counts render, JavaScript syntax compiles; approved CSS and player-row markup exactly match production; the live production football script reference and TV pages remain unchanged.
+
+**Not yet verified:** accessing live ESPN JSON from this environment; actual source coverage, game status, player-ID completeness, correct six-player identities, timely substitutions or accurate depth-chart/injury data. The user may visually compare the preview against the game, but the engine must continue to say **probable**, never confirmed all on-field participants.
