@@ -48,7 +48,8 @@
           "route": "boards/page4_broncos.html",
           "review_index": 22
         }
-      ]
+      ],
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/den.png"
     },
     {
       "key": "nba",
@@ -85,7 +86,8 @@
           "route": "boards/page4_celtics.html",
           "review_index": 23
         }
-      ]
+      ],
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nba/500/bos.png"
     },
     {
       "key": "nhl",
@@ -122,7 +124,8 @@
           "route": "boards/page4_bruins.html",
           "review_index": 24
         }
-      ]
+      ],
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nhl/500/bos.png"
     },
     {
       "key": "mlb",
@@ -159,7 +162,8 @@
           "route": "boards/page4_redsox.html",
           "review_index": 25
         }
-      ]
+      ],
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/bos.png"
     },
     {
       "key": "wnba",
@@ -196,7 +200,8 @@
           "route": "boards/page4_fever.html",
           "review_index": 26
         }
-      ]
+      ],
+      "logo_url": "https://a.espncdn.com/i/teamlogos/wnba/500/ind.png"
     },
     {
       "key": "cfb",
@@ -233,7 +238,8 @@
           "route": "boards/page4_arizona_cfb.html",
           "review_index": 27
         }
-      ]
+      ],
+      "logo_url": "https://a.espncdn.com/i/teamlogos/ncaa/500/12.png"
     },
     {
       "key": "cbb",
@@ -270,7 +276,8 @@
           "route": "boards/page4_arizona_cbb.html",
           "review_index": 28
         }
-      ]
+      ],
+      "logo_url": "https://a.espncdn.com/i/teamlogos/ncaa/500/12.png"
     }
   ],
   "release_guards": [
