@@ -60,3 +60,11 @@ Proposed position-specific stat lines, implemented in isolated preview:
 10. Syntax checks passed.
 
 **Remaining validation:** Actual live ESPN behavior and GitHub Pages serving were not independently verified in this test session; the code was committed and evaluated against simulated feed data.
+
+## Position fallback amendment — approved November 13, 2026
+- **EDGE slots:** permit ESPN roster labels `RE` (right end) and `LE` (left end) as EDGE candidates. `DE` and explicit `EDGE` still qualify; the two EDGE players remain protected.
+- **Safety and cornerback slots:** when ESPN reports only the generic `DB` position, allow verified team DB roster players in **either slot**. Prefer explicit `S/FS/SS` for safety and `CB` for cornerback when available.
+- **No duplicate DBs:** a single credited generic-DB play updates at most one defensive-back slot; a player never fills both.
+- **No unsupported assumptions:** ESPN's Pittsburgh roster exposes generic `DL` but no `RE` or `LE`, and its depth-chart endpoint contained no entries during the live test. Consequently Pittsburgh's EDGE slots legitimately remain unfilled without additional authority to treat `DL` as `EDGE`.
+- **Testing:** Real ESPN Florida State–Pittsburgh data populated both DB slots (Shadarian Harrison and Cruce Brookins), with no duplicate IDs. A controlled fixture derived from that roster, with two DL labels changed *synthetically* to RE/LE, populated both EDGE slots. Injecting one *synthetic* credited tackle by Kanye Thompson changed exactly one DB slot, retained the other and both EDGE anchors. These synthetic labels/plays are tests, not assertions about the actual game.
+- **Latest preview engine:** `football-personnel-preview-engine.js?v=3761eaf2`. Production `team-board.html` and approved CSS untouched.
