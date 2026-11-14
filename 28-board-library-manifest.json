@@ -1,0 +1,102 @@
+{
+  "project": "MAN CAVE SPORTS BOOK — 28 TEAM BOARDS",
+  "source_version": "production_v1_from_locked_v8l_20261018",
+  "source_manifest": "MAN_CAVE_PRODUCTION_v1_DELIVERY_MANIFEST.json",
+  "source_drive_folder": "https://drive.google.com/drive/folders/1l05Mc7ZsSJXgBsKiSTMvPmsyuoj7GVVi",
+  "source_archive_sha256": "e6651aa3db2dae42f38d693f1e6690de7009a0a6e34ed6ee0bc2a26cabbeed3f",
+  "source_file_count": 742,
+  "original_source_members": 700,
+  "original_source_sha256": "6a8368ce182542f3e790f0aad09163bb5ca9e3d5277bdb0ba9b4d211eb8fe3e3",
+  "page_duration_ms": 30000,
+  "spotlight_duration_ms": 7000,
+  "preserved_design": true,
+  "hosting_status": "not_hosted",
+  "remote_control_status": "not_connected",
+  "teams": [
+    {
+      "key": "nfl",
+      "label": "Denver Broncos",
+      "sport": "NFL",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "key": "nba",
+      "label": "Boston Celtics",
+      "sport": "NBA",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "key": "nhl",
+      "label": "Boston Bruins",
+      "sport": "NHL",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "key": "mlb",
+      "label": "Boston Red Sox",
+      "sport": "MLB",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "key": "wnba",
+      "label": "Indiana Fever",
+      "sport": "WNBA",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "key": "cfb",
+      "label": "Arizona Wildcats",
+      "sport": "NCAA Football",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "key": "cbb",
+      "label": "Arizona Wildcats",
+      "sport": "NCAA Basketball",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "release_guards": [
+    "Do not change the 28 approved board designs or artwork.",
+    "Do not alter the existing live-game controller or Firebase assignment rules until web-hosted boards render correctly.",
+    "Do not mark individual board URLs as available before a verified upload and playable browser run.",
+    "Preserve the original 7-second spotlight cadence and no-repeat semantics; cloud persistence requires a new validated design.",
+    "No unverified live-data claims; preserve ESPN/data dependencies and separate auth/server adaptations.",
+    "Do not overwrite the source Drive production or review packages."
+  ]
+}
