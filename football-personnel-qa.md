@@ -97,3 +97,25 @@ Read-only lab shows:
 8. JavaScript syntax and approved CSS equality checks PASS.
 
 **Open:** These pass mocked live ESPN fixtures, not independent browser verification of current game's specific receiving box-score schema or receiver roster attributes. A named receiver may be unmatched if roster names/jersey are unavailable or ambiguous; in that case use `—` instead of guessing. Full snap personnel still cannot be determined from a receiver's credited play.
+
+## Friday 8:28 PM ET live screenshots — NFL/CFB play-text participant recovery
+
+**Observed in supplied screenshots:** Florida State 6, Pittsburgh 7; live ESPN summary included 80 play records, 55 potential scrimmage plays, **0/55 structured athlete-ID plays**, but 18 named completed-pass receivers in readable descriptions. The Pittsburgh play description identified `#16 C.Dailey` rushing 12 yards. The isolated portrait previews displayed Florida State's **PROBABLE DEFENSE** and Pittsburgh's **PROBABLE OFFENSE** with populated game-specific statistics. These are presumed, not confirmed, six-player personnel groups. One Florida State player photo remained unavailable in the screenshot.
+
+**Implementation:**
+- In feature `football-board.js`, identify a **named passer, runner, or receiver** from the text of the last scrimmage play, or a **named tackler** enclosed in the description.
+- Resolve the exact credited player against the selected **team** roster by initial/surname plus jersey when present; ignore ambiguous or unmatched players. Opponent quarterbacks cannot be treated as defenders.
+- Update only positively credited dynamic player candidates. Keep all other names explicitly **probable**.
+- RB with an individually credited reception uses current-game REC/YDS/TD; RB with individually credited rush uses current-game ATT/YDS/TD. Do not flip unrelated RBs to receiving mode.
+- The live lab now shows text-only named passer/rusher/receiver/tackler credits separately from structured ESPN player IDs; a text credit never increases the count of structured-ID plays.
+- Isolated preview files were updated; approved scoreboard CSS was confirmed identical to production HTML. No change to the live TV player pages, controller, Firebase or production football code.
+
+**Tests (mocked ESPN fixtures): PASS**
+- `#16 C.Dailey rush ...` matches selected Pittsburgh QB Corey Dailey; player is credited as rusher, no fabricated structured ID.
+- `(#7 D.Ward)` credits a defender on the Florida State team, while Pittsburgh's QB is not counted as its defender.
+- An individually credited RB catch shows REC/YDS/TD and its real game receiving figures; next credited rush switches to ATT/YDS/TD and game rushing figures.
+- Each side retains the correct PROBABLE OFFENSE / PROBABLE DEFENSE label.
+- Football preview CSS exactly matches the locked production scoreboard.
+- JavaScript parsed; preview-only engine and its cache version updated.
+
+**Unverified:** No independent live ESPN sample was fetched by the assistant. Text-derived player credits are not a substitute for official snap personnel, and full offensive/defensive units remain estimates.
