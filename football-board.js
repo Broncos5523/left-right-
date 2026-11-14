@@ -7,7 +7,7 @@
   const note=app.querySelector('.note');
   const norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const rows=[...app.querySelectorAll('.row')];
-  band.textContent='OFFENSIVE CONTRIBUTORS';
+  band.textContent='ON FIELD';
 
   function logoFor(teamData){
     const t=teamData||{};
@@ -124,7 +124,7 @@
   }
   async function update(){
     if(!eventId){
-      band.textContent='AWAITING GAME';
+      band.textContent='ON FIELD';
       note.textContent='Choose an actual NFL or college football matchup in the LEFT RIGHT controller to show current-game statistics.';
       return;
     }
@@ -147,12 +147,12 @@
       const side=data.boxscore?.players?.find(x=>(match.team?.id!=null&&x.team?.id!=null&&String(x.team.id)===String(match.team.id))||norm(x.team?.displayName)===norm(team)||norm(x.team?.abbreviation)===norm(match.team?.abbreviation));
       const players=selectPlayers(side);
       rows.forEach((row,i)=>renderPlayer(row,players[i]));
-      band.textContent=players.length?'OFFENSIVE CONTRIBUTORS':'GAME STATS PENDING';
+      setGamePhaseHeading(data);
       note.textContent=players.length
         ?'Current-game ESPN offensive box-score contributors. These are not verified players on the field. QB: pass yards/completions-attempts/TD; RB: carries/rush yards/TD; WR/TE: catches/receiving yards/TD. Feed may be delayed.'
         :'No verified offensive game statistics yet. Player rows will populate when box-score data becomes available.';
     }catch(e){
-      band.textContent='GAME DATA UNAVAILABLE';
+      /* Keep the most recent game-phase heading during ESPN outages. */
       note.textContent='Could not update the selected football game: '+e.message+'. Previously received scoreboard data is retained where possible.';
     }
   }
