@@ -1,17 +1,29 @@
-/* LEFT RIGHT — NFL/CFB GAME IMPACT player tracker, development only.
- * Six players per selected team based on CURRENT GAME ESPN statistics and
- * individually credited plays. No claim of live on-field participation.
- * All approved HTML/CSS and Firebase screen assignments are unchanged.
+/* LEFT RIGHT NFL/CFB approved SIX SLOT hybrid selection - DEVELOPMENT ONLY.
+ * Preserve approved six-row layout and display current game statistics.
+ * Protected QB, rush leader, receiving leader, 2 EDGE; other roles change ONLY
+ * when a new eligible credited play appears; no time-based rotation or duplicates.
+ * Mode switches on current possession when positively identified.
  */
 (function(){
   if(sport!=='nfl'&&sport!=='cfb')return;
   const path=sport==='nfl'?'football/nfl':'football/college-football';
   const eventId=p.get('eventId'), norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const rows=[...app.querySelectorAll('.row')],band=app.querySelector('.band'),note=app.querySelector('.note');
-  const roles=['QB','RB','WR','TE','CB','S','EDGE','LB'];
+  const roles=['QB','RB','WR','TE','CB','S','EDGE','DL','LB'];
   const teamCache={id:null,stamp:0,depth:null,roster:null};
-  let impactIds=[];const impactKey='lr-football-impact-v1:'+sport+':'+eventId+':'+norm(team);
-  let lastPlayId='',rbStatMode={},busy=false,receivingPbp=new Map(),usedPbpFallback=false;let observedPlayKeys=new Set();
+  const stateKey='lr-six-slot-football-v1:'+sport+':'+eventId+':'+norm(team);
+  let slotState={offense:[null,null,null,null,null,null],defense:[null,null,null,null,null,null],
+    processed:[],lastMode:'offense',lastActionByRB:{}};
+  try{
+    const prev=JSON.parse(localStorage.getItem(stateKey)||'null');
+    if(prev&&Array.isArray(prev.offense)&&Array.isArray(prev.defense)){
+      slotState={...slotState,...prev,offense:prev.offense.slice(0,6),defense:prev.defense.slice(0,6),
+        processed:Array.isArray(prev.processed)?prev.processed.slice(-500):[],
+        lastActionByRB:prev.lastActionByRB||{}};
+    }
+  }catch(e){}
+  function persistSlots(){try{localStorage.setItem(stateKey,JSON.stringify(slotState))}catch(e){}}
+  let lastPlayId='',rbStatMode={},busy=false,receivingPbp=new Map(),rushingPbp=new Map(),usedPbpFallback=false;
   const creditedReceptions=new Map(); // event-scoped receipts, keyed by ESPN play ID
   const base='https://site.api.espn.com/apis/site/v2/sports/'+path+'/';
   const arr=x=>Array.isArray(x)?x:[];
@@ -26,12 +38,12 @@
     if(['CB','DB','NB'].includes(x))return 'CB';
     if(['FS','SS','S','SAF'].includes(x))return 'S';
     if(['DE','EDGE','ED','LE','RE'].includes(x))return 'EDGE';
+    if(['DT','NT','DL','NOSE','NG','TACKLE'].includes(x))return 'DL';
     if(['LB','OLB','ILB','MLB','WLB','SLB','ROLB','LOLB'].includes(x))return 'LB';
     return '';
   };
   const positionOf=x=>x?.position?.abbreviation||x?.position?.name||x?.position?.displayName||x?.position||'';
-  try{const saved=JSON.parse(localStorage.getItem(impactKey)||'[]');if(Array.isArray(saved))impactIds=saved.map(String).slice(0,6)}catch(e){}
-  function rememberImpact(players){impactIds=players.map(x=>x.id);try{localStorage.setItem(impactKey,JSON.stringify(impactIds))}catch(e){}}
+
   async function get(url){
     const res=await fetch(url,{cache:'no-store'});
     if(!res.ok)throw Error('ESPN '+res.status);return res.json();
@@ -189,9 +201,15 @@
     return {kind,name:m[2].trim(),jersey:m[1]};
   }
   function tackleMentions(play){
-    const text=String(play?.text||'');
-    const out=[];
-    for(const m of text.matchAll(/\(#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,2})\)/g)){
+    const text=String(play?.text||''),out=[],seen=new Set();
+    // ESPN commonly names tacklers in parentheses and also uses 'sacked by',
+    // 'intercepted by' and 'broken up by'; never treat offensive players as D.
+    const variants=[
+      /\(#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,2})\)/g,
+      /\b(?:tackled|sacked|intercepted|deflected|broken\s+up|forced\s+fumble)\s+by\s+#(\d{1,3})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){0,2})/gi
+    ];
+    for(const re of variants)for(const m of text.matchAll(re)){
+      const key=m[1]+':'+norm(m[2]);if(seen.has(key))continue;seen.add(key);
       out.push({kind:'tackler',name:m[2].trim(),jersey:m[1]});
     }
     return out;
@@ -206,7 +224,7 @@
     for(const mention of mentions){
       const roles=mention.kind==='passer'?['QB']:
         mention.kind==='receiver'?['RB','WR','TE']:
-        mention.kind==='tackler'?['CB','S','EDGE','LB']:['QB','RB','WR'];
+        mention.kind==='tackler'?['CB','S','EDGE','DL','LB']:['QB','RB','WR'];
       const athlete=matchMention(mention,pool,roles);
       if(!athlete||used.has(athlete.id))continue;
       used.add(athlete.id);
@@ -280,14 +298,14 @@
     const v=n>=0?g.a.stats?.[n]:null;
     return v===null||v===undefined||v===''?'—':v;
   }
-  function statsFor(c){
+  function statsFor(c,slot){
     const role=c.role;
     if(role==='QB')return {labels:['YDS','C/ATT','TD'],values:[
       pickStat(c,'passing',['passingyards'],['yds','passyds']),
       pickStat(c,'passing',['completionspassingattempts','completionsattempts'],['catt','compatt','cmpatt']),
       pickStat(c,'passing',['passingtouchdowns'],['td'])]};
     if(role==='RB'){
-      const type=rbStatMode[c.id]==='receiving'?'receiving':'rushing';
+      const type=slot==='rushLeader'?'rushing':rbStatMode[c.id]==='receiving'?'receiving':'rushing';
       return type==='receiving'?{labels:['REC','YDS','TD'],values:recoveredRecStats(c)}:
         {labels:['ATT','YDS','TD'],values:[
         pickStat(c,'rushing',['rushingattempts'],['car','att','rushatt']),
@@ -296,8 +314,8 @@
     }
     if(role==='WR'||role==='TE')return {labels:['REC','YDS','TD'],values:recoveredRecStats(c)};
     const def=(keys,labels)=>pickStat(c,'defense',keys,labels);
-    if(role==='EDGE')return {labels:['SACK','QB HIT','TFL'],values:[
-      def(['sacks'],['sack','sacks']),def(['quarterbackhits','qbhits'],['qbht','qbhit']),def(['tacklesforloss'],['tfl'])]};
+    if(role==='EDGE'||role==='DL')return {labels:['TACK','SACK','TFL'],values:[
+      def(['totaltackles','tackles'],['tot','tack','tackles']),def(['sacks'],['sack','sacks']),def(['tacklesforloss'],['tfl'])]};
     if(role==='LB')return {labels:['TACK','TFL','SACK'],values:[
       def(['totaltackles','tackles'],['tot','tack','tackles']),def(['tacklesforloss'],['tfl']),def(['sacks'],['sack','sacks'])]};
     return {labels:['TACK','PD','INT'],values:[
@@ -325,111 +343,193 @@
     return found;
   }
 
-  // All impact scoring uses only the SELECTED GAME's box score and its play
-  // descriptions. ESPN group statistics can be strings or occasionally absent.
-  function amount(v){
-    if(v===null||v===undefined||v==='—'||v==='')return 0;
-    const s=String(v).replace(/,/g,'').trim();
-    return /^-?\d+(?:\.\d+)?$/.test(s)?Math.max(0,Number(s)):0;
+  // Position eligibility is strict for WR/TE/DB, with OLB as an EDGE fallback
+  // for 3-4 defensive alignments and DE as an unused DL fallback if needed.
+  const SLOT_ROLES={
+    offense:['QB','RB','RB','WR','WR','TE'],
+    defense:['EDGE','EDGE','LB','DL','S','CB']
+  };
+  function pos(c){
+    return String(positionOf(c?.athlete)||'').toUpperCase().replace(/[^A-Z]/g,'');
   }
-  function stat(c,type,keys,labels){
-    return amount(pickStat(c,type,keys,labels));
+  function roleFits(c,mode,index,relaxed=false){
+    if(!c)return false;
+    const target=SLOT_ROLES[mode][index],position=pos(c);
+    if(target==='EDGE')return c.role==='EDGE'||(relaxed&&c.role==='LB'&&/^(OLB|LOLB|ROLB)$/.test(position));
+    if(target==='DL')return c.role==='DL'||(relaxed&&c.role==='EDGE');
+    if(target==='LB')return c.role==='LB';
+    return c.role===target;
   }
-  function gameImpact(c,creditCount){
-    const role=c.role;const passing=stat(c,'passing',['passingyards'],['yds','passyds']);
-    const passingTd=stat(c,'passing',['passingtouchdowns'],['td']);
-    const rushY=stat(c,'rushing',['rushingyards'],['yds','rushyds']);
-    const rushA=stat(c,'rushing',['rushingattempts'],['car','att','rushatt']);
-    const rushTd=stat(c,'rushing',['rushingtouchdowns'],['td']);
-    const receiving=receivingPbp.get(c.id);
-    const boxRec=stat(c,'receiving',['receptions'],['rec']);
-    const rec=Math.max(boxRec,receiving?.rec||0);
-    const boxY=stat(c,'receiving',['receivingyards'],['yds','recyds']);
-    const recvY=Math.max(boxY,receiving?.unknownYards?0:receiving?.yards||0);
-    const recTd=Math.max(stat(c,'receiving',['receivingtouchdowns'],['td']),receiving?.td||0);
-    const t=stat(c,'defense',['totaltackles','tackles'],['tot','tack','tackles']);
-    const tfl=stat(c,'defense',['tacklesforloss'],['tfl']);
-    const sacks=stat(c,'defense',['sacks'],['sack','sacks']);
-    const pd=stat(c,'defense',['passesdefended','passesdefensed'],['pd','pdef']);
-    const ints=stat(c,'defense',['interceptions'],['int']);
-    const ff=stat(c,'defense',['forcedfumbles'],['ff']);
-    let score=0,kind='offense';
-    if(role==='QB'){
-      score=passing/25+passingTd*5+rushY/20+rushTd*6;
-    }else if(role==='RB'){
-      score=rushY/12+rushA*.24+rushTd*7+rec*1.5+recvY/14+recTd*7;
-    }else if(role==='WR'||role==='TE'){
-      score=rec*1.6+recvY/13+recTd*7;
-    }else if(['CB','S','EDGE','LB'].includes(role)){
-      kind='defense';
-      score=t*1.1+tfl*2.5+sacks*6+pd*2+ints*8+ff*5;
-    }else return null;
-    const boxes=Object.values(c.groups||{});
-    const boxPresent=boxes.some(x=>arr(x?.a?.stats).some(v=>v!==''&&v!==null&&v!==undefined&&v!=='—'));
-    const credits=creditCount.get(c.id)||0;
-    // Rows in ESPN's game box score are eligible even before a counting stat;
-    // a roster/depth-chart entry alone is NOT a game participant.
-    if(!boxPresent&&credits===0)return null;
-    score+=Math.min(credits,5)*1.25;
-    if(score===0&&boxPresent)score=.15;
-    return {c,id:c.id,kind,score,credits};
+  function playerPriority(a,b){return (a.rank??99)-(b.rank??99)||a.id.localeCompare(b.id)}
+  function eligible(pool,mode,index,used){
+    const available=pool.filter(c=>!used.has(c.id)&&roleFits(c,mode,index));
+    if(available.length)return available.sort(playerPriority);
+    if(mode==='defense'&&(index===0||index===1||index===3)){
+      return pool.filter(c=>!used.has(c.id)&&roleFits(c,mode,index,true)).sort(playerPriority);
+    }
+    return [];
   }
-  function impactCredits(data,pool,teamId){
-    const credits=new Map(),plays=uniquePlays(data);
-    const selected=plays.slice(-30);
-    for(const play of selected){
-      const offenseId=String(play?.team?.id||play?.teamId||play?.start?.team?.id||'');
-      const same=offenseId===String(teamId);
-      if(!offenseId)continue; // no safe attribution for a team-less play
-      const actors=creditedActors(play,pool,same?'offense':'defense');
-      for(const actor of actors){
-        const prior=credits.get(actor.id)||0;
-        // Count individual credited involvement, not complete participation.
-        credits.set(actor.id,prior+1);
+  function rushLeader(pool){
+    const all=pool.filter(c=>c.role==='RB').sort(playerPriority);
+    if(!all.length)return null;
+    const ranking=all.map(c=>{
+      const raw=stat(c,'rushing',['rushingyards'],['yds','rushyds']);
+      const fromPlay=rushingPbp.get(c.id)||{yards:0,attempts:0};
+      const yards=Math.max(raw,fromPlay.yards||0);
+      const attempts=Math.max(stat(c,'rushing',['rushingattempts'],['car','att']),fromPlay.attempts);
+      return {c,yards,attempts};
+    }).sort((a,b)=>b.yards-a.yards||b.attempts-a.attempts||playerPriority(a.c,b.c));
+    const hadAction=ranking.some(x=>x.yards>0||x.attempts>0);
+    return (hadAction?ranking[0].c:all[0]);
+  }
+  function receptionLeader(pool){
+    const all=pool.filter(c=>c.role==='WR').sort(playerPriority);
+    if(!all.length)return null;
+    const ranking=all.map(c=>{
+      const pbp=receivingPbp.get(c.id);
+      const yards=Math.max(stat(c,'receiving',['receivingyards'],['yds','recyds']),pbp?.knownYards&&pbp.unknownYards===0?pbp.yards:0);
+      const rec=Math.max(stat(c,'receiving',['receptions'],['rec']),pbp?.rec||0);
+      return {c,yards,rec};
+    }).sort((a,b)=>b.yards-a.yards||b.rec-a.rec||playerPriority(a.c,b.c));
+    return ranking.some(x=>x.yards>0||x.rec>0)?ranking[0].c:all[0];
+  }
+  function playKey(play){
+    return String(play?.id||play?.playId||play?.sequenceNumber||
+      [play?.period?.number,play?.clock?.displayValue,play?.team?.id,play?.text].join('|'));
+  }
+  function orderedPlays(data){
+    const indexed=uniquePlays(data).map((play,i)=>({play,i}));
+    // Complete ESPN game logs normally arrive chronologically. Sort when
+    // explicit quarter and clock are available to correct drive-order overlap.
+    indexed.sort((a,b)=>{
+      const pa=Number(a.play?.period?.number),pb=Number(b.play?.period?.number);
+      if(Number.isFinite(pa)&&Number.isFinite(pb)&&pa&&pb&&pa!==pb)return pa-pb;
+      const seconds=x=>{const m=String(x?.clock?.displayValue||'').match(/^(\d{1,2}):(\d{2})$/);
+        return m?Number(m[1])*60+Number(m[2]):null};
+      const sa=seconds(a.play),sb=seconds(b.play);
+      if(pa&&pa===pb&&sa!==null&&sb!==null&&sa!==sb)return sb-sa;
+      return a.i-b.i;
+    });
+    return indexed.map(x=>x.play);
+  }
+  function rushingFromPlays(data,pool,teamId){
+    const result=new Map(),seen=new Set();
+    for(const play of orderedPlays(data)){
+      if(String(play?.team?.id||play?.teamId||play?.start?.team?.id||'')!==String(teamId))continue;
+      const a=creditedActors(play,pool,'offense').find(x=>x.kind==='rusher'&&x.role==='RB');
+      if(!a||seen.has(playKey(play)))continue;
+      seen.add(playKey(play));
+      const text=String(play.text||'');
+      const m=text.match(/\bfor\s+(-?\d+)\s+yards?\b/i);
+      const yards=play.statYardage!==undefined&&play.statYardage!==null&&play.statYardage!==''?
+        Number(play.statYardage):(m?Number(m[1]):null);
+      const item=result.get(a.id)||{attempts:0,yards:0};
+      item.attempts++;
+      if(Number.isFinite(yards))item.yards+=yards;
+      result.set(a.id,item);
+    }
+    return result;
+  }
+  function findPossession(data,competition,tid){
+    const candidates=[
+      competition.situation?.possession,data.situation?.possession,
+      competition.situation?.possessionId,data.situation?.possessionId,
+      data.drives?.current?.team?.id
+    ];
+    const flagged=arr(competition.competitors).find(x=>x.possession===true||x.hasPossession===true);
+    if(flagged?.team?.id)candidates.push(flagged.team.id);
+    const found=candidates.map(x=>x&&typeof x==='object'?(x.team?.id||x.id||''):x)
+      .map(x=>String(x||'')).find(x=>arr(competition.competitors).some(c=>String(c.team?.id)===x));
+    if(found)return found===String(tid)?'offense':'defense';
+    // No reliable possession identifier: hold the last known side, never
+    // pretend the previous snap is necessarily the current possession.
+    return slotState.lastMode||'offense';
+  }
+  function chooseSix(pool,mode,statics,credits){
+    const prev=Array.isArray(slotState[mode])?slotState[mode].slice(0,6):[];
+    const result=Array(6).fill(null),used=new Set();
+    const get=id=>pool.find(c=>c.id===String(id));
+    const set=(idx,c)=>{if(!c||used.has(c.id)||!roleFits(c,mode,idx,true))return false;
+      result[idx]=c;used.add(c.id);return true};
+    if(mode==='offense'){
+      set(0,statics.qb);
+      set(1,statics.rb);
+      set(3,statics.wr);
+    }else{
+      // EDGE anchors do not change just because another defender made a play.
+      const anchors=[0,1];
+      for(const i of anchors){
+        const saved=get(prev[i]);
+        if(!set(i,saved))set(i,eligible(pool,mode,i,used)[0]);
       }
     }
-    return credits;
-  }
-  function selectImpact(pool,data,teamId,state){
-    const counts=impactCredits(data,pool,teamId);
-    const scored=pool.map(c=>gameImpact(c,counts)).filter(Boolean)
-      .sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
-    const rosterMap=new Map(scored.map(x=>[x.id,x]));
-    if(state==='post'&&impactIds.length){
-      const held=impactIds.map(id=>rosterMap.get(id)).filter(Boolean);
-      // Preserve the last displayed game group at final when still available.
-      if(held.length>=3)return {players:held.map(x=>x.c).slice(0,6),ranking:scored,source:'final-hold'};
+    const dynamic=mode==='offense'?[2,4,5]:[2,3,4,5];
+    // First try newly credited players (in chronological order, last wins).
+    const lastCredits=new Map();
+    for(const credit of credits){
+      for(const idx of dynamic){
+        const c=get(credit.id);
+        if(c&&roleFits(c,mode,idx)&&!used.has(c.id))lastCredits.set(idx,c);
+      }
     }
-    // Keep balanced broadcast interest: 3 offense + 2 defense where available;
-    // sixth slot goes to the highest remaining contributor in either category.
-    let picked=[];
-    const add=x=>{if(x&&!picked.some(a=>a.id===x.id)&&picked.length<6)picked.push(x)};
-    const offense=scored.filter(x=>x.kind==='offense');
-    const defense=scored.filter(x=>x.kind==='defense');
-    for(const x of offense.slice(0,3))add(x);
-    for(const x of defense.slice(0,2))add(x);
-    for(const x of scored)add(x);
-    // Stability: do not replace existing game contributors for tiny score leads.
-    const prior=impactIds.map(id=>rosterMap.get(id)).filter(Boolean);
-    if(prior.length&&picked.length===6){
-      const used=new Set(picked.map(x=>x.id));
-      for(const old of prior){
-        if(used.has(old.id))continue;
-        const sameKind=picked.filter(x=>x.kind===old.kind);
-        const weakest=sameKind.sort((a,b)=>a.score-b.score)[0];
-        if(weakest&&weakest.score-old.score<2.3){
-          const idx=picked.findIndex(x=>x.id===weakest.id);
-          if(idx>=0){used.delete(weakest.id);picked[idx]=old;used.add(old.id)}
+    for(const idx of dynamic){
+      // Avoid reacting to an event involving a protected leader.
+      const next=lastCredits.get(idx);
+      if(next)set(idx,next);
+    }
+    for(const idx of dynamic){
+      if(result[idx])continue;
+      const saved=get(prev[idx]);
+      if(set(idx,saved))continue;
+      // If a dynamic player has just become the protected leader, prefer
+      // the former leader as the new dynamic player (same position).
+      const displaced=mode==='offense'&&idx===2?get(prev[1]):mode==='offense'&&idx===4?get(prev[3]):null;
+      if(set(idx,displaced))continue;
+      // Kickoff fallback from the depth chart. No timed rotation.
+      set(idx,eligible(pool,mode,idx,used)[0]);
+    }
+    return result;
+  }
+  function creditEvents(data,pool,tid){
+    const processed=new Set(slotState.processed);
+    const fresh=[];
+    for(const play of orderedPlays(data)){
+      const id=playKey(play);
+      if(!id||processed.has(id))continue;
+      processed.add(id);
+      const offenseId=String(play?.team?.id||play?.teamId||play?.start?.team?.id||'');
+      if(!offenseId)continue;
+      const ownOffense=offenseId===String(tid);
+      for(const credit of creditedActors(play,pool,ownOffense?'offense':'defense')){
+        fresh.push({...credit,mode:ownOffense?'offense':'defense'});
+        if(ownOffense&&credit.role==='RB'){
+          if(credit.kind==='receiver')slotState.lastActionByRB[credit.id]='receiving';
+          if(credit.kind==='rusher')slotState.lastActionByRB[credit.id]='rushing';
         }
       }
     }
-    // Keep familiar portrait positions stable as players change.
-    const pickMap=new Map(picked.map(x=>[x.id,x]));
-    const ordered=impactIds.map(id=>pickMap.get(id)).filter(Boolean);
-    for(const x of picked)if(!ordered.some(y=>y.id===x.id))ordered.push(x);
-    return {players:ordered.map(x=>x.c).slice(0,6),ranking:scored,source:'game-stats'};
+    slotState.processed=[...processed].slice(-500);
+    return fresh;
   }
-  function renderRow(row,c){
+  function selectSlots(pool,data,tid,state){
+    rushingPbp=rushingFromPlays(data,pool,tid);
+    receivingPbp=receivingFromPlays(data,pool,tid);
+    const formerOffense=slotState.offense.slice(),formerDefense=slotState.defense.slice();
+    const ranks=pool.filter(c=>c.role==='QB').sort((a,b)=>{
+      // Starting QB comes from actual game passing activity if known.
+      const statA=stat(a,'passing',['passingattempts'],['att'])+stat(a,'passing',['passingyards'],['yds'])/200;
+      const statB=stat(b,'passing',['passingattempts'],['att'])+stat(b,'passing',['passingyards'],['yds'])/200;
+      return statB-statA||playerPriority(a,b);
+    });
+    const statics={qb:ranks[0]||null,rb:rushLeader(pool),wr:receptionLeader(pool)};
+    const events=state==='post'&&slotState.processed.length?[]:creditEvents(data,pool,tid);
+    slotState.offense=chooseSix(pool,'offense',statics,events.filter(x=>x.mode==='offense'));
+    slotState.defense=chooseSix(pool,'defense',statics,events.filter(x=>x.mode==='defense'));
+    for(const [id,action] of Object.entries(slotState.lastActionByRB))rbStatMode[id]=action;
+    return {offense:slotState.offense.map(id=>id),defense:slotState.defense.map(id=>id),
+      eventCredits:events.length,formerOffense,formerDefense};
+  }
+  function renderRow(row,c,slot){
     const face=row.querySelector('.portrait'),name=row.querySelector('.player');
     const keys=[...row.querySelectorAll('.stats small')],vals=[...row.querySelectorAll('.stats b')];
     if(!c){face.textContent='—';name.textContent='PLAYER DATA UNAVAILABLE';keys.forEach(x=>x.textContent='—');vals.forEach(x=>x.textContent='—');return}
@@ -439,7 +539,7 @@
       img.style.cssText='height:10vh;max-width:100%;object-fit:contain';
       img.onerror=()=>{face.textContent='HEADSHOT UNAVAILABLE'};face.appendChild(img);
     }else face.textContent='HEADSHOT UNAVAILABLE';
-    const s=statsFor(c);
+    const s=statsFor(c,slot);
     keys.forEach((x,i)=>x.textContent=s.labels[i]||'—');
     vals.forEach((x,i)=>x.textContent=s.values[i]??'—');
   }
@@ -465,37 +565,28 @@
       const context=await getTeamContext(tid);
       const side=arr(data.boxscore?.players).find(x=>String(x.team?.id)===String(tid)||norm(x.team?.displayName)===norm(team));
       const pool=candidatePool(context.depth,context.roster,null,side,tid,false,data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
-      const play=recentPlay(data);
-      receivingPbp=receivingFromPlays(data,pool,tid);
-      // Prefer a RB's latest individually credited action for stat format.
-      if(play){
-        const playTeam=String(play?.team?.id||play?.teamId||play?.start?.team?.id||'');
-        if(playTeam===String(tid)){
-          const c=creditedActors(play,pool,'offense');
-          for(const x of c){
-            if(x.role!=='RB')continue;
-            if(x.kind==='receiver')rbStatMode[x.id]='receiving';
-            if(x.kind==='rusher')rbStatMode[x.id]='rushing';
-          }
-        }
-      }
-      const selection=selectImpact(pool,data,tid,state);
-      const shown=selection.players;
-      if(shown.length===0&&rows.some(row=>!!row.querySelector('.player')?.textContent&&!/UNAVAILABLE|PENDING|PLAYER DATA/.test(row.querySelector('.player').textContent))){
+      // Build both modes from depth-chart fallback + game-leading stats +
+      // newly credited plays. Switching possession does not reset either mode.
+      const selection=selectSlots(pool,data,tid,state);
+      const mode=state==='post'?slotState.lastMode:findPossession(data,competition,tid);
+      slotState.lastMode=mode;
+      const selectedIds=mode==='defense'?slotState.defense:slotState.offense;
+      const shown=selectedIds.map(id=>id?pool.find(c=>c.id===id)||null:null);
+      persistSlots();
+      if(shown.every(x=>!x)&&rows.some(row=>!!row.querySelector('.player')?.textContent&&!/UNAVAILABLE|PENDING|PLAYER DATA/.test(row.querySelector('.player').textContent))){
         band.textContent='GAME DATA DELAYED';
         note.textContent='Holding the previous game contributors while ESPN stats are unavailable.';
         return;
       }
-      if(shown.length)rememberImpact(shown);
       usedPbpFallback=false;
-      rows.forEach((row,i)=>renderRow(row,shown[i]));
-      band.textContent='GAME IMPACT PLAYERS';
-      const missing=Math.max(0,6-shown.length);
-      note.textContent='Six key contributors selected by current-game statistics and credited play-by-play events, not on-field personnel. '+
-        (selection.source==='final-hold'?'Final game group held. ':'')+
-        (usedPbpFallback?'Receiving totals provisionally recovered from named plays; official totals take priority. ':'')+
-        (missing?missing+' slots still awaiting game-participant data. ':'')+
-        'Player roles and headshots may be unavailable or delayed.';
+      rows.forEach((row,i)=>renderRow(row,shown[i],mode==='offense'&&i===1?'rushLeader':''));
+      band.textContent=mode==='offense'?'OFFENSIVE CONTRIBUTORS':'DEFENSIVE CONTRIBUTORS';
+      const missing=shown.filter(x=>!x).length;
+      note.textContent='Protected leaders from current-game stats; other positions change only after credited plays. '+
+        (state==='post'?'Final game players held. ':'')+
+        (missing?missing+' positions awaiting eligible depth-chart players. ':'')+
+        (usedPbpFallback?'Some receiving figures are provisional from ESPN play descriptions. ':'')+
+        'No duplicates, no timed rotation, no on-field personnel claim.';
     }catch(e){
       band.textContent='GAME STATS RETRYING';
       note.textContent='Game impact refresh unavailable: '+e.message+'. Previously displayed player names and current-game stats are retained.';
