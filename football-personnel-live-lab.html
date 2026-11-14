@@ -1,0 +1,239 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEFT RIGHT · Live Football Personnel Lab</title>
+<style>
+:root{color-scheme:dark;font:15px/1.48 system-ui,-apple-system,Arial,sans-serif;background:#0a0e17;color:#f1f4fb}
+*{box-sizing:border-box}body{margin:0}main{max-width:990px;margin:0 auto;padding:16px 14px 44px}
+h1{font-size:1.5rem;line-height:1.2;margin:4px 0 6px}h2{font-size:1.12rem;margin:4px 0 10px}
+small,.muted{color:#adbbce}p{margin:8px 0 12px}
+.card{background:#172032;border:1px solid #36455e;border-radius:14px;padding:14px;margin:13px 0}
+label{display:block;font-weight:700;font-size:.91rem;margin:10px 0 5px}
+select,input,button{font:inherit;color:#fff;background:#26364f;border:1px solid #526987;border-radius:9px;padding:11px;width:100%;min-width:0}
+button{cursor:pointer;font-weight:700}.primary{background:#176ace;border-color:#448fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.frame{width:100%;max-width:440px;aspect-ratio:9/16;display:block;margin:auto;border:1px solid #35445b;background:#000}
+.chip{display:inline-block;border:1px solid #586984;background:#27344b;padding:3px 7px;border-radius:13px;font-size:.8rem;margin:3px}
+.good{color:#9ee6b4}.warn{color:#efc98b}.bad{color:#f7aaa9}
+#latest,#metrics,#sourceStats,#status{white-space:pre-wrap;overflow-wrap:anywhere}
+#lastIds{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.note{font-size:.87rem;color:#b1bdd1}summary{cursor:pointer}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.frame{max-width:390px}}
+</style></head><body><main>
+<small>MAN CAVE SPORTS BOOK · READ-ONLY DEVELOPMENT</small>
+<h1>Football Personnel · Live Test</h1>
+<p class="muted">ESPN can identify who was credited on a play, but its public feed may not list everyone on the field. Both six-player boards are explicitly <strong>probable</strong>, never certified live personnel. This test cannot control LEFT RIGHT TVs.</p>
+<div class="card">
+<label for="match">College football game · Friday, Nov 13</label>
+<select id="match"><option value="401858293" data-away="Florida State Seminoles" data-home="Pittsburgh Panthers">Florida State @ Pittsburgh · 7 PM ET (reference)</option></select>
+<div class="buttons">
+<button id="load" class="primary" type="button">Inspect selected game</button>
+<button id="refresh" type="button">Refresh ESPN schedule</button>
+</div>
+<details style="margin-top:12px"><summary>Game missing? Enter another ESPN event ID</summary>
+<label for="manual">Numeric ESPN game ID</label><input id="manual" inputmode="numeric" pattern="[0-9]*" placeholder="ESPN event ID"><button id="manualBtn" style="margin-top:8px">Inspect this event ID</button>
+</details>
+<p id="status" role="status" class="muted">Checking today's ESPN football schedule…</p>
+</div>
+<div class="card">
+<h2>Live evidence</h2>
+<div id="metrics" class="muted">Awaiting ESPN data.</div>
+<div id="latest" style="margin:12px 0">—</div>
+<strong>Structured player IDs in latest scrimmage play</strong>
+<div id="lastIds" style="margin-top:7px"><small>No snap evidence yet.</small></div>
+<p class="note">A name here means credited in that play's data, <strong>not</strong> that the entire offense or defense is identified. The last snap's offense can differ from the current possession after a turnover.</p>
+<details><summary>Source availability and coverage</summary><div id="sourceStats" class="muted" style="padding:10px 0">Waiting for source inspection.</div></details>
+</div>
+<div class="card">
+<h2>Probable six-player portrait boards</h2>
+<p class="muted">Existing approved scoreboard CSS and player-row layout are reused exactly. The labels remain explicit about what is inferred.</p>
+<div class="grid">
+<section><h2 id="awayName">LEFT · AWAY</h2><iframe id="leftPreview" class="frame" title="LEFT team preview" loading="lazy"></iframe></section>
+<section><h2 id="homeName">RIGHT · HOME</h2><iframe id="rightPreview" class="frame" title="RIGHT team preview" loading="lazy"></iframe></section>
+</div>
+</div>
+<p class="note">Live summaries sampled every 20 seconds, team personnel source checks when selecting a game. No Firebase, TV screen assignment, scoreboard CSS, or production football renderer is modified.</p>
+</main><script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id),arr=x=>Array.isArray(x)?x:[];
+const base='https://site.api.espn.com/apis/site/v2/sports/football/college-football/';
+const known={id:'401858293',away:'Florida State Seminoles',home:'Pittsburgh Panthers',
+ label:'Florida State @ Pittsburgh · 7 PM ET (reference)'};
+const norm=x=>String(x??'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const ident=x=>String(x?.id||x?.athlete?.id||x?.player?.id||x?.athleteId||x?.playerId||'');
+let selected='',timer=null,loading=false,samples=0,lastSeen='',lastData=null,games=new Map([[known.id,known]]);
+function msg(t,error=false){$('status').textContent=t;$('status').className=error?'bad':'muted'}
+async function get(url){const res=await fetch(url,{cache:'no-store'});if(!res.ok)throw Error('ESPN HTTP '+res.status);return res.json()}
+function dateKey(){const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).map(x=>[x.type,x.value]));return p.year+p.month+p.day}
+function teamsOf(s){
+ const xs=arr(s.header?.competitions?.[0]?.competitors);
+ const away=xs.find(x=>x.homeAway==='away')||xs[0],home=xs.find(x=>x.homeAway==='home')||xs[1];
+ if(!away?.team||!home?.team)return null;
+ return [{id:String(away.team.id),name:away.team.displayName,score:away.score??'—',side:'away'},
+         {id:String(home.team.id),name:home.team.displayName,score:home.score??'—',side:'home'}];
+}
+function allPlays(s){
+ const raw=[];
+ if(Array.isArray(s.plays))raw.push(...s.plays);
+ else raw.push(...arr(s.plays?.all));
+ for(const d of arr(s.drives?.previous))raw.push(...arr(d.plays));
+ raw.push(...arr(s.drives?.current?.plays));
+ const seen=new Set();
+ return raw.filter(x=>{
+  const k=String(x.id||x.playId||x.sequenceNumber||x.period?.number+'|'+x.clock?.displayValue+'|'+x.text);
+  if(seen.has(k))return false;seen.add(k);return true;
+ });
+}
+function category(x){
+ const label=String(x.type?.text||x.playType?.text||x.type?.displayName||'')+' '+String(x.text||'');
+ if(/kickoff|punt|field goal|extra point|two.point|timeout|end of|penalty|coin toss|tv timeout/i.test(label))return 'special/admin';
+ if(/pass|rush|ran |run |sack|scramble|interception|fumble|kneel|spike/i.test(label))return 'possible scrimmage';
+ return 'uncertain';
+}
+function lastScrimmage(plays){
+ const possible=plays.filter(x=>category(x)==='possible scrimmage');
+ const numbered=possible.filter(x=>Number.isFinite(Number(x.sequenceNumber??x.sequence)));
+ if(numbered.length){
+  return numbered.reduce((a,b)=>Number(a.sequenceNumber??a.sequence)>Number(b.sequenceNumber??b.sequence)?a:b);
+ }
+ const curr=possible.filter(x=>x.driveId&&x.driveId!==undefined);
+ return (curr.length?curr:possible).at(-1)||null;
+}
+function playerIds(play){
+ const p=[...arr(play?.participants),...arr(play?.athletes),...arr(play?.players)];
+ const ids=new Set();
+ for(const x of p){const id=ident(x.athlete||x.player||x);if(id)ids.add(id)}
+ return [...ids];
+}
+function participantNames(s){
+ const map=new Map();
+ for(const side of arr(s.boxscore?.players))for(const group of arr(side.statistics))for(const row of arr(group.athletes)){
+  const a=row.athlete||{},id=ident(a);if(id)map.set(id,a.displayName||a.fullName||id);
+ }
+ return map;
+}
+function render(s){
+ const teams=teamsOf(s);if(!teams)throw Error('Summary has no two teams');
+ // Avoid showing a guessed fallback ID as an unrelated matchup.
+ if(selected===known.id&&(!teams.some(t=>/floridastate/i.test(norm(t.name)))||!teams.some(t=>/pittsburgh|pittpanthers/i.test(norm(t.name))))){
+  throw Error('ESPN event ID does not match Florida State @ Pittsburgh; preview halted for safety');
+ }
+ const state=s.header?.competitions?.[0]?.status?.type?.state||'unknown';
+ const plays=allPlays(s),scrimmage=plays.filter(x=>category(x)==='possible scrimmage'),latest=lastScrimmage(plays);
+ const ids=playerIds(latest),names=participantNames(s);
+ const nameById=Object.fromEntries(teams.map(x=>[x.id,x.name]));
+ const snapTeam=String(latest?.team?.id||latest?.teamId||latest?.start?.team?.id||'');
+ const possession=String(s.header?.competitions?.[0]?.situation?.possession||'');
+ const playKey=String(latest?.id||latest?.sequenceNumber||latest?.text||'');
+ if(playKey&&playKey!==lastSeen)lastSeen=playKey;
+ const withIds=scrimmage.filter(x=>playerIds(x).length>0).length;
+ const counted=scrimmage.reduce((sum,x)=>sum+playerIds(x).length,0);
+ const playOffense=nameById[snapTeam]|| (snapTeam?'ID '+snapTeam:'unknown');
+ const possessionName=nameById[possession]|| (possession?'ID '+possession:'not provided');
+ $('metrics').textContent='Game status: '+state+
+  '\n'+teams.map(t=>t.name+' '+t.score).join(' · ')+
+  '\nSamples collected: '+samples+
+  ' · ESPN play records: '+plays.length+
+  ' · Potential scrimmage plays: '+scrimmage.length+
+  '\nScrimmage plays with any structured participant IDs: '+withIds+'/'+scrimmage.length+
+  ' ('+(scrimmage.length?Math.round(100*withIds/scrimmage.length):0)+'%)'+
+  '\nTotal credited IDs across scrimmage plays: '+counted+
+  '\nLast-snap offense: '+playOffense+
+  ' · Current possession: '+possessionName;
+ $('latest').textContent='Latest candidate snap: '+(latest?.text||'No classified scrimmage play yet')+
+   '\nPeriod '+(latest?.period?.number||'?')+' · clock '+(latest?.clock?.displayValue||'?');
+ const container=$('lastIds');container.replaceChildren();
+ if(ids.length){
+  for(const id of ids){
+   const chip=document.createElement('span');chip.className='chip';
+   chip.textContent=(names.get(id)||'Athlete ID '+id)+' ['+id+']';container.append(chip);
+  }
+ }else{
+  const text=document.createElement('span');text.className='warn';
+  text.textContent='No structured athlete IDs found in the latest candidate snap. The engine must infer personnel, not claim confirmed participation.';
+  container.append(text);
+ }
+ return teams;
+}
+async function teamSources(teams){
+ const lines=[];
+ for(const t of teams){
+   const urls=['depthcharts','roster','injuries'].map(x=>base+'teams/'+encodeURIComponent(t.id)+'/'+x);
+   const rs=await Promise.allSettled(urls.map(get));
+   const detail=rs.map((r,i)=>{
+    if(r.status!=='fulfilled')return ['depth','roster','injury'][i]+': unavailable';
+    const v=r.value;
+    let size=i===0?arr(v.depthCharts||v.depthcharts).length:i===1?arr(v.athletes||v.roster).length:arr(v.injuries).length;
+    return ['depth groups','roster groups','injury entries'][i]+': '+size;
+   });
+   lines.push(t.name+' — '+detail.join(' · '));
+ }
+ $('sourceStats').textContent=lines.join('\n')+
+  '\nCounts indicate availability of ESPN fields, not complete depth charts, validated game-day active lists, or confirmed lineups.';
+}
+function assignBoards(teams){
+ const [away,home]=teams;
+ $('awayName').textContent='LEFT · '+away.name;
+ $('homeName').textContent='RIGHT · '+home.name;
+ const pairs=[['leftPreview',away,'left'],['rightPreview',home,'right']];
+ for(const [target,t,side] of pairs){
+   const q=new URLSearchParams({sport:'cfb',team:t.name,eventId:selected,side});
+   const path='./football-personnel-preview-board.html?'+q.toString();
+   if($(target).getAttribute('src')!==path)$(target).setAttribute('src',path);
+ }
+}
+async function sample(){
+ if(loading||!selected)return;
+ loading=true;
+ try{
+  const data=await get(base+'summary?event='+encodeURIComponent(selected));
+  const first=!lastData;
+  lastData=data;samples++;
+  const teams=render(data);
+  if(first){assignBoards(teams);teamSources(teams).catch(()=>{})}
+  msg('Sampling event '+selected+' every 20 seconds. Last received '+new Date().toLocaleTimeString()+'. Both portrait previews are isolated from TV assignments.');
+ }catch(e){msg('ESPN selected-game data unavailable: '+e.message+'. Keeping the last valid preview.',true)}
+ finally{loading=false}
+}
+function inspect(id){
+ if(!/^\d{7,15}$/.test(String(id))){msg('Enter a valid ESPN numeric event ID.',true);return}
+ if(timer)clearInterval(timer);timer=null;
+ selected=String(id);samples=0;lastSeen='';lastData=null;
+ $('metrics').textContent='Loading selected event…';$('sourceStats').textContent='Checking context on first successful response…';
+ $('leftPreview').removeAttribute('src');$('rightPreview').removeAttribute('src');
+ sample();timer=setInterval(sample,20000);
+}
+async function schedule(){
+ const date=dateKey(),urls=[base+'scoreboard?dates='+date+'&groups=80&limit=200',base+'scoreboard?dates='+date+'&limit=200'];
+ let results=[],attempts=[];
+ for(const url of urls){
+  try{
+   const data=await get(url),events=arr(data.events);
+   attempts.push(events.length+' games returned');
+   if(!events.length)continue;
+   results=events.map(e=>{
+    const comp=arr(e.competitions)[0]||{},teams=arr(comp.competitors);
+    const a=teams.find(x=>x.homeAway==='away'),h=teams.find(x=>x.homeAway==='home');
+    if(!a?.team||!h?.team)return null;
+    const state=e.status?.type?.state||'pre';
+    return{id:String(e.id),away:a.team.displayName,home:h.team.displayName,
+      label:(state==='in'?'LIVE':state==='post'?'FINAL':'UPCOMING')+' · '+(a.team.shortDisplayName||a.team.displayName)+' @ '+(h.team.shortDisplayName||h.team.displayName),
+      rank:state==='in'?0:state==='pre'?1:2};
+   }).filter(Boolean);
+   if(results.length)break;
+  }catch(e){attempts.push(String(e.message||e))}
+ }
+ games=new Map([[known.id,known],...results.map(x=>[x.id,x])]);
+ const select=$('match'),old=select.value;select.replaceChildren();
+ for(const g of [...games.values()].sort((a,b)=>(a.rank??0)-(b.rank??0))){
+  const option=document.createElement('option');option.value=g.id;option.textContent=g.label;select.append(option);
+ }
+ const defaultLive=results.find(g=>g.id===known.id)||results.find(g=>g.rank===0);
+ select.value=games.has(old)?old:(defaultLive?.id||known.id);
+ msg(results.length+' college football games from ESPN for '+date+'. '+(results.some(x=>x.rank===0)?'Live games appear first.':'The reference matchup is available even if ESPN discovery is incomplete.')+'');
+}
+$('refresh').addEventListener('click',schedule);
+$('load').addEventListener('click',()=>inspect($('match').value));
+$('manualBtn').addEventListener('click',()=>inspect($('manual').value.trim()));
+schedule().finally(()=>inspect($('match').value||known.id));
+})();
+</script></body></html>
