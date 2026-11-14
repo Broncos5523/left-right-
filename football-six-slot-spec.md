@@ -68,3 +68,13 @@ Proposed position-specific stat lines, implemented in isolated preview:
 - **No unsupported assumptions:** ESPN's Pittsburgh roster exposes generic `DL` but no `RE` or `LE`, and its depth-chart endpoint contained no entries during the live test. Consequently Pittsburgh's EDGE slots legitimately remain unfilled without additional authority to treat `DL` as `EDGE`.
 - **Testing:** Real ESPN Florida State–Pittsburgh data populated both DB slots (Shadarian Harrison and Cruce Brookins), with no duplicate IDs. A controlled fixture derived from that roster, with two DL labels changed *synthetically* to RE/LE, populated both EDGE slots. Injecting one *synthetic* credited tackle by Kanye Thompson changed exactly one DB slot, retained the other and both EDGE anchors. These synthetic labels/plays are tests, not assertions about the actual game.
 - **Latest preview engine:** `football-personnel-preview-engine.js?v=3761eaf2`. Production `team-board.html` and approved CSS untouched.
+
+## Live ESPN defensive play validation — November 13, 2026
+- Replayed **actual** Florida State–Pittsburgh game play descriptions against the isolated football engine; controlled play cutoffs retain true ESPN play text, not invented tackles.
+- Shared tackle play `401858293669` contains `(#14 J.Guerrier; #3 S.Lee Jr.)`. Parsed and roster-matched both credited Pitt DBs as **Josh Guerrier** and **Shawn Lee Jr.**. Both took separate S/CB fallback slots during that live-play replay without duplicate IDs.
+- Subsequent real plays credited **Cruce Brookins**, **Raion Strader**, and linebacker **Jeremiah Warren**, replacing their respective eligible dynamic slots. No periodic rotation was added.
+- An earlier transient test reported an empty linebacker slot, but a repeat instrumented replay did not reproduce it. Track in future live tests rather than introducing an unverified fix.
+- ESPN's Pitt depth-chart response was empty and generic DL/DB roster labels remain a limitation. Keep Pitt EDGE slots unfilled where no explicit EDGE/DE/RE/LE exists; do not silently classify all DL as EDGE.
+- Fixed the parser to detect both players in semicolon-delimited shared tackles and common named defensive actions. Validated the specific ESPN players against actual roster IDs.
+- New source published to development branch and isolated main-branch preview file `football-personnel-preview-engine.js`; preview HTML query version `c5d015db`. This is **not** a production TV deployment.
+- GitHub Pages publication for the latest parser commit was still running at last check; do not claim the new source is being served before verification.
