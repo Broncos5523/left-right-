@@ -171,7 +171,7 @@ async function update(){
   note.textContent=live
    ?'B/S/O, occupied bases, batter, pitcher, and last play appear only when the live feed supplies them. Batting numbers are current-game stats; pitchers show game IP/K and ERA when published. H/AB is used when plate appearances are unavailable.'
    :'Selected team box-score contributors. Final scores and game statistics remain displayed until you select another board. No live count, baserunners, or current batter/pitcher are claimed after the game ends.';
- }catch(e){band.textContent='GAME DATA UNAVAILABLE';note.textContent='MLB update unavailable: '+e.message+'. Retrying automatically.'}
+ }catch(e){/* Retain last verified game-phase heading on feed outage. */note.textContent='MLB update unavailable: '+e.message+'. Retrying automatically.'}
 }
 update();setInterval(update,45000);
 })();
