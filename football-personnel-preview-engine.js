@@ -370,7 +370,9 @@
   function roleFits(c,mode,index,relaxed=false){
     if(!c)return false;
     const target=SLOT_ROLES[mode][index],position=pos(c);
-    if(target==='EDGE')return c.role==='EDGE'||(relaxed&&c.role==='LB'&&/^(OLB|LOLB|ROLB)$/.test(position));
+    // Generic DL is the final EDGE display fallback when ESPN lacks a specific
+    // EDGE/DE/RE/LE. Display role is not evidence of actual edge alignment.
+    if(target==='EDGE')return c.role==='EDGE'||(relaxed&&(c.role==='DL'||c.role==='LB'&&/^(OLB|LOLB|ROLB)$/.test(position)));
     if(target==='DL')return c.role==='DL'||(relaxed&&c.role==='EDGE');
     if(target==='LB')return c.role==='LB';
     if((target==='S'||target==='CB')&&c.role==='DB')return relaxed;
@@ -380,7 +382,21 @@
   function eligible(pool,mode,index,used){
     const available=pool.filter(c=>!used.has(c.id)&&roleFits(c,mode,index));
     if(available.length)return available.sort(playerPriority);
-    if(mode==='defense'&&(index===0||index===1||index===3||index===4||index===5)){
+    if(mode==='defense'&&(index===0||index===1)){
+      // Prefer exact EDGE/DE/RE/LE, then verified roster DL candidates when
+      // a source cannot distinguish ends. Anchors remain static after selection.
+      const dl=pool.filter(c=>c.role==='DL'&&!used.has(c.id));
+      if(dl.length)return dl.sort((a,b)=>{
+        const aBox=a.groups?.defense?1:0,bBox=b.groups?.defense?1:0;
+        const impact=c=>stat(c,'defense',['totaltackles','tackles'],['tot','tack','tackles'])+
+          3*stat(c,'defense',['sacks'],['sack','sacks'])+
+          2*stat(c,'defense',['tacklesforloss'],['tfl']);
+        return bBox-aBox||impact(b)-impact(a)||playerPriority(a,b);
+      });
+      return pool.filter(c=>!used.has(c.id)&&c.role==='LB'&&
+        /^(OLB|LOLB|ROLB)$/.test(pos(c))).sort(playerPriority);
+    }
+    if(mode==='defense'&&(index===3||index===4||index===5)){
       return pool.filter(c=>!used.has(c.id)&&roleFits(c,mode,index,true)).sort(playerPriority);
     }
     return [];
