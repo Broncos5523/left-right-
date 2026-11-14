@@ -69,3 +69,19 @@ distinct ready/unavailable status; fail safely when not yet hosted.
 
 Do not overwrite original Drive archives or change the approved Game Wall
 controller/header/visual style without user review.
+
+## Phase 2a — browser and live-source proof (2026-11-14)
+
+- Preserved original approved NBA Page 2 HTML and 2026-10-18 runtime byte-for-byte:
+  - `migration/source/boards/page2_nba.html` — Git blob `2e3ad2f231c16add5dd7a8b89211121a321c404a`
+  - `migration/source/runtime_nba_p2_v7p.js` — Git blob `ef368631ace4bb940c2ff177c48581b93ad1fb04`
+- Reused pre-existing, unpublished **Man Cave NBA Page 2** Floot project for a **development-only** render at `/__dev/nba-v8l`, leaving its published/home page and Game Wall untouched. A new hosting project and branching were unavailable on the free account; do not require the user to upgrade to proceed with GitHub staging.
+- Original NBA arena, original trophy and a pixel-identical lossless-WebP version of the original neon logo were loaded into that existing project's assets. This does not modify original source files.
+- Exact original `page2_nba.html` DOM/CSS adapted ONLY in the development page's in-memory copy for asset URLs; original live runtime currently disabled in that visual test.
+- In the running browser, original stage exists, the arena background is applied, and 30/30 image elements loaded. This is a static visual compatibility check, **not** 28-board acceptance or live stats certification.
+- Created development-only read-only API endpoint `/_api/__dev/nba-v8l-probe` in the existing Floot project. It obtains current NBA season from ESPN scoreboard and the six original Page 2 leader categories using the same ESPNs statistical keys as the verified Python source.
+- Initial and repeat cloud checks: HTTP 200, 6/6 available qualified leader records, verified current-season context; frontend/endpoint typecheck clean. Original Python server's DNS was blocked in this container, but cloud source requests succeeded.
+- The dev preview shows the six live-source health results **below** the original locked board; it does **not** inject them into the approved design. MVP, team-leader panels, ticker data, and production API parity remain to be built and independently validated.
+- No Firebase commands, TV receiver changes, or edits to the live Game Wall controller occurred.
+
+**Next:** Reproduce the original NBA Page 2 feed JSON contract (including six leader details, valid team panels, credible award-watch source, 48-hour ticker selection and last-good behavior), then enable the unchanged runtime adapter against an isolated route. Do not show live NBA stats over frozen 2025–26 FINAL footer text; validate correct season and labels first. Only after full acceptance should a controller tile send this hosted board to a TV.
