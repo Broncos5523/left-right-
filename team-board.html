@@ -16,8 +16,65 @@
 </style></head><body><main id="app"></main><script>
 const p=new URLSearchParams(location.search),sport=p.get('sport')||'nba',team=p.get('team')||'Team awaiting assignment';
 const conf={nba:['ON COURT',5,'#00a65a',['PTS','REB','AST']],wnba:['ON COURT',5,'#ed174b',['PTS','REB','AST']],cbb:['ON COURT',5,'#cc0033',['PTS','REB','AST']],nhl:['ON ICE',6,'#ffb81c',['G','A','+/-']],nfl:['ON OFFENSE',6,'#fb4f14',['YDS','ATT','TD']],cfb:['ON OFFENSE',6,'#cc0033',['YDS','ATT','TD']],mlb:['AT THE PLATE',4,'#bd3039',['H','AB','HR']]}[sport]||['TEAM BOARD',5,'#777',['—','—','—']];
-const sidePosition=p.get('side')==='right'?'right':'left';const app=document.getElementById('app');app.style.setProperty('--accent',conf[2]);
-function setScore(value){const el=app.querySelector('.score');el.textContent=value;el.classList.toggle('triple',String(value??'').replace(/[^0-9]/g,'').length>=3)}function setHeader(match){if(!match)return;const t=match.team||{};const abbr=t.abbreviation||t.shortDisplayName||String(team).split(' ').map(x=>x[0]).join('').slice(0,4);app.querySelector('.team-abbr').textContent=String(abbr).toUpperCase();if(match.homeAway)app.querySelector('.side-label').textContent=match.homeAway.toUpperCase()}function setRank(rank){const el=app.querySelector('.rank-badge');const n=Number(rank);el.hidden=!(sport==='cfb'||sport==='cbb')||!Number.isInteger(n)||n<1||n>25;if(!el.hidden)el.textContent='#'+n}const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sidePosition=p.get('side')==='right'?'right':'left';const app=document.getElementById('app');
+
+/*
+  LOCKED TEAM COLOR STANDARD — all seven LEFT RIGHT production leagues.
+  Applies only to existing CSS --accent; player layout, data and selection rules stay intact.
+  1. ESPN primary if readable on black; 2. ESPN alternate; 3. verified club fallback.
+  4. Brighten the selected team's own color if necessary; otherwise neutral silver.
+*/
+const APPROVED_TEAM_ACCENTS=Object.freeze({
+ 'denver broncos':'#FB4F14',
+ 'boston celtics':'#008B42',
+ 'boston bruins':'#FFB81C',
+ 'boston red sox':'#BD3039',
+ 'indiana fever':'#E03A3E',
+ 'arizona wildcats':'#AB0520',
+ 'indiana pacers':'#FDBB30'
+});
+function normalizeAccent(value){
+ if(typeof value!=='string')return null;
+ let hex=value.trim().replace(/^#/,'');
+ if(/^[0-9a-f]{3}$/i.test(hex))hex=hex.split('').map(x=>x+x).join('');
+ return /^[0-9a-f]{6}$/i.test(hex)?'#'+hex.toUpperCase():null;
+}
+function accentContrast(hex){
+ const vals=[1,3,5].map(i=>{
+  const v=parseInt(hex.slice(i,i+2),16)/255;
+  return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);
+ });
+ return (vals[0]*.2126+vals[1]*.7152+vals[2]*.0722+.05)/.05;
+}
+function lightenedAccent(hex){
+ for(let part=1;part<=14;part++){
+  const mix=part*.04;
+  const rgb=[1,3,5].map(i=>{
+   const n=parseInt(hex.slice(i,i+2),16);
+   return Math.round(n+(255-n)*mix).toString(16).padStart(2,'0');
+  });
+  const candidate='#'+rgb.join('').toUpperCase();
+  if(accentContrast(candidate)>=3.5)return candidate;
+ }
+ return '#AEB8C5';
+}
+function teamAccent(data){
+ const t=data||{};
+ const key=String(t.displayName||t.name||team).trim().toLowerCase();
+ const primary=normalizeAccent(t.color);
+ const alternate=normalizeAccent(t.alternateColor);
+ const official=normalizeAccent(APPROVED_TEAM_ACCENTS[key]);
+ if(primary&&accentContrast(primary)>=3.5)return primary;
+ if(alternate&&accentContrast(alternate)>=3.5)return alternate;
+ if(official&&accentContrast(official)>=3.5)return official;
+ if(primary&&primary!=='#000000')return lightenedAccent(primary);
+ if(alternate&&alternate!=='#000000')return lightenedAccent(alternate);
+ if(official)return lightenedAccent(official);
+ return '#AEB8C5'; // unidentified team: neutral, never another team's hue
+}
+app.style.setProperty('--accent',teamAccent({displayName:team}));
+
+function setScore(value){const el=app.querySelector('.score');el.textContent=value;el.classList.toggle('triple',String(value??'').replace(/[^0-9]/g,'').length>=3)}function setHeader(match){if(!match)return;const t=match.team||{};app.style.setProperty('--accent',teamAccent(t));const abbr=t.abbreviation||t.shortDisplayName||String(team).split(' ').map(x=>x[0]).join('').slice(0,4);app.querySelector('.team-abbr').textContent=String(abbr).toUpperCase();if(match.homeAway)app.querySelector('.side-label').textContent=match.homeAway.toUpperCase()}function setRank(rank){const el=app.querySelector('.rank-badge');const n=Number(rank);el.hidden=!(sport==='cfb'||sport==='cbb')||!Number.isInteger(n)||n<1||n>25;if(!el.hidden)el.textContent='#'+n}const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 app.innerHTML='<div class="header '+(sidePosition==='right'?'right-side':'')+'"><div class="logo-group"><div class="logo-wrap"><span class="rank-badge" hidden></span><img class="logo" alt="Team logo" hidden></div></div><div class="team"><div class="side-label">'+(sidePosition==='right'?'HOME':'AWAY')+'</div><div class="team-abbr">TEAM</div><div class="team-record"></div><div class="name">'+esc(team)+'</div><div class="meta">CURRENT GAME · DATA PENDING</div></div><div class="score">—</div></div><div class="band">'+conf[0]+'</div>'+Array.from({length:conf[1]},(_,i)=>'<div class="row"><div class="portrait">HEADSHOT<br>UNAVAILABLE</div><div class="player">PLAYER<br>UNVERIFIED</div><div class="stats">'+conf[3].map(x=>'<div><small>'+x+'</small><b>—</b></div>').join('')+'</div></div>').join('')+'<p class="note">Layout development preview only. No live lineup, player statistics, headshots, team record, or score have been verified. Approved artwork will be integrated separately.</p>';
 </script><script>
 if(sport==='cbb'){
