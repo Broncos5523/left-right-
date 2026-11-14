@@ -120,7 +120,7 @@ function parsedSubstitution(s){
  if(!m)return null;
  const cleanup=x=>x.replace(/\s*\([^)]*\)\s*$/,'').trim();
  const incoming=norm(cleanup(m[1])),outgoing=norm(cleanup(m[2]));
- return incoming&&outgoing?{incoming,outgoing,text:txt,teamId:String(s.team?.id||'')}:null;
+ return incoming&&outgoing?{incoming,outgoing,text:txt,teamId:String(s.team?.id||''),eventKey:subKey(s)}:null;
 }
 function compareSamples(teams,rosters,active,plays,subs){
  const previous=observations.filter(x=>x.id===currentId).at(-1);
@@ -145,7 +145,7 @@ function compareSamples(teams,rosters,active,plays,subs){
    for(const shift of shifts){
      const entered=shift.added.some(n=>norm(n)===pair.incoming);
      const left=shift.removed.some(n=>norm(n)===pair.outgoing);
-     if(entered&&left&&(!pair.teamId||pair.teamId===shift.teamId))exactMatches.push({team:shift.team,in:pair.incoming,out:pair.outgoing});
+     if(entered&&left&&(!pair.teamId||pair.teamId===shift.teamId))exactMatches.push({team:shift.team,in:pair.incoming,out:pair.outgoing,eventKey:pair.eventKey});
    }
  }
  const record={time:new Date().toLocaleTimeString(),substitutions:newSubs,plays:newPlays,shifts,pairs,
@@ -159,22 +159,24 @@ function compareSamples(teams,rosters,active,plays,subs){
    for(const pair of later)for(const shift of earlier.shifts){
      if(pair.teamId&&pair.teamId!==shift.teamId)continue;
      if(shift.added.some(n=>norm(n)===pair.incoming)&&shift.removed.some(n=>norm(n)===pair.outgoing))
-       earlier.exactMatches.push({team:shift.team,in:pair.incoming,out:pair.outgoing});
+       earlier.exactMatches.push({team:shift.team,in:pair.incoming,out:pair.outgoing,eventKey:pair.eventKey});
    }
  }
  const matched=changes.filter(x=>x.correlated).length;
  const unexplained=changes.filter(x=>x.unexplained).length;
  const changed=changes.filter(x=>x.shifts.length).length;
- const exact=changes.reduce((sum,x)=>sum+x.exactMatches.length,0);
+ // A substitution can match neighboring samples because ESPN responses lag. Count
+ // each ESPN event/team pair only once rather than inflating a repeated match.
+ const exact=new Set(changes.flatMap(x=>(x.exactMatches||[]).map(y=>y.eventKey+'|'+y.team))).size;
  $('correlation').textContent='Sample intervals: '+changes.length+
   ' · Lineup-change intervals: '+changed+
   ' · Change intervals with new substitution records: '+matched+
   ' · Changes without new substitutions: '+unexplained+
-  ' · Exact IN/OUT name-pair matches: '+exact+
+  ' · Unique exact IN/OUT substitution matches: '+exact+
   '\n'+(exact>=2?'Multiple named substitutions match both entering and leaving active-player flags.':exact===1?'One named substitution matches an IN/OUT change.':matched?'Lineup changes overlap substitution records, but no exact player-name pair has matched.':'Waiting for a lineup change during a recorded substitution.')+
   ' This is supporting evidence, not independent on-court verification.';
  $('quickCorrelation').textContent=exact?
-   'EXACT SUBSTITUTION MATCHES: '+exact+' IN/OUT name-pair'+(exact===1?'':'s')+' observed (allowing up to ~30s feed lag).':
+   'UNIQUE SUBSTITUTION MATCHES: '+exact+' IN/OUT name-pair'+(exact===1?'':'s')+' observed (allowing up to ~30s feed lag).':
    'LINEUP CHECK: '+changed+' change intervals; '+matched+' overlapped substitutions. Exact name matches not established.';
  const lastExamples=freshSubs.slice(-3).map(x=>String(x.text||'').slice(0,160));
  $('parserInfo').textContent='New substitution events this sample: '+newSubs+
