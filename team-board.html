@@ -15,8 +15,70 @@
 .header.right-side .score{grid-column:1;justify-self:start;text-align:left;padding:0 0 0 clamp(5px,1.4vw,12px)}
 /* Full-height portrait TV iframe: avoid the phone-only 540px width cap without changing approved component positions. */
 @media (orientation:portrait) and (min-width:541px){main{max-width:none}}
+
+/* LEFT/RIGHT FIRE TV PORTRAIT FILL — November 2026
+   Applied only for ?tv=1 on the two rotated Fire TV receiver iframes.
+   Let the existing five-, six-, or four-row layout divide the available
+   vertical space without touching score layouts, board feeds, or phone previews.
+   Original header grid and approved team colors remain intact. */
+html[data-tv-board="true"],
+html[data-tv-board="true"] body {height:100%;overflow:hidden}
+html[data-tv-board="true"] main {
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  max-width:none;
+  height:100vh;
+  min-height:100vh;
+  margin:0 auto;
+  padding:1.35vh 2.35vw 1.45vh;
+  overflow:hidden;
+}
+html[data-tv-board="true"] .header {flex:0 0 auto;min-width:0;padding-bottom:.8vh}
+html[data-tv-board="true"] .band {
+  flex:0 0 auto;
+  margin:.7vh 0 .1vh;
+  padding:.48vh 0;
+  font-size:clamp(25px,3.8vh,45px);
+}
+html[data-tv-board="true"] .mlb-game-state {flex:0 0 auto}
+html[data-tv-board="true"] .row {
+  flex:1 1 0;
+  min-height:0;
+  height:auto;
+  overflow:hidden;
+  align-items:center;
+}
+html[data-tv-board="true"] .portrait {
+  height:100%;
+  min-height:0;
+  display:grid;
+  align-items:center;
+  justify-items:center;
+}
+html[data-tv-board="true"] .portrait img {
+  height:12.2vh!important;
+  max-height:88%!important;
+  max-width:100%!important;
+  width:auto;
+  object-fit:contain;
+}
+html[data-tv-board="true"] .player {
+  font-size:clamp(16px,2.55vh,30px)!important;
+  line-height:1.1;
+  overflow-wrap:break-word;
+  word-break:normal;
+  padding-right:clamp(5px,.9vw,10px);
+}
+html[data-tv-board="true"] .stats {padding-left:clamp(7px,1.1vw,13px);gap:3px}
+html[data-tv-board="true"] .stats small {font-size:clamp(12px,1.65vh,19px);line-height:1.15}
+html[data-tv-board="true"] .stats b {font-size:clamp(23px,3.9vh,46px);line-height:1.12}
+html[data-tv-board="true"] .mlb-role {font-size:clamp(11px,1.35vh,16px)}
 </style></head><body><main id="app"></main><script>
 const p=new URLSearchParams(location.search),sport=p.get('sport')||'nba',team=p.get('team')||'Team awaiting assignment';
+/* Isolated full-height styling for mounted LEFT/RIGHT Fire TVs; no change to browser/phone previews. */
+document.documentElement.dataset.tvBoard=p.get('tv')==='1'?'true':'false';
 const conf={nba:['ON COURT',5,'#00a65a',['PTS','REB','AST']],wnba:['ON COURT',5,'#ed174b',['PTS','REB','AST']],cbb:['ON COURT',5,'#cc0033',['PTS','REB','AST']],nhl:['ON ICE',6,'#ffb81c',['G','A','+/-']],nfl:['ON FIELD',6,'#fb4f14',['YDS','ATT','TD']],cfb:['ON FIELD',6,'#cc0033',['YDS','ATT','TD']],mlb:['AT THE PLATE',4,'#bd3039',['H','AB','HR']]}[sport]||['TEAM BOARD',5,'#777',['—','—','—']];
 const sidePosition=p.get('side')==='right'?'right':'left';const app=document.getElementById('app');
 
