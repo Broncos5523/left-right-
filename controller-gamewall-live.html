@@ -25,7 +25,7 @@
 </style>
 </head>
 <body><main class="shell">
-<header class="hero"><div class="brace"><div class="brand-mark"><img class="brand-logo" src="https://raw.githubusercontent.com/Broncos5523/Live-Game-Field-/main/landscape-preview-v1/assets/branding/man-cave-sports-book-transparent.png" alt="Man Cave Sports Book logo" decoding="async" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='https://broncos5523.github.io/Live-Game-Field-/landscape-preview-v1/assets/branding/man-cave-sports-book-transparent.png?v=brand-20261114';}else{this.hidden=true;document.getElementById('logoFallback').hidden=false;}" onload="this.hidden=false;document.getElementById('logoFallback').hidden=true"><span class="kicker" id="logoFallback" hidden>MAN CAVE SPORTS BOOK</span></div><span class="chip preview" id="remoteChip">REMOTE · SIGN IN</span></div><h1>GAME <em>WALL</em></h1><div class="strap">LEFT / RIGHT · Broadcast Command Center</div></header>
+<header class="hero"><div class="brace"><div class="brand-mark"><img class="brand-logo" src="https://raw.githubusercontent.com/Broncos5523/Live-Game-Field-/main/landscape-preview-v1/assets/branding/man-cave-sports-book-transparent.png" alt="Man Cave Sports Book logo" decoding="async" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='https://broncos5523.github.io/Live-Game-Field-/landscape-preview-v1/assets/branding/man-cave-sports-book-transparent.png?v=brand-20261114';}else{this.hidden=true;document.getElementById('logoFallback').hidden=false;}" onload="this.hidden=false;document.getElementById('logoFallback').hidden=true"><span class="kicker" id="logoFallback" hidden>MAN CAVE SPORTS BOOK</span></div><span class="chip preview" id="remoteChip">REMOTE · SIGN IN</span></div><h1>GAME <em>WALL</em></h1><div class="strap">LEFT / RIGHT / TV 3 · Broadcast Command Center</div></header>
 <section id="assignment" class="panel">
 <div class="head"><h2>TV Assignments</h2><small>Authenticated control · LEFT + RIGHT</small></div>
 <div class="selection"><div class="eyebrow" style="margin-bottom:10px">Selected matchup</div><div id="selected" class="selected">Tap any game below to select it</div>
@@ -36,12 +36,41 @@
 <form id="remoteLogin" autocomplete="on"><label for="remoteEmail">Controller email</label><input id="remoteEmail" type="email" autocomplete="username" placeholder="Email address" required><label for="remotePassword">Password</label><input id="remotePassword" type="password" autocomplete="current-password" required><div class="bar"><button type="submit" id="remoteConnect" class="action gold" disabled>CONNECT</button><button type="button" id="remoteLogout" class="action" hidden>SIGN OUT</button></div></form>
 <p class="status" id="remoteStatus" role="status">Loading secure Firebase connection…</p>
 <p class="status" id="remoteActivity"></p></details></div></section>
+<section id="thirdAssignment" class="panel">
+<div class="head"><h2>TV 3 · 28-PAGE BOARD</h2><small>Independent Onn TV · existing Render address</small></div>
+<div class="selection">
+<div class="outputs" style="grid-template-columns:1fr">
+<div class="output" style="border-top:3px solid var(--gold)">
+<h3>● TV 3 <span>ONN · PORTRAIT</span></h3>
+<div class="chosen"><b id="thirdChosen">All 28 boards · automatic rotation</b></div>
+<div class="option-line">Display on TV 3</div>
+<select id="thirdPick" class="pick" aria-label="TV 3 28-page board selection">
+<option value="rotation">ALL 28 BOARDS · AUTO ROTATION</option>
+<optgroup label="NFL · Denver Broncos">
+<option value="page1_nfl">Broncos · Page 1</option><option value="page2_nfl">Broncos · Page 2</option><option value="page3_broncos">Broncos · Page 3</option><option value="page4_broncos">Broncos · Page 4</option>
+</optgroup><optgroup label="NBA · Boston Celtics">
+<option value="page1_nba">Celtics · Page 1</option><option value="page2_nba">Celtics · Page 2</option><option value="page3_celtics">Celtics · Page 3</option><option value="page4_celtics">Celtics · Page 4</option>
+</optgroup><optgroup label="NHL · Boston Bruins">
+<option value="page1_nhl">Bruins · Page 1</option><option value="page2_nhl">Bruins · Page 2</option><option value="page3_bruins">Bruins · Page 3</option><option value="page4_bruins">Bruins · Page 4</option>
+</optgroup><optgroup label="MLB · Boston Red Sox">
+<option value="page1_mlb">Red Sox · Page 1</option><option value="page2_mlb">Red Sox · Page 2</option><option value="page3_redsox">Red Sox · Page 3</option><option value="page4_redsox">Red Sox · Page 4</option>
+</optgroup><optgroup label="WNBA · Indiana Fever">
+<option value="page1_wnba">Fever · Page 1</option><option value="page2_wnba">Fever · Page 2</option><option value="page3_fever">Fever · Page 3</option><option value="page4_fever">Fever · Page 4</option>
+</optgroup><optgroup label="NCAA Football · Arizona Wildcats">
+<option value="page1_cfb">Arizona Football · Page 1</option><option value="page2_cfb">Arizona Football · Page 2</option><option value="page3_arizona_cfb">Arizona Football · Page 3</option><option value="page4_arizona_cfb">Arizona Football · Page 4</option>
+</optgroup><optgroup label="NCAA Basketball · Arizona Wildcats">
+<option value="page1_cbb">Arizona Basketball · Page 1</option><option value="page2_cbb">Arizona Basketball · Page 2</option><option value="page3_arizona_cbb">Arizona Basketball · Page 3</option><option value="page4_arizona_cbb">Arizona Basketball · Page 4</option>
+</optgroup></select>
+</div></div>
+<div class="bar"><button class="action gold" id="thirdSend" type="button">SEND TO TV 3</button></div>
+<p class="status" id="thirdStatus" role="status">TV 3 continues its original 28-board rotation unless you send a new assignment. LEFT and RIGHT stay untouched.</p>
+</div></section>
 <div class="wall-head"><div><div class="eyebrow">LIVE SCHEDULE FEED</div><h2>All Games <span id="gameCount" class="count">· …</span></h2></div><div class="mini-actions"><button id="refresh" class="refresh" type="button">↻ Refresh</button></div></div>
 <div class="league-controls"><label for="leaguePick">LEAGUE</label><select id="leaguePick" aria-label="Choose league"><option value="favorites">★ MY TEAMS</option><option value="NFL">NFL</option><option value="NBA">NBA</option><option value="NHL">NHL</option><option value="MLB">MLB</option><option value="WNBA">WNBA</option><option value="CFB">COLLEGE FOOTBALL</option><option value="CBB">COLLEGE BASKETBALL</option><option value="all">ALL LEAGUES</option></select></div>
 <div class="toolbar" id="filters" aria-label="Filter matchups"><button class="filter active" data-filter="all" type="button">ALL</button><button class="filter" data-filter="live" type="button">● LIVE</button><button class="filter" data-filter="upcoming" type="button">UPCOMING</button><button class="filter" data-filter="final" type="button">FINALS</button><button class="filter" data-filter="favorites" type="button">★ FAVORITES</button></div>
 <p id="feedStatus" class="status" style="margin:0 4px 12px" role="status">Loading ESPN matchups across all seven sports…</p>
 <div id="wall" class="wall"><div class="empty">Loading your teams' games. Choose any league above to narrow the list…</div></div>
-<div class="bottom-note">Matchups and scores are sourced from ESPN when available and may be delayed. This controller uses your existing Firebase LEFT/RIGHT commands. The approved 9:16 player boards and Upcoming/Live websites remain unchanged.</div>
+<div class="bottom-note">Matchups and scores are sourced from ESPN when available and may be delayed. LEFT and RIGHT game assignments and TV 3 28-page controls use independent Firebase paths. The approved 9:16 player boards and Upcoming/Live websites remain unchanged.</div>
 </main>
 <script>
 (function(){
@@ -119,6 +148,12 @@ const connect=document.getElementById('remoteConnect');
 const logout=document.getElementById('remoteLogout');
 const signInForm=document.getElementById('remoteLogin');
 const bridge=window.GameWallBridge;
+const thirdPick=document.getElementById('thirdPick');
+const thirdStatus=document.getElementById('thirdStatus');
+const thirdSend=document.getElementById('thirdSend');
+const thirdChosen=document.getElementById('thirdChosen');
+function thirdLabel(mode){const o=Array.from(thirdPick.options).find(opt=>opt.value===mode);return o?o.textContent:'Unknown board';}
+thirdPick.addEventListener('change',()=>{thirdChosen.textContent=thirdLabel(thirdPick.value);thirdStatus.textContent='Selection ready. Tap SEND TO TV 3 to apply; LEFT and RIGHT are unaffected.';});
 let loggedIn=false,queue=Promise.resolve(),requestNumber=0,unsubscribeScreens=null,firebaseSdk=null;
 function info(message){remoteStatus.textContent=message;}
 function connected(user){
@@ -136,7 +171,7 @@ function connected(user){
    const data=snapshot.val();
    if(!data)return;
    function brief(v){return v?.type==='team'?(v.team||'Team'):v?.type==='upcoming'?'Upcoming Matchups':v?.type==='live'?'Live Games / Results':'Unassigned';}
-   document.getElementById('remoteActivity').textContent='Firebase currently holds · LEFT: '+brief(data.left)+' · RIGHT: '+brief(data.right)+'. This confirms database state, not TV playback.';
+   document.getElementById('remoteActivity').textContent='Firebase currently holds · LEFT: '+brief(data.left)+' · RIGHT: '+brief(data.right)+' · TV 3: '+(data.third?.type==='rotation'?'28-page rotation':data.third?.type==='board'?thirdLabel(data.third.board):'No remote assignment')+'. This confirms database state, not TV playback.';
   },error=>{document.getElementById('remoteActivity').textContent='Assignment read unavailable · '+(error.code||error.message);});
  }
  if(!loggedIn){info('Sign in to activate one-tap game switching.');document.getElementById('remoteActivity').textContent='';}
@@ -157,7 +192,8 @@ async function send(cause){
  bridge.status('Sending '+cause+' · LEFT: '+labels.left+' · RIGHT: '+labels.right+'…');
  const task=queue.catch(()=>{}).then(async()=>{
   if(!auth.currentUser)throw new Error('Firebase sign-in expired');
-  await set(ref(db,'screens'),payload);
+  // Update only LEFT and RIGHT so selecting a game never erases TV 3's command.
+  await update(ref(db,'screens'),payload);
  });
  queue=task;
  try{
@@ -167,12 +203,28 @@ async function send(cause){
   if(number===requestNumber){bridge.status('Send failed · '+(error.code||error.message||'Unknown Firebase error'));info('Firebase did not save the assignment. Check your connection and database rules.');}
  }
 }
-window.GameWallRemote={send};
-let auth,db,ref,set;
+async function sendThird(){
+ if(!requireAuth())return;
+ const choice=thirdPick.value;
+ const command=choice==='rotation'?{type:'rotation',updatedAt:Date.now()}:{type:'board',board:choice,updatedAt:Date.now()};
+ thirdSend.disabled=true;
+ thirdStatus.textContent='Sending '+thirdLabel(choice)+' to TV 3…';
+ try{
+  if(!auth.currentUser)throw new Error('Firebase sign-in expired');
+  // Independent assignment: does not modify LEFT/RIGHT, even during game selections.
+  await set(ref(db,'screens/third'),command);
+  thirdStatus.textContent='Saved TV 3: '+thirdLabel(choice)+'. The Onn display updates when connected; TV playback is not yet independently verified.';
+ }catch(error){
+  thirdStatus.textContent='TV 3 command failed · '+(error.code||error.message||'Unknown Firebase error');
+ }finally{thirdSend.disabled=false;}
+}
+thirdSend.addEventListener('click',sendThird);
+window.GameWallRemote={send,sendThird};
+let auth,db,ref,set,update;
 try{
  const sdk=await import('./firebase.js');
  firebaseSdk=sdk;
- ({auth,db,ref,set}=sdk);
+ ({auth,db,ref,set,update}=sdk);
  connect.disabled=false;
  sdk.onAuthStateChanged(auth,connected,error=>info('Firebase authentication error · '+(error.code||error.message)));
  signInForm.addEventListener('submit',async event=>{
