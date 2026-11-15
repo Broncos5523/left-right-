@@ -736,7 +736,7 @@
       // Review-only override for viewing both sides of a completed NFL game.
       const forced=p.get('previewMode');
       const mode=forced==='offense'||forced==='defense'?forced:
-        state==='post'?slotState.lastMode:findPossession(data,competition,tid,scoreboard);
+        state==='post'?(slotState.lastMode||'offense'):findPossession(data,competition,tid,scoreboard);
       if(mode==='offense'||mode==='defense')slotState.lastMode=mode;
       const selectedIds=mode==='defense'?slotState.defense:mode==='offense'?slotState.offense:[];
       const shown=selectedIds.map(id=>id?pool.find(c=>c.id===id)||null:null);
