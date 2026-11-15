@@ -11,6 +11,25 @@
   const rows=[...app.querySelectorAll('.row')],band=app.querySelector('.band'),note=app.querySelector('.note');
   const roles=['QB','RB','WR','TE','CB','S','DB','EDGE','DL','LB'];
   const teamCache={id:null,stamp:0,depth:null,roster:null,injuries:null};
+  // Separate fast authoritative score refresh from the slower player/personnel
+  // refresh. Never regress an in-progress score when ESPN's feeds disagree.
+  const scoreState={last:null,source:null,at:null,teamId:null,date:null,phase:null};
+  let scoreBusy=false,scoreboardCache={slot:-1,day:'',promise:null};
+  function acceptVerifiedScore(value,source,phase){
+    const raw=String(value??'').trim();
+    if(!/^\d{1,3}$/.test(raw))return false;
+    const next=Number(raw);
+    if(!Number.isSafeInteger(next))return false;
+    if(scoreState.last!==null&&next<scoreState.last&&phase!=='post')return false;
+    if(next!==scoreState.last){
+      scoreState.last=next;scoreState.source=source;
+      scoreState.at=new Date().toISOString();
+      setScore(String(next));
+    }
+    window.__LR_NFL_SCORE__={score:scoreState.last,source:scoreState.source,
+      updatedAt:scoreState.at,phase:phase||scoreState.phase};
+    return true;
+  }
   const stateKey='lr-six-slot-nfl-v3:'+eventId+':'+norm(team);
   let slotState={offense:[null,null,null,null,null,null],defense:[null,null,null,null,null,null],
     processed:[],lastMode:null,lastActionByRB:{},lastDbSlot:5};
@@ -496,15 +515,35 @@
   }
   let possessionSource=null;
   async function getScoreboard(data){
-    const rawDate=data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate||'';
+    const rawDate=data?.header?.competitions?.[0]?.date||data?.header?.competitions?.[0]?.startDate||scoreState.date||'';
     const date=new Date(rawDate);
     if(!Number.isFinite(date.getTime()))return null;
     const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{
       timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'
     }).formatToParts(date).map(x=>[x.type,x.value]));
     const day=parts.year+parts.month+parts.day;
-    const board=await get(base+'scoreboard?dates='+day+'&limit=500&_='+Math.floor(Date.now()/15000));
-    return arr(board.events).find(x=>String(x.id)===String(eventId))||null;
+    const slot=Math.floor(Date.now()/5000);
+    if(scoreboardCache.slot===slot&&scoreboardCache.day===day&&scoreboardCache.promise)
+      return scoreboardCache.promise;
+    const promise=get(base+'scoreboard?dates='+day+'&limit=500&_='+slot)
+      .then(board=>arr(board.events).find(x=>String(x.id)===String(eventId))||null);
+    scoreboardCache={slot,day,promise};
+    return promise;
+  }
+  async function pollScoreboard(){
+    if(scoreBusy||!eventId||!scoreState.teamId||!scoreState.date)return;
+    scoreBusy=true;
+    try{
+      const board=await getScoreboard();
+      const comp=arr(board?.competitions)[0]||{};
+      const match=arr(comp.competitors).find(x=>String(x.team?.id||'')===scoreState.teamId);
+      if(match){
+        const phase=comp.status?.type?.state||scoreState.phase;
+        acceptVerifiedScore(match.score,'scoreboard',phase);
+      }
+    }catch(e){
+      // Keep the last confirmed score and let the next short poll retry.
+    }finally{scoreBusy=false}
   }
   function findPossession(data,competition,tid,scoreboard){
     const ids=arr(competition.competitors).map(x=>String(x.team?.id||'')).filter(Boolean);
@@ -712,7 +751,9 @@
       const competitors=arr(competition.competitors);
       const match=competitors.find(x=>norm(x.team?.displayName)===norm(team)||norm(x.team?.name)===norm(team));
       if(!match)throw Error('Selected event does not contain this team');
-      setHeader(match);setScore(match.score??'—');
+      const state=competition.status?.type?.state||'pre';
+      setHeader(match);
+      acceptVerifiedScore(match.score,'summary',state);
       const logo=app.querySelector('.logo');
       const src=match.team?.logo||match.team?.logos?.[0]?.href;
       if(src){logo.src=src;logo.hidden=false}
@@ -721,12 +762,17 @@
       if(sport==='cfb')setRank(match.curatedRank?.current??match.team?.rank??match.rank);
       const tid=match.team?.id;
       if(!tid)throw Error('Game team ID unavailable');
-      const state=competition.status?.type?.state||data.header?.competitions?.[0]?.status?.type?.state||'pre';
+      scoreState.teamId=String(tid);
+      scoreState.date=competition.date||competition.startDate||scoreState.date;
+      scoreState.phase=state;
       const [context,scoreboardResult]=await Promise.allSettled([
         getTeamContext(tid),getScoreboard(data)
       ]);
       const teamInfo=context.status==='fulfilled'?context.value:{depth:null,roster:null,injuries:null};
       const scoreboard=scoreboardResult.status==='fulfilled'?scoreboardResult.value:null;
+      const boardComp=arr(scoreboard?.competitions)[0]||{};
+      const boardTeam=arr(boardComp.competitors).find(x=>String(x.team?.id||'')===String(tid));
+      if(boardTeam)acceptVerifiedScore(boardTeam.score,'scoreboard',boardComp.status?.type?.state||state);
       const side=arr(data.boxscore?.players).find(x=>String(x.team?.id)===String(tid)||norm(x.team?.displayName)===norm(team));
       const pool=candidatePool(teamInfo.depth,teamInfo.roster,teamInfo.injuries||data.injuries,side,tid,
         state==='in',data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
@@ -767,7 +813,10 @@
     }finally{busy=false}
   }
   update();setInterval(update,15000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
-  window.addEventListener('focus',update);
-  window.addEventListener('online',update);
+  // Scores can arrive on ESPN's scoreboard ahead of its game-summary feed.
+  // Five-second refresh never infers points from plays or guesses a touchdown.
+  setInterval(pollScoreboard,5000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();pollScoreboard()}});
+  window.addEventListener('focus',()=>{update();pollScoreboard()});
+  window.addEventListener('online',()=>{update();pollScoreboard()});
 })();
