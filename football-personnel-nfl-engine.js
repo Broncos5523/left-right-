@@ -167,10 +167,12 @@
       if(n.includes('passing'))return 'passing';if(n.includes('rushing'))return 'rushing';
       if(n.includes('receiving'))return 'receiving';
       if(n==='interceptions'||n.includes('interception'))return 'interceptions';
-      if(n.includes('defensive')||n.includes('defense'))return 'defense';
-      const labs=arr(g.labels).map(norm);
+      if(n.includes('defensive')||n.includes('defense')||n==='tackles')return 'defense';
+      const labs=arr(g.labels).map(norm),keys=arr(g.keys).map(norm);
       if(labs.includes('rec'))return 'receiving';if(labs.includes('car'))return 'rushing';
-      if(labs.includes('catt'))return 'passing';if(labs.includes('tackles')||labs.includes('tot'))return 'defense';
+      if(labs.includes('catt'))return 'passing';
+      if(labs.some(x=>['tot','tkl','tack','tackles','tfl'].includes(x))||
+         keys.some(x=>['totaltackles','solotackles','tacklesforloss','passesdefended'].includes(x)))return 'defense';
       return null;
     }
     for(const g of arr(side?.statistics)){
@@ -180,7 +182,12 @@
         if(!id||a.didNotPlay||ath.didNotPlay)continue;
         const keys=arr(g.keys).map(norm),labels=arr(g.labels).map(norm);
         if(!groups.has(id))groups.set(id,{});
-        groups.get(id)[type]={a,keys,labels};
+        const grouped=groups.get(id);
+        const entry={a,keys,labels};
+        if(type==='defense'){
+          if(!grouped.defense)grouped.defense=entry;
+          (grouped.defenseCandidates||(grouped.defenseCandidates=[])).push(entry);
+        }else grouped[type]=entry;
         if(!map.has(id))upsert(ath,positionOf(ath)||(type==='passing'?'QB':type==='rushing'?'RB':type==='receiving'?'WR':'LB'),95,'boxscore');
         else upsert(ath,positionOf(ath)||map.get(id)?.role,99,'boxscore');
       }
@@ -357,18 +364,27 @@
     ];
   }
   function pickStat(c,type,keys,labels){
-    const g=c?.groups?.[type];if(!g)return '—';
-    const candidates=arr(g.a?.stats);
-    // ESPN has both ordered scalar groups and named stat-object variants.
-    if(candidates.length&&typeof candidates[0]==='object'){
-      const named=candidates.find(x=>keys.includes(norm(x?.name))||labels.includes(norm(x?.abbreviation||x?.shortDisplayName)));
-      const value=named?.displayValue??named?.value;
-      if(value!==null&&value!==undefined&&value!=='')return value;
+    const groups=type==='defense'?(c?.groups?.defenseCandidates||[]):
+      (c?.groups?.[type]?[c.groups[type]]:[]);
+    const wantedKeys=keys.map(norm),wantedLabels=labels.map(norm);
+    for(const g of groups){
+      const values=arr(g.a?.stats);
+      // Some ESPN events use objects carrying both name and displayValue.
+      if(values.length&&typeof values[0]==='object'){
+        const named=values.find(x=>wantedKeys.includes(norm(x?.name))||
+          wantedLabels.includes(norm(x?.abbreviation||x?.shortDisplayName||x?.displayName)));
+        const value=named?.displayValue??named?.value;
+        if(value!==null&&value!==undefined&&value!==''&&value!=='—'&&value!=='--')
+          return String(value);
+      }
+      let index=arr(g.keys).findIndex(k=>wantedKeys.includes(k));
+      if(index<0)index=arr(g.labels).findIndex(k=>wantedLabels.includes(k));
+      const raw=index>=0?values[index]:null;
+      const value=raw&&typeof raw==='object'?(raw.displayValue??raw.value):raw;
+      if(value!==null&&value!==undefined&&value!==''&&value!=='—'&&value!=='--')
+        return String(value);
     }
-    let n=g.keys.findIndex(k=>keys.includes(k));
-    if(n<0)n=g.labels.findIndex(k=>labels.includes(k));
-    const v=n>=0?g.a.stats?.[n]:null;
-    return v===null||v===undefined||v===''?'—':v;
+    return '—';
   }
   function statsFor(c,slot){
     const role=c.role;
@@ -384,9 +400,9 @@
     if(role==='WR'||role==='TE')return {labels:['REC','YDS','TD'],values:recoveredRecStats(c)};
     const def=(keys,labels)=>pickStat(c,'defense',keys,labels);
     if(role==='EDGE'||role==='DL')return {labels:['TACK','SACK','TFL'],values:[
-      def(['totaltackles','tackles'],['tot','tack','tackles']),def(['sacks'],['sack','sacks']),def(['tacklesforloss'],['tfl'])]};
+      def(['totaltackles','tackles'],['tot','tkl','tack','tackles']),def(['sacks','sack'],['sack','sacks','sk']),def(['tacklesforloss','tfl'],['tfl','tfls'])]};
     if(role==='LB')return {labels:['TACK','TFL','SACK'],values:[
-      def(['totaltackles','tackles'],['tot','tack','tackles']),def(['tacklesforloss'],['tfl']),def(['sacks'],['sack','sacks'])]};
+      def(['totaltackles','tackles'],['tot','tkl','tack','tackles']),def(['tacklesforloss','tfl'],['tfl','tfls']),def(['sacks','sack'],['sack','sacks','sk'])]};
     return {labels:['TACK','PD','INT'],values:[
       def(['totaltackles','tackles'],['tot','tack','tackles']),def(['passesdefended','passesdefensed'],['pd','pdef']),
       (def(['interceptions'],['int'])!=='—'?def(['interceptions'],['int']):pickStat(c,'interceptions',['interceptions'],['int']))]};
