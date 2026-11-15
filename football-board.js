@@ -1,6 +1,6 @@
 /* MAN CAVE SPORTS BOOK — football box scores. The approved scoreboard CSS is intentionally untouched. */
 (function(){
-  if(sport!=='nfl' && sport!=='cfb')return;
+  if(sport!=='cfb')return; // NFL now uses its dedicated live six-slot engine
   const path=sport==='nfl'?'football/nfl':'football/college-football';
   const eventId=p.get('eventId');
   const band=app.querySelector('.band');
