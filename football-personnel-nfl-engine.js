@@ -15,6 +15,9 @@
   // refresh. Never regress an in-progress score when ESPN's feeds disagree.
   const scoreState={last:null,source:null,at:null,teamId:null,date:null,phase:null};
   let scoreBusy=false,scoreboardCache={slot:-1,day:'',promise:null};
+  let lastScoreboardEvent=null,latestSummary=null,latestPool=null,latestCompetition=null,latestTeamId=null;
+  const renderedRows=new WeakMap();
+  let contextPromise=null;
   function acceptVerifiedScore(value,source,phase){
     const raw=String(value??'').trim();
     if(!/^\d{1,3}$/.test(raw))return false;
@@ -64,20 +67,46 @@
   };
   const positionOf=x=>x?.position?.abbreviation||x?.position?.name||x?.position?.displayName||x?.position||'';
 
-  async function get(url){
-    const res=await fetch(url,{cache:'no-store'});
-    if(!res.ok)throw Error('ESPN '+res.status);return res.json();
+  async function get(url,timeoutMs=9000){
+    // Slow or stuck requests must never block every subsequent refresh tick.
+    const controller=typeof AbortController==='function'?new AbortController():null;
+    const alarm=controller?setTimeout(()=>controller.abort(),timeoutMs):null;
+    try{
+      const res=await fetch(url,{cache:'no-store',...(controller?{signal:controller.signal}:{})});
+      if(!res.ok)throw Error('ESPN '+res.status);
+      return await res.json();
+    }finally{
+      if(alarm!==null)clearTimeout(alarm);
+    }
   }
-  async function getTeamContext(teamId){
-    if(teamCache.id===String(teamId)&&Date.now()-teamCache.stamp<600000)return teamCache;
-    const root=base+'teams/'+encodeURIComponent(teamId);
-    const responses=await Promise.allSettled([get(root+'/depthcharts'),get(root+'/roster'),get(root+'/injuries')]);
-    const [depth,roster,injuries]=responses.map(x=>x.status==='fulfilled'?x.value:null);
-    if(teamCache.id!==String(teamId)){teamCache.depth=null;teamCache.roster=null;teamCache.injuries=null}
-    teamCache.id=String(teamId);teamCache.stamp=Date.now();
-    if(depth)teamCache.depth=depth;
-    if(roster)teamCache.roster=roster;
-    if(injuries)teamCache.injuries=injuries;
+  function getTeamContext(teamId){
+    const key=String(teamId);
+    if(teamCache.id!==key){
+      teamCache.id=key;teamCache.stamp=0;
+      teamCache.depth=null;teamCache.roster=null;teamCache.injuries=null;
+      contextPromise=null;
+    }
+    // Read the existing roster instantly. Three optional network requests
+    // run in the background and must NEVER hold up scores or game statistics.
+    if(Date.now()-teamCache.stamp>=600000&&!contextPromise){
+      teamCache.stamp=Date.now();
+      const root=base+'teams/'+encodeURIComponent(key);
+      const pending=Promise.allSettled([
+        get(root+'/depthcharts',8000),get(root+'/roster',8000),get(root+'/injuries',8000)
+      ]);
+      contextPromise=pending;
+      pending.then(results=>{
+        if(teamCache.id!==key)return;
+        const [depth,roster,injuries]=results.map(x=>x.status==='fulfilled'?x.value:null);
+        if(depth)teamCache.depth=depth;
+        if(roster)teamCache.roster=roster;
+        if(injuries)teamCache.injuries=injuries;
+        if(!depth&&!roster&&!injuries)teamCache.stamp=Date.now()-540000;
+      }).finally(()=>{
+        if(contextPromise===pending)contextPromise=null;
+        if(!busy&&teamCache.id===key)update();
+      });
+    }
     return teamCache;
   }
   function candidatePool(depth,roster,injuries,side,teamId,activeGame,eventDate){
@@ -515,7 +544,7 @@
   }
   let possessionSource=null;
   async function getScoreboard(data){
-    const rawDate=data?.header?.competitions?.[0]?.date||data?.header?.competitions?.[0]?.startDate||scoreState.date||'';
+    const rawDate=data?.header?.competitions?.[0]?.date||data?.header?.competitions?.[0]?.startDate||scoreState.date||new Date().toISOString();
     const date=new Date(rawDate);
     if(!Number.isFinite(date.getTime()))return null;
     const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{
@@ -525,24 +554,55 @@
     const slot=Math.floor(Date.now()/5000);
     if(scoreboardCache.slot===slot&&scoreboardCache.day===day&&scoreboardCache.promise)
       return scoreboardCache.promise;
-    const promise=get(base+'scoreboard?dates='+day+'&limit=500&_='+slot)
-      .then(board=>arr(board.events).find(x=>String(x.id)===String(eventId))||null);
+    // NFL has at most 16 games in one week. Avoid the heavy 500-event
+    // response and repeated JSON parsing on low-memory Fire TV browsers.
+    const promise=get(base+'scoreboard?dates='+day+'&limit=25&_='+slot,8000)
+      .then(board=>{
+        const chosen=arr(board.events).find(x=>String(x.id)===String(eventId))||null;
+        if(chosen)lastScoreboardEvent=chosen;
+        return chosen;
+      }).catch(error=>{
+        if(scoreboardCache.promise===promise)scoreboardCache.promise=null;
+        throw error;
+      });
     scoreboardCache={slot,day,promise};
     return promise;
   }
   async function pollScoreboard(){
-    if(scoreBusy||!eventId||!scoreState.teamId||!scoreState.date)return;
+    if(scoreBusy||!eventId)return;
     scoreBusy=true;
     try{
       const board=await getScoreboard();
       const comp=arr(board?.competitions)[0]||{};
-      const match=arr(comp.competitors).find(x=>String(x.team?.id||'')===scoreState.teamId);
+      const competitors=arr(comp.competitors);
+      if(!scoreState.teamId){
+        const matched=competitors.find(x=>norm(x.team?.displayName)===norm(team)||norm(x.team?.name)===norm(team));
+        if(matched?.team?.id)scoreState.teamId=String(matched.team.id);
+      }
+      const match=competitors.find(x=>String(x.team?.id||'')===scoreState.teamId);
       if(match){
         const phase=comp.status?.type?.state||scoreState.phase;
         acceptVerifiedScore(match.score,'scoreboard',phase);
       }
+      // The scoreboard often reports a new possession before the detailed
+      // game-summary / box score catches up. Swap our already verified six
+      // players immediately instead of waiting for the next slow stats pull.
+      if(latestSummary&&latestPool&&latestCompetition&&latestTeamId&&scoreState.phase==='in'){
+        const nextMode=findPossession(latestSummary,latestCompetition,latestTeamId,board);
+        if((nextMode==='offense'||nextMode==='defense')&&nextMode!==slotState.lastMode){
+          slotState.lastMode=nextMode;
+          const selected=slotState[nextMode].map(id=>id?latestPool.find(c=>c.id===id)||null:null);
+          rows.forEach((row,i)=>renderRow(row,selected[i],nextMode==='offense'&&i===1?'rushLeader':''));
+          band.textContent='ON FIELD';
+          persistSlots();
+          window.__LR_NFL_SYNC__={...(window.__LR_NFL_SYNC__||{}),
+            mode:nextMode,possessionSource:possessionSource||'scoreboard',
+            players:selected.map(x=>x?.athlete?.displayName||''),
+            refreshedAt:new Date().toISOString(),lastError:null};
+        }
+      }
     }catch(e){
-      // Keep the last confirmed score and let the next short poll retry.
+      // Keep the last confirmed score/personnel while a request retries.
     }finally{scoreBusy=false}
   }
   function findPossession(data,competition,tid,scoreboard){
@@ -731,16 +791,34 @@
   function renderRow(row,c,slot){
     const face=row.querySelector('.portrait'),name=row.querySelector('.player');
     const keys=[...row.querySelectorAll('.stats small')],vals=[...row.querySelectorAll('.stats b')];
-    if(!c){face.textContent='—';name.textContent='PLAYER DATA UNAVAILABLE';keys.forEach(x=>x.textContent='—');vals.forEach(x=>x.textContent='—');return}
-    name.textContent=c.athlete.displayName||'PLAYER';name.style.fontSize=name.textContent.length>17?'clamp(11px,2.6vw,16px)':'';
-    const src=photo(c.athlete);face.textContent='';
-    if(src){const img=document.createElement('img');img.src=src;img.alt='';
-      img.style.cssText='height:10vh;max-width:100%;object-fit:contain';
-      img.onerror=()=>{face.textContent='HEADSHOT UNAVAILABLE'};face.appendChild(img);
-    }else face.textContent='HEADSHOT UNAVAILABLE';
-    const s=statsFor(c,slot);
-    keys.forEach((x,i)=>x.textContent=s.labels[i]||'—');
-    vals.forEach((x,i)=>x.textContent=s.values[i]??'—');
+    if(!c){
+      if(renderedRows.get(row)!=='empty'){
+        face.textContent='—';name.textContent='PLAYER DATA UNAVAILABLE';
+        keys.forEach(x=>x.textContent='—');vals.forEach(x=>x.textContent='—');
+        renderedRows.set(row,'empty');
+      }
+      return;
+    }
+    const id=String(c.id||c.athlete?.id||c.athlete?.displayName||'');
+    const src=photo(c.athlete);
+    const old=renderedRows.get(row);
+    if(!old||old.id!==id||old.src!==src){
+      name.textContent=c.athlete.displayName||'PLAYER';
+      name.style.fontSize=name.textContent.length>17?'clamp(11px,2.6vw,16px)':'';
+      face.textContent='';
+      if(src){
+        const img=document.createElement('img');img.src=src;img.alt='';
+        img.style.cssText='height:10vh;max-width:100%;object-fit:contain';
+        img.onerror=()=>{if(renderedRows.get(row)?.id===id)face.textContent='HEADSHOT UNAVAILABLE'};
+        face.appendChild(img);
+      }else face.textContent='HEADSHOT UNAVAILABLE';
+      renderedRows.set(row,{id,src});
+    }
+    // Updating just numbers prevents repeated headshot downloads and layout
+    // churn on Fire TV every time ESPN sends the same six players.
+    const stats=statsFor(c,slot);
+    keys.forEach((x,i)=>{const next=String(stats.labels[i]??'—');if(x.textContent!==next)x.textContent=next});
+    vals.forEach((x,i)=>{const next=String(stats.values[i]??'—');if(x.textContent!==next)x.textContent=next});
   }
   async function update(){
     if(!eventId){band.textContent='AWAITING GAME';note.textContent='Select a football game to see its key contributors.';return}
@@ -756,7 +834,7 @@
       acceptVerifiedScore(match.score,'summary',state);
       const logo=app.querySelector('.logo');
       const src=match.team?.logo||match.team?.logos?.[0]?.href;
-      if(src){logo.src=src;logo.hidden=false}
+      if(src){if(logo.src!==src)logo.src=src;logo.hidden=false}
       const rec=match.record||match.records||[];
       app.querySelector('.team-record').textContent=Array.isArray(rec)?(rec.find(x=>x.type==='total')||rec[0])?.summary||'':rec.summary||'';
       if(sport==='cfb')setRank(match.curatedRank?.current??match.team?.rank??match.rank);
@@ -765,11 +843,11 @@
       scoreState.teamId=String(tid);
       scoreState.date=competition.date||competition.startDate||scoreState.date;
       scoreState.phase=state;
-      const [context,scoreboardResult]=await Promise.allSettled([
-        getTeamContext(tid),getScoreboard(data)
-      ]);
-      const teamInfo=context.status==='fulfilled'?context.value:{depth:null,roster:null,injuries:null};
-      const scoreboard=scoreboardResult.status==='fulfilled'?scoreboardResult.value:null;
+      const teamInfo=getTeamContext(tid);
+      // The last verified scoreboard is already refreshed on its own fast
+      // timer; do not hold the player rows waiting for another network call.
+      const scoreboard=lastScoreboardEvent;
+      if(!scoreboard)pollScoreboard();
       const boardComp=arr(scoreboard?.competitions)[0]||{};
       const boardTeam=arr(boardComp.competitors).find(x=>String(x.team?.id||'')===String(tid));
       if(boardTeam)acceptVerifiedScore(boardTeam.score,'scoreboard',boardComp.status?.type?.state||state);
@@ -779,6 +857,7 @@
       // Build both modes from depth-chart fallback + game-leading stats +
       // newly credited plays. Switching possession does not reset either mode.
       const selection=selectSlots(pool,data,tid,state);
+      latestSummary=data;latestPool=pool;latestCompetition=competition;latestTeamId=String(tid);
       // Review-only override for viewing both sides of a completed NFL game.
       const forced=p.get('previewMode');
       const mode=forced==='offense'||forced==='defense'?forced:
@@ -812,7 +891,7 @@
       note.textContent='Game impact refresh unavailable: '+e.message+'. Previously displayed player names and current-game stats are retained.';
     }finally{busy=false}
   }
-  update();setInterval(update,15000);
+  update();setInterval(update,8000);
   // Scores can arrive on ESPN's scoreboard ahead of its game-summary feed.
   // Five-second refresh never infers points from plays or guesses a touchdown.
   setInterval(pollScoreboard,5000);
