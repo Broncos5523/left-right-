@@ -37,15 +37,16 @@
 <p class="status" id="remoteStatus" role="status">Loading secure Firebase connection…</p>
 <p class="status" id="remoteActivity"></p></details></div></section>
 <section id="thirdAssignment" class="panel">
-<div class="head"><h2>TV 3 · 28-PAGE BOARD</h2><small>Independent Onn TV · existing Render address</small></div>
+<div class="head"><h2>TV 3 · BOARD LIBRARY</h2><small>Independent Onn TV · existing Render address</small></div>
 <div class="selection">
 <div class="outputs" style="grid-template-columns:1fr">
 <div class="output" style="border-top:3px solid var(--gold)">
 <h3>● TV 3 <span>ONN · PORTRAIT</span></h3>
 <div class="chosen"><b id="thirdChosen">All 28 boards · automatic rotation</b></div>
 <div class="option-line">Display on TV 3</div>
-<select id="thirdPick" class="pick" aria-label="TV 3 28-page board selection">
-<option value="rotation">ALL 28 BOARDS · AUTO ROTATION</option>
+<select id="thirdPick" class="pick" aria-label="TV 3 board selection">
+<option value="rotation">ALL 28 SPORTS BOARDS · AUTO ROTATION</option>
+<option value="wrestling">INSIDE THE SQUARED CIRCLE · WRESTLING</option>
 <optgroup label="NFL · Denver Broncos">
 <option value="page1_nfl">Broncos · Page 1</option><option value="page2_nfl">Broncos · Page 2</option><option value="page3_broncos">Broncos · Page 3</option><option value="page4_broncos">Broncos · Page 4</option>
 </optgroup><optgroup label="NBA · Boston Celtics">
@@ -63,7 +64,7 @@
 </optgroup></select>
 </div></div>
 <div class="bar"><button class="action gold" id="thirdSend" type="button">SEND TO TV 3</button></div>
-<p class="status" id="thirdStatus" role="status">TV 3 continues its original 28-board rotation unless you send a new assignment. LEFT and RIGHT stay untouched.</p>
+<p class="status" id="thirdStatus" role="status">Switch TV 3 between sports and wrestling independently. LEFT and RIGHT stay untouched.</p>
 </div></section>
 <div class="wall-head"><div><div class="eyebrow">LIVE SCHEDULE FEED</div><h2>All Games <span id="gameCount" class="count">· …</span></h2></div><div class="mini-actions"><button id="refresh" class="refresh" type="button">↻ Refresh</button></div></div>
 <div class="league-controls"><label for="leaguePick">LEAGUE</label><select id="leaguePick" aria-label="Choose league"><option value="favorites">★ MY TEAMS</option><option value="NFL">NFL</option><option value="NBA">NBA</option><option value="NHL">NHL</option><option value="MLB">MLB</option><option value="WNBA">WNBA</option><option value="CFB">COLLEGE FOOTBALL</option><option value="CBB">COLLEGE BASKETBALL</option><option value="all">ALL LEAGUES</option></select></div>
@@ -171,7 +172,7 @@ function connected(user){
    const data=snapshot.val();
    if(!data)return;
    function brief(v){return v?.type==='team'?(v.team||'Team'):v?.type==='upcoming'?'Upcoming Matchups':v?.type==='live'?'Live Games / Results':'Unassigned';}
-   document.getElementById('remoteActivity').textContent='Firebase currently holds · LEFT: '+brief(data.left)+' · RIGHT: '+brief(data.right)+' · TV 3: '+(data.third?.type==='rotation'?'28-page rotation':data.third?.type==='board'?thirdLabel(data.third.board):'No remote assignment')+'. This confirms database state, not TV playback.';
+   document.getElementById('remoteActivity').textContent='Firebase currently holds · LEFT: '+brief(data.left)+' · RIGHT: '+brief(data.right)+' · TV 3: '+(data.third?.type==='rotation'?'28-page rotation':data.third?.type==='wrestling'?'Inside the Squared Circle':data.third?.type==='board'?thirdLabel(data.third.board):'No remote assignment')+'. This confirms database state, not TV playback.';
   },error=>{document.getElementById('remoteActivity').textContent='Assignment read unavailable · '+(error.code||error.message);});
  }
  if(!loggedIn){info('Sign in to activate one-tap game switching.');document.getElementById('remoteActivity').textContent='';}
@@ -206,7 +207,7 @@ async function send(cause){
 async function sendThird(){
  if(!requireAuth())return;
  const choice=thirdPick.value;
- const command=choice==='rotation'?{type:'rotation',updatedAt:Date.now()}:{type:'board',board:choice,updatedAt:Date.now()};
+ const command=choice==='rotation'?{type:'rotation',updatedAt:Date.now()}:choice==='wrestling'?{type:'wrestling',updatedAt:Date.now()}:{type:'board',board:choice,updatedAt:Date.now()};
  thirdSend.disabled=true;
  thirdStatus.textContent='Sending '+thirdLabel(choice)+' to TV 3…';
  try{
