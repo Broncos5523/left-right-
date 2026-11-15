@@ -494,20 +494,87 @@
       derived.td?String(Math.max(derived.td,Number(raw[2])||0)):
       raw[2]!=='—'&&Number.isFinite(Number(raw[2]))?raw[2]:'—'];
   }
-  function findPossession(data,competition,tid){
-    const candidates=[
-      competition.situation?.possession,data.situation?.possession,
-      competition.situation?.possessionId,data.situation?.possessionId,
-      data.drives?.current?.team?.id
+  let possessionSource=null;
+  async function getScoreboard(data){
+    const rawDate=data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate||'';
+    const date=new Date(rawDate);
+    if(!Number.isFinite(date.getTime()))return null;
+    const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{
+      timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'
+    }).formatToParts(date).map(x=>[x.type,x.value]));
+    const day=parts.year+parts.month+parts.day;
+    const board=await get(base+'scoreboard?dates='+day+'&limit=500&_='+Math.floor(Date.now()/15000));
+    return arr(board.events).find(x=>String(x.id)===String(eventId))||null;
+  }
+  function findPossession(data,competition,tid,scoreboard){
+    const ids=arr(competition.competitors).map(x=>String(x.team?.id||'')).filter(Boolean);
+    const boardComp=arr(scoreboard?.competitions)[0]||{};
+    const checks=[
+      ['scoreboard-situation',boardComp.situation?.possession],
+      ['scoreboard-situation-id',boardComp.situation?.possessionId],
+      ['summary-situation',competition.situation?.possession],
+      ['summary-situation-id',competition.situation?.possessionId],
+      ['summary-top-situation',data.situation?.possession],
+      ['summary-top-situation-id',data.situation?.possessionId],
+      ['current-drive',data.drives?.current?.team?.id]
     ];
-    const flagged=arr(competition.competitors).find(x=>x.possession===true||x.hasPossession===true);
-    if(flagged?.team?.id)candidates.push(flagged.team.id);
-    const found=candidates.map(x=>x&&typeof x==='object'?(x.team?.id||x.id||''):x)
-      .map(x=>String(x||'')).find(x=>arr(competition.competitors).some(c=>String(c.team?.id)===x));
-    if(found)return found===String(tid)?'offense':'defense';
-    // No reliable possession identifier: hold the last known side, never
-    // pretend the previous snap is necessarily the current possession.
+    const boardFlag=arr(boardComp.competitors).find(x=>x.possession===true||x.hasPossession===true);
+    const summaryFlag=arr(competition.competitors).find(x=>x.possession===true||x.hasPossession===true);
+    checks.push(['scoreboard-competitor',boardFlag?.team?.id],['summary-competitor',summaryFlag?.team?.id]);
+    for(const [source,candidate] of checks){
+      const raw=candidate&&typeof candidate==='object'?(candidate.team?.id||candidate.id||candidate.teamId):candidate;
+      const found=String(raw??'');
+      if(!ids.includes(found))continue;
+      possessionSource=source;
+      return found===String(tid)?'offense':'defense';
+    }
+    // If ESPN omits its live possession property, the last documented
+    // scrimmage play can establish an offense. Special teams / turnovers
+    // reverse it, but do not pretend to know the outcome of an onside kick.
+    const latest=orderedPlays(data).at(-1);
+    const playTeam=String(latest?.team?.id||latest?.teamId||'');
+    const type=String(latest?.type?.text||latest?.playType?.text||'').toLowerCase();
+    const label=String(latest?.text||'').toLowerCase();
+    if(ids.includes(playTeam)){
+      const isTurnover=/intercepted|turnover on downs/.test(label);
+      const isPunt=/punt/.test(type)||/\bpunts?\b/.test(label);
+      const isKickoff=/kickoff/.test(type)||/\bkicks?\s+\d+\s+yards?\s+from\b/.test(label);
+      const isSnap=/pass|rush|sack|run|scramble|kneel/.test(type)||/\b(pass|sacked|left guard|right guard|up the middle|scrambles?)\b/.test(label);
+      if(isTurnover||isPunt||isKickoff||isSnap){
+        const teamWithBall=isTurnover||isPunt||isKickoff?ids.find(x=>x!==playTeam):playTeam;
+        if(teamWithBall){
+          possessionSource='latest-play-'+(isTurnover?'turnover':isPunt?'punt':isKickoff?'kickoff':'scrimmage');
+          return teamWithBall===String(tid)?'offense':'defense';
+        }
+      }
+    }
+    possessionSource='held-last-confirmed';
     return slotState.lastMode||null;
+  }
+  function latestVerifiedQuarterback(data,pool,teamId){
+    const plays=orderedPlays(data);
+    for(let i=plays.length-1;i>=0;i--){
+      const play=plays[i];
+      if(String(play?.team?.id||play?.teamId||play?.start?.team?.id||'')!==String(teamId))continue;
+      const text=String(play?.text||'');
+      if(/\bno play\b/i.test(text))continue;
+      if(!/\bpass\b|\bsacked\b|\bscrambles?\b|\bkneels?\b/i.test(text))continue;
+      const participant=arr(play.participants||play.athletes||play.players)
+        .map(x=>idOf(x?.athlete||x?.player||x))
+        .map(id=>pool.find(c=>c.id===id&&c.role==='QB')).find(Boolean);
+      if(participant)return participant;
+      const named=text.match(/\b(?:\d{1,2}-)?([A-Z](?:\.[A-Z])*\.[A-Za-z][A-Za-z'-]*)\s+(?:pass|sacked|scrambles?|kneels?)\b/i);
+      if(named){
+        const actor=matchMention({name:named[1],jersey:''},pool,['QB']);
+        if(actor)return actor;
+      }
+      const full=pool.filter(c=>c.role==='QB').filter(c=>{
+        const n=String(c.athlete?.displayName||'');
+        return n&&text.toLowerCase().includes(n.toLowerCase()+' pass');
+      });
+      if(full.length===1)return full[0];
+    }
+    return null;
   }
   function chooseSix(pool,mode,statics,credits){
     const prev=Array.isArray(slotState[mode])?slotState[mode].slice(0,6):[];
@@ -610,7 +677,11 @@
       const statB=stat(b,'passing',['passingattempts'],['att'])+stat(b,'passing',['passingyards'],['yds'])/200;
       return statB-statA||playerPriority(a,b);
     });
-    const statics={qb:ranks[0]||null,rb:rushLeader(pool),wr:receptionLeader(pool)};
+    // A quarterback can leave mid-game. The most recently VERIFIED passer
+    // or scrambler outranks total passing attempts, which retain injured
+    // starters in ESPN's box score even after replacement.
+    const activeQB=latestVerifiedQuarterback(data,pool,tid);
+    const statics={qb:activeQB||ranks[0]||null,rb:rushLeader(pool),wr:receptionLeader(pool)};
     const events=state==='post'&&slotState.processed.length?[]:creditEvents(data,pool,tid);
     slotState.offense=chooseSix(pool,'offense',statics,events.filter(x=>x.mode==='offense')).map(x=>x?.id||null);
     slotState.defense=chooseSix(pool,'defense',statics,events.filter(x=>x.mode==='defense')).map(x=>x?.id||null);
