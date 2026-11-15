@@ -1,4 +1,4 @@
-/* LEFT RIGHT NFL dedicated six-slot player selection — preview only.
+/* LEFT RIGHT NFL dedicated six-slot player selection — production.
  * Preserve approved six-row layout and display current game statistics.
  * Protected QB, rush leader, receiving leader, 2 EDGE; other roles change ONLY
  * when a new eligible credited play appears; no time-based rotation or duplicates.
@@ -10,10 +10,10 @@
   const eventId=p.get('eventId'), norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const rows=[...app.querySelectorAll('.row')],band=app.querySelector('.band'),note=app.querySelector('.note');
   const roles=['QB','RB','WR','TE','CB','S','DB','EDGE','DL','LB'];
-  const teamCache={id:null,stamp:0,depth:null,roster:null};
-  const stateKey='lr-six-slot-nfl-v2:'+eventId+':'+norm(team);
+  const teamCache={id:null,stamp:0,depth:null,roster:null,injuries:null};
+  const stateKey='lr-six-slot-nfl-v3:'+eventId+':'+norm(team);
   let slotState={offense:[null,null,null,null,null,null],defense:[null,null,null,null,null,null],
-    processed:[],lastMode:'offense',lastActionByRB:{},lastDbSlot:5};
+    processed:[],lastMode:null,lastActionByRB:{},lastDbSlot:5};
   try{
     const prev=JSON.parse(localStorage.getItem(stateKey)||'null');
     if(prev&&Array.isArray(prev.offense)&&Array.isArray(prev.defense)){
@@ -52,12 +52,13 @@
   async function getTeamContext(teamId){
     if(teamCache.id===String(teamId)&&Date.now()-teamCache.stamp<600000)return teamCache;
     const root=base+'teams/'+encodeURIComponent(teamId);
-    const responses=await Promise.allSettled([get(root+'/depthcharts'),get(root+'/roster')]);
-    const [depth,roster]=responses.map(x=>x.status==='fulfilled'?x.value:null);
-    if(teamCache.id!==String(teamId)){teamCache.depth=null;teamCache.roster=null}
+    const responses=await Promise.allSettled([get(root+'/depthcharts'),get(root+'/roster'),get(root+'/injuries')]);
+    const [depth,roster,injuries]=responses.map(x=>x.status==='fulfilled'?x.value:null);
+    if(teamCache.id!==String(teamId)){teamCache.depth=null;teamCache.roster=null;teamCache.injuries=null}
     teamCache.id=String(teamId);teamCache.stamp=Date.now();
     if(depth)teamCache.depth=depth;
     if(roster)teamCache.roster=roster;
+    if(injuries)teamCache.injuries=injuries;
     return teamCache;
   }
   function candidatePool(depth,roster,injuries,side,teamId,activeGame,eventDate){
@@ -103,16 +104,15 @@
       if(x?.athlete?.team?.id!=null&&String(x.athlete.team.id)!==String(teamId))continue;
       const id=idOf(x.athlete||x),name=norm(x.athlete?.displayName);
       if(!id&&!name)continue;
-      const st=statusText(x.status||x.fantasy?.status);
+      const st=statusText(x.status||x.fantasy?.status||x.type);
       const date=x.date?new Date(x.date).getTime():null;
       const game=new Date(eventDate||Date.now()).getTime();
       // Old injury reports must never remove participants from historical finals.
       const isFresh=!date||(Number.isFinite(date)&&Number.isFinite(game)&&Math.abs(game-date)<10*86400000);
-      if(activeGame&&isFresh&&unavailable(st))injuryMap.set(id||name,st);
-    }
-    for(const [id,c] of map){
-      const st=statusText(c.athlete?.status);
-      if(activeGame&&(unavailable(st)||injuryMap.has(id)||injuryMap.has(norm(c.athlete.displayName))))map.delete(id);
+      if(activeGame&&isFresh&&unavailable(st)){
+        if(id)injuryMap.set(id,st);
+        if(name)injuryMap.set(name,st);
+      }
     }
     function groupType(g){
       const n=norm(g.name||g.displayName||g.type||g.title);
@@ -135,6 +135,16 @@
         groups.get(id)[type]={a,keys,labels};
         if(!map.has(id))upsert(ath,positionOf(ath)||(type==='passing'?'QB':type==='rushing'?'RB':type==='receiving'?'WR':'LB'),95,'boxscore');
         else upsert(ath,positionOf(ath)||map.get(id)?.role,99,'boxscore');
+      }
+    }
+    // Apply injury exclusions AFTER box-score enrichment: previous game
+    // contributions must not silently reinsert someone marked inactive/out.
+    if(activeGame){
+      for(const [id,c] of map){
+        const status=statusText(c.athlete?.status);
+        if(unavailable(status)||injuryMap.has(id)||injuryMap.has(norm(c.athlete?.displayName))){
+          map.delete(id);
+        }
       }
     }
     return [...map.values()].map(c=>({...c,groups:groups.get(c.id)||{}}));
@@ -497,7 +507,7 @@
     if(found)return found===String(tid)?'offense':'defense';
     // No reliable possession identifier: hold the last known side, never
     // pretend the previous snap is necessarily the current possession.
-    return slotState.lastMode||'offense';
+    return slotState.lastMode||null;
   }
   function chooseSix(pool,mode,statics,credits){
     const prev=Array.isArray(slotState[mode])?slotState[mode].slice(0,6):[];
@@ -641,18 +651,23 @@
       const tid=match.team?.id;
       if(!tid)throw Error('Game team ID unavailable');
       const state=competition.status?.type?.state||data.header?.competitions?.[0]?.status?.type?.state||'pre';
-      const context=await getTeamContext(tid);
+      const [context,scoreboardResult]=await Promise.allSettled([
+        getTeamContext(tid),getScoreboard(data)
+      ]);
+      const teamInfo=context.status==='fulfilled'?context.value:{depth:null,roster:null,injuries:null};
+      const scoreboard=scoreboardResult.status==='fulfilled'?scoreboardResult.value:null;
       const side=arr(data.boxscore?.players).find(x=>String(x.team?.id)===String(tid)||norm(x.team?.displayName)===norm(team));
-      const pool=candidatePool(context.depth,context.roster,null,side,tid,false,data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
+      const pool=candidatePool(teamInfo.depth,teamInfo.roster,teamInfo.injuries||data.injuries,side,tid,
+        state==='in',data.header?.competitions?.[0]?.date||data.header?.competitions?.[0]?.startDate);
       // Build both modes from depth-chart fallback + game-leading stats +
       // newly credited plays. Switching possession does not reset either mode.
       const selection=selectSlots(pool,data,tid,state);
       // Review-only override for viewing both sides of a completed NFL game.
       const forced=p.get('previewMode');
       const mode=forced==='offense'||forced==='defense'?forced:
-        state==='post'?slotState.lastMode:findPossession(data,competition,tid);
-      slotState.lastMode=mode;
-      const selectedIds=mode==='defense'?slotState.defense:slotState.offense;
+        state==='post'?slotState.lastMode:findPossession(data,competition,tid,scoreboard);
+      if(mode==='offense'||mode==='defense')slotState.lastMode=mode;
+      const selectedIds=mode==='defense'?slotState.defense:mode==='offense'?slotState.offense:[];
       const shown=selectedIds.map(id=>id?pool.find(c=>c.id===id)||null:null);
       persistSlots();
       if(shown.every(x=>!x)&&rows.some(row=>!!row.querySelector('.player')?.textContent&&!/UNAVAILABLE|PENDING|PLAYER DATA/.test(row.querySelector('.player').textContent))){
@@ -662,7 +677,12 @@
       }
       usedPbpFallback=false;
       rows.forEach((row,i)=>renderRow(row,shown[i],mode==='offense'&&i===1?'rushLeader':''));
-      band.textContent=mode==='offense'?'OFFENSIVE CONTRIBUTORS':'DEFENSIVE CONTRIBUTORS';
+      // Keep the approved broadcast heading. Only the underlying six people
+      // change; never restyle the locked portrait boards.
+      band.textContent=state==='post'?'KEY PLAYERS':mode?'ON FIELD':'POSSESSION PENDING';
+      window.__LR_NFL_SYNC__={mode:mode||'unknown',state,teamId:String(tid),
+        possessionSource:possessionSource||'unverified',players:shown.map(x=>x?.athlete?.displayName||''),
+        refreshedAt:new Date().toISOString(),lastError:null};
       const missing=shown.filter(x=>!x).length;
       note.textContent='Protected leaders from current-game stats; other positions change only after credited plays. '+
         (state==='post'?'Final game players held. ':'')+
@@ -670,9 +690,13 @@
         (usedPbpFallback?'Some rushing/receiving figures are provisional from ESPN play descriptions. ':'')+
         'No duplicates, no timed rotation, no on-field personnel claim.';
     }catch(e){
-      band.textContent='GAME STATS RETRYING';
+      window.__LR_NFL_SYNC__={...(window.__LR_NFL_SYNC__||{}),lastError:String(e.message||e),
+        attemptedAt:new Date().toISOString()};
       note.textContent='Game impact refresh unavailable: '+e.message+'. Previously displayed player names and current-game stats are retained.';
     }finally{busy=false}
   }
-  update();setInterval(update,30000);
+  update();setInterval(update,15000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+  window.addEventListener('focus',update);
+  window.addEventListener('online',update);
 })();
