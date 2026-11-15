@@ -38,20 +38,39 @@ function rosterMap(data){
 function group(side,key){
   return (side?.statistics||[]).find(x=>n(x.name||x.title||x.type||x.displayName)===n(key));
 }
+function defensiveGroups(side){
+  // Match the published game box score, including ESPN category/label variants.
+  return (side?.statistics||[]).filter(g=>{
+    const name=n(g.name||g.title||g.type||g.displayName);
+    if(['defensive','defense','defensivestats','tackles'].includes(name))return true;
+    const keys=(g.keys||[]).map(n),labels=(g.labels||[]).map(n);
+    return keys.some(k=>['totaltackles','solotackles','tacklesforloss','passesdefended'].includes(k))||
+      labels.some(k=>['tot','tkl','tack','tfl','tackles'].includes(k));
+  });
+}
 function statFor(g,a,keys,labels=[]){
   if(!g||!a)return '—';
   const k=(g.keys||[]).map(n),l=(g.labels||[]).map(n);
-  let i=k.findIndex(x=>keys.map(n).includes(x));
-  if(i<0)i=l.findIndex(x=>labels.map(n).includes(x));
-  const val=a.stats?.[i];
-  return i>=0&&valid(val)?String(val):'—';
+  const wantedKeys=keys.map(n),wantedLabels=labels.map(n);
+  const values=Array.isArray(a.stats)?a.stats:[];
+  if(values.length&&typeof values[0]==='object'){
+    const named=values.find(x=>wantedKeys.includes(n(x?.name))||
+      wantedLabels.includes(n(x?.abbreviation||x?.shortDisplayName||x?.displayName)));
+    const v=named?.displayValue??named?.value;
+    if(valid(v))return String(v);
+  }
+  let i=k.findIndex(x=>wantedKeys.includes(x));
+  if(i<0)i=l.findIndex(x=>wantedLabels.includes(x));
+  const raw=i>=0?values[i]:null;
+  const value=raw&&typeof raw==='object'?(raw.displayValue??raw.value):raw;
+  return valid(value)?String(value):'—';
 }
 function contrib(side,roster){
   const known=rosterMap(roster);
   const map=new Map();
   for(const type of ['passing','rushing','receiving','defensive','interceptions']){
-    const g=group(side,type);
-    for(const a of g?.athletes||[]){
+    const sources=type==='defensive'?defensiveGroups(side):[group(side,type)].filter(Boolean);
+    for(const g of sources)for(const a of g?.athletes||[]){
       const athlete=a.athlete||{},pid=id(athlete.id);
       if(!pid||a.didNotPlay||athlete.didNotPlay)continue;
       let row=map.get(pid);
@@ -62,13 +81,27 @@ function contrib(side,roster){
           headshot:athlete.headshot?.href||rosterInfo?.headshot||'',groups:{},verified:true};
         map.set(pid,row);
       }
-      row.groups[type]={g,a};
+      if(type==='defensive'){
+        if(!row.groups.defensive)row.groups.defensive={g,a};
+        (row.defensiveGroups||(row.defensiveGroups=[])).push({g,a});
+      }else row.groups[type]={g,a};
     }
   }
   return map;
 }
-function has(row,type){return !!row?.groups?.[type] && Array.isArray(row.groups[type].a?.stats)&&row.groups[type].a.stats.some(valid)}
-function stat(row,type,keys,labels=[]){const o=row?.groups?.[type];return o?statFor(o.g,o.a,keys,labels):'—'}
+function has(row,type){
+  const groups=type==='defensive'?(row?.defensiveGroups||[]):[row?.groups?.[type]].filter(Boolean);
+  return groups.some(x=>Array.isArray(x.a?.stats)&&x.a.stats.some(v=>
+    valid(v&&typeof v==='object'?(v.displayValue??v.value):v)));
+}
+function stat(row,type,keys,labels=[]){
+  const groups=type==='defensive'?(row?.defensiveGroups||[]):[row?.groups?.[type]].filter(Boolean);
+  for(const entry of groups){
+    const value=statFor(entry.g,entry.a,keys,labels);
+    if(value!=='—')return value;
+  }
+  return '—';
+}
 function fromRoster(x){
   return {id:x.id,name:x.name,position:x.position,headshot:x.headshot,
     groups:{},verified:false};
@@ -121,7 +154,7 @@ function selectDefense(side,roster){
    return false;
  }
  function defensiveRank(x){
-   const val=Number(stat(x,'defensive',['totaltackles'],['tot'])||0);
+   const val=Number(stat(x,'defensive',['totaltackles','tackles'],['tot','tkl','tack','tackles'])||0);
    return Number.isFinite(val)?val:0;
  }
  for(const role of roles){
@@ -152,9 +185,9 @@ function selectDefense(side,roster){
 function displayStats(item){
  if(!item)return {labels:['—','—','—'],values:['—','—','—']};
  if(item.side==='defense'){
-   const tackle=stat(item,'defensive',['totaltackles'],['tot']);
-   const sack=stat(item,'defensive',['sacks'],['sacks']);
-   const tfl=stat(item,'defensive',['tacklesforloss'],['tfl']);
+   const tackle=stat(item,'defensive',['totaltackles','tackles'],['tot','tkl','tack','tackles']);
+   const sack=stat(item,'defensive',['sacks','sack'],['sack','sacks','sk']);
+   const tfl=stat(item,'defensive',['tacklesforloss','tfl'],['tfl','tfls']);
    const pd=stat(item,'defensive',['passesdefended'],['pd']);
    const interception=stat(item,'interceptions',['interceptions'],['int']);
    if(item.role==='CB'||item.role==='S')return {labels:['TKL','PD','INT'],values:[tackle,pd,interception]};
