@@ -110,6 +110,38 @@ function safeScore(g,idx){return g.state==='pre'?'–':(g.teams[idx].score!==''?
 function timeString(d){try{return new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'}).format(new Date(d))+' ET'}catch(e){return 'Time TBA'}}
 function isFav(g){return g.teams.some(function(t){return favorites.includes(t.name)})}
 function stateLabel(g){if(g.state==='in')return '● LIVE · '+(g.detail||'IN PROGRESS');if(g.state==='post')return 'FINAL';return timeString(g.date)}
+// ESPN abbreviations and full broadcaster names should resolve to the same badge.
+function normalizeNetworkName(name){
+  var key=String(name||'').toUpperCase().replace(/[^A-Z0-9+]/g,'');
+  var aliases={
+    'AMAZON':'PRIMEVIDEO','AMAZONPRIME':'PRIMEVIDEO','AMAZONPRIMEVIDEO':'PRIMEVIDEO',
+    'PRIMEVIDEO':'PRIMEVIDEO','PEACOCKTV':'PEACOCK',
+    'NBCSBOSTON':'NBCSPORTSBOSTON','NBCSBOSTONHD':'NBCSPORTSBOSTON',
+    'NBCSPORTSBOSTONHD':'NBCSPORTSBOSTON','NBCSPORTSBOSTON':'NBCSPORTSBOSTON',
+    'MSGNETWORK':'MSG','MSGSPORTSNET':'MSGSN',
+    'IONTELEVISION':'ION','IONTV':'ION',
+    'USANETWORK':'USA','USASPORTS':'USA',
+    'CBSSPORTSNETWORK':'CBSSN','FOXSPORTS1':'FS1','FOXSPORTS2':'FS2',
+    'NFLN':'NFLNETWORK','NBATVHD':'NBATV',
+    'BIGTENNETWORK':'BTN','BTNNETWORK':'BTN',
+    'SECNETWORK':'SECN','SECNET':'SECN','ACCNETWORK':'ACCN',
+    'ESPNNEWS':'ESPNEWS','ESPNUHD':'ESPNU',
+    'ESPNPLUS':'ESPN+','TRU':'TRUTV','THECW':'CW','CWNETWORK':'CW',
+    'NESNPLUS':'NESN+','YESNETWORK':'YES',
+    'FANDUELSPORTS':'FANDUELSPORTSNETWORK',
+    'AMAZONPRIMEVIDEO':'PRIMEVIDEO','APPLET+':'APPLETV','APPLETV+':'APPLETV',
+    'PARAMOUNTPLUS':'PARAMOUNT+','HBOMAX':'MAX'
+  };
+  return aliases[key]||key;
+}
+function networkLabel(name){
+  var key=normalizeNetworkName(name);
+  var short={'PRIMEVIDEO':'PRIME','NBCSPORTSBOSTON':'NBCSB',
+    'CBSSN':'CBS SN','NFLNETWORK':'NFL N','NHLNETWORK':'NHL N',
+    'MLBNETWORK':'MLB N','FANDUELSPORTSNETWORK':'FANDUEL',
+    'BALLYSPORTS':'BALLY','ROOTSPORTS':'ROOT','PARAMOUNT+':'PAR+'};
+  return short[key]||name;
+}
 function broadcastNames(c,e){
   var found=[],seen=new Set();
   function add(raw){
@@ -117,7 +149,7 @@ function broadcastNames(c,e){
     raw.split(/\s*[,;/]\s*/).forEach(function(value){
       var name=value.trim().replace(/\s+/g,' ');
       if(!name||/^(?:tbd|tba|n\/?a|none|not available|radio|tv|streaming)$/i.test(name))return;
-      var key=name.toUpperCase().replace(/[^A-Z0-9+]/g,'');
+      var key=normalizeNetworkName(name);
       if(!key||seen.has(key))return;
       seen.add(key);found.push(name);
     });
@@ -146,10 +178,28 @@ var networkArtwork={
   'ESPN+':'ESPN Plus.svg',
   'ESPN3':'ESPN3 logo.svg',
   'ESPNEWS':'ESPNews.svg',
-  'TNT':'TNT logo.svg'
+  'TNT':'TNT logo.svg',
+  // Verified Commons artwork for additional cable, streaming and regional outlets.
+  'PRIMEVIDEO':'Prime Video logo (2024).svg',
+  'NETFLIX':'Netflix 2015 logo.svg',
+  'PEACOCK':'NBCUniversal Peacock Logo (2026).svg',
+  'NBCSPORTSBOSTON':'NBC Sports Boston.png',
+  'MSG':'MSG Network.svg',
+  'ION':'Ion logo.svg',
+  'USA':'USA Network 2025 logo.svg',
+  'CBSSN':'CBS Sports Network 2021.svg',
+  'FS1':'2015 Fox Sports 1 logo.svg',
+  'SECN':'SEC Network (2024).svg',
+  'ACCN':'ACC Network ESPN logo.svg',
+  'CW':'The CW 2024.svg',
+  'NESN':'New England Sports Network (logo).png',
+  'YES':'YES Network logo.svg',
+  'SNY':'SNY logo.svg',
+  'APPLETV':'Apple TV Plus Logo.svg',
+  'PARAMOUNT+':'Paramount+ logo.svg'
 };
 function networkArt(name){
-  var key=String(name||'').toUpperCase().replace(/\s+/g,'');
+  var key=normalizeNetworkName(name);
   var file=networkArtwork[key];
   return file?'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(file):'';
 }
@@ -157,7 +207,7 @@ function networkStrip(g){
   if(!g.networks?.length)return null;
   var strip=elem('div','network-strip');strip.title='Broadcast reported by ESPN: '+g.networks.join(' · ');
   g.networks.slice(0,2).forEach(function(name){
-    var badge=elem('span','network-badge'),label=elem('span','broadcast-label',name),src=networkArt(name);
+    var badge=elem('span','network-badge'),label=elem('span','broadcast-label',networkLabel(name)),src=networkArt(name);
     badge.title=name;badge.appendChild(label);
     if(src){
       var logo=elem('img');logo.alt=name+' network';logo.loading='lazy';logo.referrerPolicy='no-referrer';
