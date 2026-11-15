@@ -110,6 +110,66 @@ function safeScore(g,idx){return g.state==='pre'?'–':(g.teams[idx].score!==''?
 function timeString(d){try{return new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'}).format(new Date(d))+' ET'}catch(e){return 'Time TBA'}}
 function isFav(g){return g.teams.some(function(t){return favorites.includes(t.name)})}
 function stateLabel(g){if(g.state==='in')return '● LIVE · '+(g.detail||'IN PROGRESS');if(g.state==='post')return 'FINAL';return timeString(g.date)}
+function broadcastNames(c,e){
+  var found=[],seen=new Set();
+  function add(raw){
+    if(typeof raw!=='string')return;
+    raw.split(/\s*[,;/]\s*/).forEach(function(value){
+      var name=value.trim().replace(/\s+/g,' ');
+      if(!name||/^(?:tbd|tba|n\/?a|none|not available|radio|tv|streaming)$/i.test(name))return;
+      var key=name.toUpperCase().replace(/[^A-Z0-9+]/g,'');
+      if(!key||seen.has(key))return;
+      seen.add(key);found.push(name);
+    });
+  }
+  (c.broadcasts||[]).forEach(function(b){
+    if(/radio/i.test(b?.type?.shortName||b?.type?.name||''))return;
+    (b.names||[]).forEach(add);
+    if(!b.names?.length)add(b.media?.shortName);
+  });
+  (c.geoBroadcasts||[]).forEach(function(b){
+    if(/radio/i.test(b?.type?.shortName||b?.type?.name||''))return;
+    add(b.media?.shortName);
+  });
+  if(!found.length)add(c.broadcast);
+  if(!found.length)add(e.broadcast);
+  return found.slice(0,5);
+}
+var networkArtwork={
+  'CBS':'CBS Eyemark.svg',
+  'FOX':'Fox Broadcasting Company logo (2019).svg',
+  'NBC':'NBC logo 2022.svg',
+  'ABC':'ABC-2021-LOGO.svg',
+  'ESPN':'ESPN wordmark.svg',
+  'ESPN2':'ESPN2 logo.svg',
+  'ESPNU':'ESPN U logo.svg',
+  'ESPN+':'ESPN Plus.svg',
+  'ESPN3':'ESPN3 logo.svg',
+  'ESPNEWS':'ESPNews.svg',
+  'TNT':'TNT logo.svg'
+};
+function networkArt(name){
+  var key=String(name||'').toUpperCase().replace(/\s+/g,'');
+  var file=networkArtwork[key];
+  return file?'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(file):'';
+}
+function networkStrip(g){
+  if(!g.networks?.length)return null;
+  var strip=elem('div','network-strip');strip.title='Broadcast reported by ESPN: '+g.networks.join(' · ');
+  g.networks.slice(0,2).forEach(function(name){
+    var badge=elem('span','network-badge'),label=elem('span','broadcast-label',name),src=networkArt(name);
+    badge.title=name;badge.appendChild(label);
+    if(src){
+      var logo=elem('img');logo.alt=name+' network';logo.loading='lazy';logo.referrerPolicy='no-referrer';
+      logo.onload=function(){badge.classList.add('with-logo')};
+      logo.onerror=function(){logo.remove();badge.classList.remove('with-logo')};
+      logo.src=src;badge.insertBefore(logo,label);
+    }
+    strip.appendChild(badge);
+  });
+  if(g.networks.length>2)strip.appendChild(elem('span','network-extra','+'+(g.networks.length-2)));
+  return strip;
+}
 function fromESPN(key,e){var c=e.competitions?.[0];if(!c)return null;var comps=c.competitors||[];var away=comps.find(function(x){return x.homeAway==='away'}),home=comps.find(function(x){return x.homeAway==='home'});if(!away||!home)return null;return {key:key,id:String(e.id),teams:[team(away),team(home)],state:e.status?.type?.state||'pre',detail:e.status?.type?.shortDetail||e.status?.type?.detail||'',date:e.date||'',networks:broadcastNames(c,e),favorite:false}}
 function compact(el){while(el.firstChild)el.removeChild(el.firstChild)}
 function img(t){var x=elem('img');x.alt=t.name+' logo';x.loading='lazy';x.referrerPolicy='no-referrer';if(t.logo)x.src=t.logo;else x.style.display='none';x.onerror=function(){x.style.display='none'};return x}
