@@ -72,7 +72,7 @@ button:disabled{opacity:.45;cursor:default}
 </section>
 <section class="card">
  <div class="cardhead"><span class="number">2</span><div><h2>Check private bridge</h2><p class="hint">The bridge must be deployed on Render with its secret configuration before pairing can begin.</p></div></div>
- <label class="field">Secure bridge URL<input type="url" id="bridgeUrl" value="" placeholder="Pending verified Render deployment" readonly spellcheck="false" autocomplete="off"></label>
+ <label class="field">Secure bridge URL<input type="url" id="bridgeUrl" value="https://man-cave-xfinity-bridge.onrender.com" placeholder="Verified Render service" readonly spellcheck="false" autocomplete="off"></label>
  <div class="row"><button class="btn" id="healthBtn" type="button">Check bridge</button><button class="btn" id="boxesBtn" type="button">Refresh box status</button></div>
  <p id="serverStatus" class="status">Not checked.</p>
 </section>
@@ -108,9 +108,9 @@ button:disabled{opacity:.45;cursor:default}
 <script type="module">
 import {auth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from './firebase.js';
 const $=id=>document.getElementById(id);
-const TRUSTED_BRIDGE_ORIGIN=""; // Set only after Render returns a verified service URL.
+const TRUSTED_BRIDGE_ORIGIN="https://man-cave-xfinity-bridge.onrender.com"; // Exact hostname returned by the Render deployment.
 const boxNames=['Top Left','Top Right','Center','Side'];
-let currentUser=null,selected='Center',paired=new Set(),pairTimer=null,inFlight=false;
+let currentUser=null,selected='Center',paired=new Set(),pairTimer=null,inFlight=false,bridgeReady=false;
 const status=(id,message,tone='')=>{const el=$(id);el.textContent=message;el.className='status'+(tone?' '+tone:'');};
 const base=()=>{
  if(!TRUSTED_BRIDGE_ORIGIN)throw Error('Bridge has not been deployed and verified yet.');
@@ -120,7 +120,7 @@ const base=()=>{
   throw Error('For safety, only a secure .onrender.com bridge URL is accepted.');
  return url.origin;
 };
-const busy=state=>{$('pairBtn').disabled=state||!currentUser;$('sendBtn').disabled=state||!currentUser||!paired.has(selected);};
+const busy=state=>{$('pairBtn').disabled=state||!currentUser||!bridgeReady;$('sendBtn').disabled=state||!currentUser||!bridgeReady||!paired.has(selected);};
 async function api(path,data){
  if(!currentUser)throw Error('Sign in to Firebase first.');
  const userToken=await currentUser.getIdToken();
@@ -216,8 +216,8 @@ $('healthBtn').addEventListener('click',async()=>{
  try{
   const r=await fetch(base()+'/health'),j=await r.json();
   if(!r.ok)throw Error('HTTP '+r.status);
-  status('serverStatus',j.configured?'Bridge online and configured.':'Bridge online but missing secure environment settings.',j.configured?'good':'warn');
- }catch(error){status('serverStatus','Bridge check failed: '+error.message,'warn');}
+  bridgeReady=!!j.configured;busy(inFlight);status('serverStatus',j.configured?'Bridge online and configured. Ready to test pairing.':'Bridge online but missing private Firebase settings. Pairing remains disabled.',j.configured?'good':'warn');
+ }catch(error){bridgeReady=false;busy(inFlight);status('serverStatus','Bridge check failed: '+error.message,'warn');}
 });
 $('boxesBtn').addEventListener('click',refreshBoxes);
 $('pairBtn').addEventListener('click',pair);
