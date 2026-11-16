@@ -11,6 +11,19 @@ const DB_URL=process.env.FIREBASE_DATABASE_URL||'https://man-cave-left-right-def
 const BOXES=Object.freeze({'Top Left':'top_left','Top Right':'top_right','Center':'center','Side':'side'});
 const UID_ALLOWLIST=(process.env.ADMIN_UIDS||'').split(',').map(s=>s.trim()).filter(Boolean);
 const API='https://remote.xfinity.com';
+// Explicitly allowlisted streaming app commands; never accept arbitrary app names from the browser.
+// Xfinity voice interpretation can vary by TV box and supported app. Server success != app opened.
+const STREAMING_APP_COMMANDS=Object.freeze({
+ netflix:'Watch Netflix',
+ prime:'Watch Prime Video',
+ appletv:'Launch Apple TV app',
+ paramount:'Paramount+',
+ disney:'Disney plus app',
+ espnplus:'ESPN+',
+ youtube:'YouTube',
+ peacock:'Peacock',
+ hulu:'Hulu'
+});
 const REFRESH_INTERVAL=35*60*1000,PAIR_TIMEOUT=180*1000;
 const pairings=new Map(),busy=new Set(),lastCommands=new Map();
 let auth=null,db=null,encKey=null,configError=null;
@@ -161,7 +174,8 @@ app.post('/api/send',async(req,res)=>{
  const {box,kind}=req.body||{};
  const value=String(req.body?.value||'').trim();
  if(!validBox(box))return fail(res,400,'Choose a valid box.');
- if(!['text','channel','key'].includes(kind))return fail(res,400,'Invalid command kind.');
+ if(!['text','channel','key','app'].includes(kind))return fail(res,400,'Invalid command kind.');
+ if(kind==='app'&&!Object.hasOwn(STREAMING_APP_COMMANDS,value))return fail(res,400,'Unsupported streaming app.');
  if(kind==='channel'&&!/^\d{1,5}$/.test(value))return fail(res,400,'Enter 1–5 channel digits.');
  if(kind==='text'&&(!/^[\w\s.+&,'?!:-]{1,90}$/.test(value)||!/^(watch|tune to|find|go to|show)\b/i.test(value)))
    return fail(res,400,'Use a command such as Watch ESPN.');
@@ -173,6 +187,7 @@ app.post('/api/send',async(req,res)=>{
    const token=await tokenFor(box);
    if(!token){const e=new Error('Not paired');e.code='UNPAIRED';throw e;}
    if(kind==='text')await xfinity('/api/v1/text',{cmd:value,arToken:token},null);
+   if(kind==='app')await xfinity('/api/v1/text',{cmd:STREAMING_APP_COMMANDS[value],arToken:token},null);
    if(kind==='key')await xfinity('/api/v1/processKey',{vcode:keys[value]},token);
    if(kind==='channel')for(let i=0;i<value.length;i++){
     if(i)await new Promise(resolve=>setTimeout(resolve,400));
