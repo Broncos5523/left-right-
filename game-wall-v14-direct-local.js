@@ -82,8 +82,24 @@ function gameNetwork(){
  const option=guide.querySelector('select[data-xt-game] option:checked');
  return {network:chosen,details:option?.textContent||'Selected ESPN matchup'};
 }
+let watchedGuide=null,guideObserver=null;
+function followEspnSelection(){
+ const guide=document.getElementById('xfinityTuneGuide');
+ if(guide===watchedGuide)return;
+ if(guideObserver)guideObserver.disconnect();
+ watchedGuide=guide;
+ if(guide){
+  guideObserver=new MutationObserver(()=>{
+   // ESPN's existing Quick Tune re-renders its own subtree after game/filter changes.
+   // Our panel is a sibling, so rendering here cannot cause an observer loop.
+   if(root())render();
+  });
+  guideObserver.observe(guide,{childList:true,subtree:true,characterData:true});
+ }
+}
 function render(){
  const node=root();if(!node)return;
+ followEspnSelection();
  const n=selectedNetwork(),num=numberFor(n),pair=s.paired.has(s.box);
  const games=gameNetwork();
  node.innerHTML='<section class="localDirect"><div class="localDirectHead"><div><span class="localDirectEyebrow">DIRECT XFINITY CONTROL · 02767</span><h3>Local Sports Channels</h3><p>Raynham, MA · ZIP-based channel suggestions. Tune your paired boxes directly and save the numbers confirmed on your own Xfinity service.</p></div><div class="localDirectZip">02767</div></div>'
