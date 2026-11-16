@@ -1,0 +1,17 @@
+{
+  "name": "man-cave-xfinity-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Firebase-authenticated unofficial Xfinity X1 cloud remote bridge for the Man Cave Sports Book",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.0"
+  }
+}
