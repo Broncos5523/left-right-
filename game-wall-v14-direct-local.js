@@ -9,6 +9,8 @@ const HOST='https://man-cave-xfinity-bridge.onrender.com'; // Verified Render de
 const ZIP='02767',STORE='man-cave-v14-02767-channel-overrides';
 const BOXES=[['Top Left','Top Left 40″'],['Top Right','Top Right 55″'],['Center','Center 65″'],['Side','Side 40″']];
 const NETWORKS=[
+ ['CBS · WPRI','WPRI','11','187'],['FOX · WNAC','WNAC','10','186'],
+ ['NBC · WJAR','WJAR','9','185'],['ABC · WLNE','WLNE','5','181'],
  ['ESPN','ESPN','44','217'],['ESPN2','ESPN2','45','218'],
  ['ESPNEWS','ESPNEWS','118','172'],['ESPNU','ESPNU','148','235'],
  ['NESN','NESN','46','219'],['NESN+','NESN+','63','234'],
@@ -33,7 +35,8 @@ const s={box:'Center',network:'ESPN',quality:'HD',overrides:{},user:null,paired:
  checking:false,sending:false,filter:''};
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 function normalize(x){return String(x||'').toLowerCase().replace(/[^a-z0-9+]/g,'');}
-const alias={'nbcsportsboston':'NBC Sports Boston','nbcsboston':'NBC Sports Boston',
+const alias={'cbs':'CBS · WPRI','fox':'FOX · WNAC','nbc':'NBC · WJAR','abc':'ABC · WLNE',
+ 'nbcsportsboston':'NBC Sports Boston','nbcsboston':'NBC Sports Boston',
  'nbcsportsbostonplus':'NBC Sports Boston Plus',
  'newenglandsportsnetwork':'NESN','newenglandsportsnetworkplus':'NESN+',
  'foxsports1':'FS1','foxsports2':'FS2','cbs sports network':'CBS Sports Network',
