@@ -4,6 +4,7 @@
 const express=require('express');
 const crypto=require('node:crypto');
 const admin=require('firebase-admin');
+const cheerio=require('cheerio');
 const app=express();
 const PORT=Number(process.env.PORT||10000);
 const ORIGIN=process.env.CONTROLLER_ORIGIN||'https://broncos5523.github.io';
@@ -112,6 +113,73 @@ app.use((req,res,next)=>{
  next();
 });
 app.use(express.json({limit:'12kb'}));
+
+// Public facts only: latest Providence-New Bedford CBS/FOX NFL broadcast assignments.
+// Refuse to classify a game as local when the publisher has not posted that exact Sunday.
+// Does NOT expose any user account, Firebase data, paired Xfinity boxes or credentials.
+const PROV_COVERAGE_URL='https://www.thesportsmaps.com/tv-markets/providence-new-bedford.html';
+const localNflCache={at:0,data:null};
+function cleanCoverageText(html){
+ const $=cheerio.load(html);
+ $('script,style,noscript,svg').remove();
+ return $('body').text().replace(/\s+/g,' ').trim();
+}
+function parseProvidenceCoverage(raw){
+ const text=cleanCoverageText(raw);
+ const heading=/On Local TV in Providence-New Bedford:\s*Week\s*(\d+)/i.exec(text);
+ if(!heading)throw Error('Local NFL listing heading missing');
+ const after=text.slice(heading.index+heading[0].length);
+ const date=/Sunday,?\s+([A-Za-z]+)\s+(\d{1,2})(?:,?\s*(20\d\d))?/i.exec(after);
+ if(!date)throw Error('Local NFL broadcast date missing');
+ const yr=date[3]||String(new Date().getUTCFullYear());
+ const mo=Number(new Date(date[1]+' 1, '+yr).getUTCMonth())+1;
+ if(!mo||mo>12)throw Error('Invalid listing month');
+ const dateIso=yr+'-'+String(mo).padStart(2,'0')+'-'+date[2].padStart(2,'0');
+ const end=after.search(/National games(?:\s|\u00b7)|Not on TV in Providence/i);
+ if(end<0)throw Error('Local listing section incomplete');
+ const section=after.slice(date.index+date[0].length,end);
+ const games=[];
+ const pattern=/(\d{1,2}:\d\d)\s*(AM|PM)\s*ET\s*(CBS|FOX)\s+(.+?)\s+at\s+(.+?)\s*See the map/gi;
+ let match;
+ while((match=pattern.exec(section))!==null){
+  const away=match[4].trim(),home=match[5].trim();
+  if(away.length>50||home.length>50||!away||!home)continue;
+  games.push({time:match[1]+' '+match[2].toUpperCase(),network:match[3].toUpperCase(),away,home});
+ }
+ // No inferred local assignments: if parsing misses a game, the source is not considered complete.
+ if(games.length<1||games.length>5)throw Error('Local NFL game rows could not be validated');
+ return {date:dateIso,week:Number(heading[1]),market:'Providence–New Bedford',
+         source:PROV_COVERAGE_URL,games};
+}
+async function getProvidenceNflCoverage(){
+ if(localNflCache.data&&Date.now()-localNflCache.at<30*60*1000)return localNflCache.data;
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8500);
+ try{
+  const response=await fetch(PROV_COVERAGE_URL,{headers:{'Accept':'text/html','User-Agent':'ManCaveSportsBook/1.0 (local NFL broadcast lookup)'},signal:controller.signal});
+  if(!response.ok)throw Error('Listing HTTP '+response.status);
+  const html=await response.text();
+  if(html.length>1500000)throw Error('Unexpected listing size');
+  const data=parseProvidenceCoverage(html);
+  localNflCache.at=Date.now();localNflCache.data=data;
+  return data;
+ }finally{clearTimeout(timeout);}
+}
+app.get('/nfl-local-coverage',async(req,res)=>{
+ const date=String(req.query.date||'');
+ if(!/^20\d{2}-\d{2}-\d{2}$/.test(date))return fail(res,400,'Provide a Sunday date as YYYY-MM-DD.');
+ try{
+  const current=await getProvidenceNflCoverage();
+  const verified=current.date===date;
+  res.set('Cache-Control','public, max-age=300');
+  res.json({ok:true,requestedDate:date,date:current.date,week:current.week,
+    market:current.market,source:current.source,verifiedForRequestedDate:verified,
+    games:verified?current.games:[],status:verified?'published':'not_yet_published'});
+ }catch(err){
+  console.warn('Providence NFL listing unavailable:',err.message);
+  res.status(503).json({ok:false,requestedDate:date,verifiedForRequestedDate:false,
+   games:[],status:'unavailable',error:'Providence NFL station assignments not confirmed at this time.'});
+ }
+});
 app.get('/health',(_,res)=>res.json({ok:true,service:'man-cave-xfinity-bridge',configured:!configError}));
 app.get('/',(_,res)=>res.type('text/plain').send('Man Cave Xfinity Remote Bridge. Open the private controller pairing page.'));
 app.use('/api',async(req,res,next)=>{
