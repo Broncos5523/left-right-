@@ -72,7 +72,7 @@ button:disabled{opacity:.45;cursor:default}
 </section>
 <section class="card">
  <div class="cardhead"><span class="number">2</span><div><h2>Check private bridge</h2><p class="hint">The bridge must be deployed on Render with its secret configuration before pairing can begin.</p></div></div>
- <label class="field">Secure bridge URL<input type="url" id="bridgeUrl" value="https://man-cave-xfinity-bridge.onrender.com" placeholder="https://…onrender.com" spellcheck="false" autocomplete="off"></label>
+ <label class="field">Secure bridge URL<input type="url" id="bridgeUrl" value="" placeholder="Pending verified Render deployment" readonly spellcheck="false" autocomplete="off"></label>
  <div class="row"><button class="btn" id="healthBtn" type="button">Check bridge</button><button class="btn" id="boxesBtn" type="button">Refresh box status</button></div>
  <p id="serverStatus" class="status">Not checked.</p>
 </section>
@@ -108,12 +108,14 @@ button:disabled{opacity:.45;cursor:default}
 <script type="module">
 import {auth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from './firebase.js';
 const $=id=>document.getElementById(id);
+const TRUSTED_BRIDGE_ORIGIN=""; // Set only after Render returns a verified service URL.
 const boxNames=['Top Left','Top Right','Center','Side'];
 let currentUser=null,selected='Center',paired=new Set(),pairTimer=null,inFlight=false;
 const status=(id,message,tone='')=>{const el=$(id);el.textContent=message;el.className='status'+(tone?' '+tone:'');};
 const base=()=>{
- const input=$('bridgeUrl').value.trim().replace(/\/+$/,'');
- let url;try{url=new URL(input);}catch{throw Error('Enter a valid Render bridge URL.');}
+ if(!TRUSTED_BRIDGE_ORIGIN)throw Error('Bridge has not been deployed and verified yet.');
+ const input=TRUSTED_BRIDGE_ORIGIN;
+ let url;try{url=new URL(input);}catch{throw Error('The configured bridge URL is invalid.');}
  if(url.protocol!=='https:'||!/^[a-z0-9-]+\.onrender\.com$/i.test(url.hostname)||url.username||url.password||url.port||url.pathname!=='/'&&url.pathname!=='')
   throw Error('For safety, only a secure .onrender.com bridge URL is accepted.');
  return url.origin;
@@ -195,7 +197,7 @@ onAuthStateChanged(auth,user=>{
  $('loginForm').hidden=!!user;$('signedIn').hidden=!user;
  $('identity').textContent=user?'Signed in · '+(user.email||'Account')+' · UID: '+user.uid:'';
  status('authStatus',user?'Firebase controller session active.':'Sign in with your existing controller account.',user?'good':'');
- renderBoxes();if(user)refreshBoxes();
+ renderBoxes();/* Do not contact any bridge until the server host has been verified. */
 });
 $('loginForm').addEventListener('submit',async e=>{
  e.preventDefault();$('loginBtn').disabled=true;
@@ -226,8 +228,8 @@ $('boxGrid').addEventListener('click',e=>{
  stopPolling();$('pairPanel').hidden=true;selected=button.dataset.box;renderBoxes();
  status('pairStatus','Selected '+selected+'. Start EasyPair to pair this box.');
 });
-$('bridgeUrl').addEventListener('change',()=>{try{localStorage.setItem('man-cave-xfinity-bridge-url',base());}catch{}});
-try{const saved=localStorage.getItem('man-cave-xfinity-bridge-url');if(saved)$('bridgeUrl').value=saved;}catch{}
+/* The backend URL is a trusted deployment value, not user-supplied. */
+$('bridgeUrl').value=TRUSTED_BRIDGE_ORIGIN;
 renderBoxes();
 </script>
 </body></html>
