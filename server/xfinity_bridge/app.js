@@ -14,12 +14,12 @@ const API='https://remote.xfinity.com';
 // Explicitly allowlisted streaming app commands; never accept arbitrary app names from the browser.
 // Xfinity voice interpretation can vary by TV box and supported app. Server success != app opened.
 const STREAMING_APP_COMMANDS=Object.freeze({
- netflix:'Watch Netflix',
+ netflix:'Netflix',
  prime:'Watch Prime Video',
  appletv:'Launch Apple TV app',
  paramount:'Paramount+',
  disney:'Disney plus app',
- espnplus:'ESPN+',
+ espnplus:'ESPN app',
  youtube:'YouTube',
  peacock:'Peacock',
  hulu:'Hulu'
