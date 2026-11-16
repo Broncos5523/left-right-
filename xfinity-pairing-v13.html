@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#081522">
+<title>MAN CAVE SPORTS BOOK · Xfinity Direct Control Setup</title>
+<style>
+:root{color-scheme:dark;--bg:#081522;--panel:#10253a;--edge:#30536b;--cyan:#67dffa;--gold:#ffd17c;--text:#eef8ff;--sub:#a1b9cc;--green:#8aefb6}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 85% -10%,#17435d 0,transparent 55%),#081522;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+main{max-width:620px;margin:0 auto;padding:22px 14px calc(92px + env(safe-area-inset-bottom))}
+a{color:var(--cyan)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:21px}
+.back{font-size:12px;text-decoration:none;color:#b3d8ef;font-weight:750}
+.tag{color:var(--cyan);font-size:10px;font-weight:950;letter-spacing:.14em;border:1px solid #487992;border-radius:30px;padding:7px 10px}
+.brand{font-weight:950;letter-spacing:.22em;font-size:10px;color:var(--gold)}
+h1{font-size:clamp(30px,8.5vw,44px);line-height:1.02;letter-spacing:-.05em;margin:9px 0}
+h1 span{color:var(--cyan)}
+.intro{line-height:1.55;font-size:13px;color:var(--sub);margin:10px 0 24px}
+.card{border:1px solid var(--edge);border-radius:17px;background:linear-gradient(135deg,#132d44,#0d2030);padding:17px;margin:0 0 15px;box-shadow:0 10px 30px #0003}
+.cardhead{display:flex;gap:11px;align-items:flex-start;margin-bottom:13px}
+.number{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#2a5572;color:#e6f9ff;font-weight:1000;flex:0 0 auto}
+h2{font-size:18px;margin:0 0 4px;letter-spacing:-.025em}
+.hint,.muted{color:var(--sub);font-size:12px;line-height:1.5;margin:5px 0 11px}
+.field{display:block;color:#d5e8f4;font-size:12px;font-weight:850;margin:13px 0}
+input,select{display:block;background:#081b2a;color:#eef8ff;border:1px solid #4c6f86;border-radius:10px;padding:12px;font:inherit;font-size:14px;width:100%;margin:7px 0 0;min-height:45px}
+button{font:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:default}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid #527991;border-radius:10px;background:#193d56;color:var(--text);padding:12px 13px;min-height:44px;font-size:12px;font-weight:900;text-align:center}
+.btn.primary{background:linear-gradient(120deg,#74e4ff,#b7f5ff);border-color:#b9f5ff;color:#0b283b}
+.btn.gold{background:linear-gradient(100deg,#efbf64,#ffe9a5);border-color:#ffe9a5;color:#1b241c}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.row .btn{flex:1}
+.status{font-size:12px;color:#adccdc;border-left:3px solid #47768d;padding:9px 11px;background:#0b2032;border-radius:5px;line-height:1.5;overflow-wrap:anywhere}
+.status.good{border-left-color:var(--green);color:#c6f5d9}
+.status.warn{border-left-color:#e9bd68;color:#ffe3a6}
+.identity{font-size:11px;color:#8eddec;overflow-wrap:anywhere;margin:9px 0}
+.boxes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.boxitem{display:flex;flex-direction:column;gap:6px;border:1px solid #375a73;border-radius:11px;background:#0f2639;color:#c5ddeb;padding:13px;text-align:left}
+.boxitem.active{background:#19415c;border-color:#74def5;box-shadow:0 0 0 1px #64d3ee}
+.boxitem b{font-size:13px}
+.boxitem span{font-size:11px;color:#9bb5c8}
+.boxitem.paired span{color:#8df6bb}
+.pairCode{font-size:clamp(39px,13vw,58px);font-variant-numeric:tabular-nums;letter-spacing:.13em;text-align:center;font-weight:950;color:#fff8c4;padding:17px 0}
+.pairPanel{background:#071c2c;border:1px dashed #a78c55;border-radius:12px;padding:10px 13px;margin:11px 0}
+.steps{color:#b7d1e3;line-height:1.7;font-size:12px;margin:8px 0 0;padding-left:19px}
+.quick{font-size:11px;color:#a3c0d0}
+.foot{margin-top:23px;padding:14px;border-top:1px solid #284459;color:#9cb1c1;font-size:11px;line-height:1.6}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><a class="back" href="./game-wall-v12-quick-tune.html">‹ Back to Game Wall V12</a><span class="tag">PRIVATE REMOTE · BETA</span></div>
+<div class="brand">MAN CAVE SPORTS BOOK</div>
+<h1>XFINITY <span>DIRECT CONTROL</span></h1>
+<p class="intro">We're building the one-tap controller. First we pair just your Center box and confirm that our own command can change a channel — without opening Xfinity Web Remote.</p>
+<section class="card">
+ <div class="cardhead"><span class="number">1</span><div><h2>Connect securely</h2><p class="hint">Sign in with your existing Man Cave Firebase controller account. We will never ask for your Xfinity password.</p></div></div>
+ <form id="loginForm">
+  <label class="field">Firebase controller email<input id="loginEmail" type="email" autocomplete="username" required></label>
+  <label class="field">Password<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+  <button class="btn primary" type="submit" id="loginBtn">Sign in</button>
+ </form>
+ <div id="signedIn" hidden>
+  <div id="identity" class="identity"></div>
+  <div class="row"><button class="btn" id="copyUid" type="button">Copy my Firebase UID</button><button class="btn" id="logout" type="button">Sign out</button></div>
+  <p class="hint">The UID identifies your Firebase account for the bridge's server-side allowlist. It is not an Xfinity pairing token.</p>
+ </div>
+ <p id="authStatus" class="status">Checking your current Firebase session…</p>
+</section>
+<section class="card">
+ <div class="cardhead"><span class="number">2</span><div><h2>Check private bridge</h2><p class="hint">The bridge must be deployed on Render with its secret configuration before pairing can begin.</p></div></div>
+ <label class="field">Secure bridge URL<input type="url" id="bridgeUrl" value="https://man-cave-xfinity-bridge.onrender.com" placeholder="https://…onrender.com" spellcheck="false" autocomplete="off"></label>
+ <div class="row"><button class="btn" id="healthBtn" type="button">Check bridge</button><button class="btn" id="boxesBtn" type="button">Refresh box status</button></div>
+ <p id="serverStatus" class="status">Not checked.</p>
+</section>
+<section class="card">
+ <div class="cardhead"><span class="number">3</span><div><h2>Pair an Xfinity box</h2><p class="hint">Choose Center for our first proof-of-concept. No channel commands are sent during pairing.</p></div></div>
+ <div id="boxGrid" class="boxes">
+  <button type="button" class="boxitem" data-box="Top Left"><b>Top Left</b><span>Not checked</span></button>
+  <button type="button" class="boxitem" data-box="Top Right"><b>Top Right</b><span>Not checked</span></button>
+  <button type="button" class="boxitem active" data-box="Center"><b>Center</b><span>Not checked</span></button>
+  <button type="button" class="boxitem" data-box="Side"><b>Side</b><span>Not checked</span></button>
+ </div>
+ <div class="row"><button type="button" class="btn gold" id="pairBtn" disabled>Start EasyPair · Center</button></div>
+ <div class="pairPanel" id="pairPanel" hidden>
+  <p class="muted">Enter this code on the selected box. It expires in approximately 3 minutes.</p>
+  <div class="pairCode" id="pairCode">•••••••</div>
+  <ol class="steps">
+   <li>Use the physical Xfinity voice remote for <b id="pairBox">Center</b>.</li>
+   <li>Say <b>“Easy Pair.”</b></li>
+   <li>Type this seven-digit code on that TV and select Pair Now.</li>
+  </ol>
+ </div>
+ <p id="pairStatus" class="status">Sign in and connect the bridge to enable pairing.</p>
+</section>
+<section class="card">
+ <div class="cardhead"><span class="number">4</span><div><h2>Test one-tap tuning</h2><p class="hint">Once Center is paired, send a single command directly from this page. Watch the actual TV to confirm it changed.</p></div></div>
+ <label class="field">Command<input type="text" value="Watch ESPN" id="testCommand" maxlength="90" autocomplete="off"></label>
+ <button class="btn primary" type="button" id="sendBtn" disabled>Send command to Center</button>
+ <p id="testStatus" class="status">No command sent.</p>
+ <p class="quick">An accepted request proves Xfinity received a command, not that the TV switched. We'll verify that together before enabling automated game selection.</p>
+</section>
+<div class="foot">This feature uses an unofficial Xfinity cloud API. It may stop working if Xfinity changes its protocol. Authentication tokens stay on the encrypted private bridge. Never paste Xfinity remote tokens or Firebase service-account credentials into this page or into GitHub.</div>
+</main>
+<script type="module">
+import {auth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from './firebase.js';
+const $=id=>document.getElementById(id);
+const boxNames=['Top Left','Top Right','Center','Side'];
+let currentUser=null,selected='Center',paired=new Set(),pairTimer=null,inFlight=false;
+const status=(id,message,tone='')=>{const el=$(id);el.textContent=message;el.className='status'+(tone?' '+tone:'');};
+const base=()=>{
+ const input=$('bridgeUrl').value.trim().replace(/\/+$/,'');
+ let url;try{url=new URL(input);}catch{throw Error('Enter a valid Render bridge URL.');}
+ if(url.protocol!=='https:'||!/^[a-z0-9-]+\.onrender\.com$/i.test(url.hostname)||url.username||url.password||url.port||url.pathname!=='/'&&url.pathname!=='')
+  throw Error('For safety, only a secure .onrender.com bridge URL is accepted.');
+ return url.origin;
+};
+const busy=state=>{$('pairBtn').disabled=state||!currentUser;$('sendBtn').disabled=state||!currentUser||!paired.has(selected);};
+async function api(path,data){
+ if(!currentUser)throw Error('Sign in to Firebase first.');
+ const userToken=await currentUser.getIdToken();
+ const response=await fetch(base()+path,{
+  method:data?'POST':'GET',
+  headers:{Authorization:'Bearer '+userToken,'Content-Type':'application/json'},
+  ...(data?{body:JSON.stringify(data)}:{})
+ });
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok)throw Error(result.error||'Bridge returned HTTP '+response.status);
+ return result;
+};
+function renderBoxes(){
+ document.querySelectorAll('[data-box]').forEach(el=>{
+  const name=el.dataset.box,yes=paired.has(name);
+  el.className='boxitem'+(name===selected?' active':'')+(yes?' paired':'');
+  el.querySelector('span').textContent=yes?'Paired · ready':'Not paired';
+ });
+ $('pairBtn').textContent='Start EasyPair · '+selected;
+ $('sendBtn').textContent='Send command to '+selected;
+ busy(inFlight);
+}
+function stopPolling(){if(pairTimer){clearInterval(pairTimer);pairTimer=null;}}
+async function refreshBoxes(){
+ try{
+  const result=await api('/api/boxes');
+  paired=new Set((result.boxes||[]).filter(x=>x.paired).map(x=>x.name));
+  renderBoxes();
+  status('serverStatus','Bridge connected. '+paired.size+' of 4 Xfinity boxes paired.','good');
+ }catch(error){status('serverStatus','Cannot fetch box status: '+error.message,'warn');}
+}
+async function pairStatus(){
+ try{
+  const result=await api('/api/pair/status',{box:selected});
+  if(result.status==='paired'){
+   stopPolling();$('pairPanel').hidden=true;
+   status('pairStatus',selected+' paired successfully! The box is now ready for a direct test.','good');
+   await refreshBoxes();
+  }else if(result.status==='expired'||result.status==='not_started'){
+   stopPolling();$('pairPanel').hidden=true;
+   status('pairStatus','Pairing expired. Start EasyPair again.','warn');
+  }else status('pairStatus','Waiting for '+selected+' TV confirmation · '+result.expiresInSeconds+'s remaining.');
+ }catch(error){status('pairStatus','Pairing status unavailable: '+error.message,'warn');}
+}
+async function pair(){
+ if(inFlight||!currentUser)return;
+ stopPolling();inFlight=true;busy(true);
+ try{
+  const result=await api('/api/pair/start',{box:selected});
+  $('pairCode').textContent=result.code;
+  $('pairBox').textContent=selected;
+  $('pairPanel').hidden=false;
+  status('pairStatus','Code ready. Say “Easy Pair” into the physical Xfinity remote for '+selected+'.');
+  pairTimer=setInterval(pairStatus,5000);
+ }catch(error){status('pairStatus','Could not start pairing: '+error.message,'warn');}
+ finally{inFlight=false;busy(false);}
+}
+async function sendTest(){
+ if(inFlight||!currentUser||!paired.has(selected))return;
+ const command=$('testCommand').value.trim();
+ if(!/^(watch|tune to|find|go to|show)\b/i.test(command)||command.length>90){
+  status('testStatus','Enter a command like Watch ESPN.','warn');return;
+ }
+ inFlight=true;busy(true);
+ status('testStatus','Sending to '+selected+' through Xfinity…');
+ try{
+  const result=await api('/api/send',{box:selected,kind:'text',value:command});
+  status('testStatus',result.commandAccepted?'Xfinity accepted '+command+' for '+selected+'. Did the actual TV change?':'Xfinity returned no acceptance.','good');
+ }catch(error){status('testStatus','Command failed: '+error.message,'warn');}
+ finally{inFlight=false;busy(false);}
+}
+onAuthStateChanged(auth,user=>{
+ currentUser=user;
+ $('loginForm').hidden=!!user;$('signedIn').hidden=!user;
+ $('identity').textContent=user?'Signed in · '+(user.email||'Account')+' · UID: '+user.uid:'';
+ status('authStatus',user?'Firebase controller session active.':'Sign in with your existing controller account.',user?'good':'');
+ renderBoxes();if(user)refreshBoxes();
+});
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();$('loginBtn').disabled=true;
+ try{
+  await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value);
+  $('loginPassword').value='';
+ }catch(error){status('authStatus','Sign-in failed: '+(error.code||error.message),'warn');}
+ finally{$('loginBtn').disabled=false;}
+});
+$('logout').addEventListener('click',async()=>{stopPolling();await signOut(auth);});
+$('copyUid').addEventListener('click',async()=>{
+ try{await navigator.clipboard.writeText(currentUser.uid);status('authStatus','Firebase UID copied. Paste it only into your private Render ADMIN_UIDS setting.','good');}
+ catch{status('authStatus','Copy blocked. Select the UID shown above and copy it manually.','warn');}
+});
+$('healthBtn').addEventListener('click',async()=>{
+ try{
+  const r=await fetch(base()+'/health'),j=await r.json();
+  if(!r.ok)throw Error('HTTP '+r.status);
+  status('serverStatus',j.configured?'Bridge online and configured.':'Bridge online but missing secure environment settings.',j.configured?'good':'warn');
+ }catch(error){status('serverStatus','Bridge check failed: '+error.message,'warn');}
+});
+$('boxesBtn').addEventListener('click',refreshBoxes);
+$('pairBtn').addEventListener('click',pair);
+$('sendBtn').addEventListener('click',sendTest);
+$('boxGrid').addEventListener('click',e=>{
+ const button=e.target.closest('[data-box]');
+ if(!button||inFlight)return;
+ stopPolling();$('pairPanel').hidden=true;selected=button.dataset.box;renderBoxes();
+ status('pairStatus','Selected '+selected+'. Start EasyPair to pair this box.');
+});
+$('bridgeUrl').addEventListener('change',()=>{try{localStorage.setItem('man-cave-xfinity-bridge-url',base());}catch{}});
+try{const saved=localStorage.getItem('man-cave-xfinity-bridge-url');if(saved)$('bridgeUrl').value=saved;}catch{}
+renderBoxes();
+</script>
+</body></html>
