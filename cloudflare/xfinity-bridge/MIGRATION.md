@@ -19,6 +19,14 @@ Do not treat this URL as active until the public `/health` endpoint is verified.
 
 No TV commands or real Firebase writes are executed by the test workflow:
 `.github/workflows/verify-cloudflare-xfinity-bridge.yml`.
+
+A **separate, non-production iPhone controller** is staged as:
+`https://broncos5523.github.io/left-right-/game-wall-v47-home-screen.html`.
+It retains V46 board UI/design but points all four Xfinity modules, public sports
+lookup calls, and its pairing setup to the expected Cloudflare Worker origin.
+Do not use V47 to command real Xfinity boxes until the Worker is deployed,
+secrets added, and `/api/boxes` verified. Continue using V46 for all working
+sport-board controls in the meantime.
 The tests cover legacy Node AES-GCM compatibility, signed Firebase ID-token
 validation, all four separate pairings, command requests, rejection of bad tokens,
 and safe failure if the original encryption key is missing or mismatched.
@@ -87,9 +95,9 @@ artifact.
 - The original four Xfinity box names are preserved.
 - A successful Xfinity HTTP response is not proof the physical TV changed.
 - The old Express bridge also hosted separate public sports-info routes
-  (`/nfl-local-coverage`, `/nhl-team-leaders`). Those are **not yet
-  migrated** to this security-focused Xfinity Worker. Do not retire their
-  client consumers or claim a total Render retirement without checking them.
+  (`/nfl-local-coverage`, `/nhl-team-leaders`). They are now ported in
+  `public-data.mjs` with source-validation and fail-closed responses.
+  Live source accessibility must still be checked after deployment.
 
 **Do not redirect Controller V46 until after:**
 1. Worker `/health` reports configured true.
