@@ -1,0 +1,27 @@
+name: Verify Cloudflare Xfinity bridge — offline no accounts or TV commands
+on:
+  push:
+    branches: [main]
+    paths:
+      - cloudflare/xfinity-bridge/**
+      - .github/workflows/verify-cloudflare-xfinity-bridge.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Firebase auth, encryption compatibility, pairing and command routing offline
+        run: node --test cloudflare/xfinity-bridge/worker.test.mjs
+      - name: Check standalone Worker can bundle without changing the live sports board
+        working-directory: cloudflare/xfinity-bridge
+        run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/xfinity-worker-dryrun
+      - name: Report isolation from 28 sports boards
+        run: |
+          test -f cloudflare/xfinity-bridge/worker.mjs
+          test -f cloudflare/xfinity-bridge/wrangler.jsonc
+          grep -q '"name": "man-cave-xfinity-bridge"' cloudflare/xfinity-bridge/wrangler.jsonc
+          echo 'PASS_XFINITY_ISOLATED_WORKER_NO_LIVE_TV_DEPLOYMENT'
