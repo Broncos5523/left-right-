@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verify Firebase auth, encryption compatibility, pairing and command routing offline
-        run: node --test cloudflare/xfinity-bridge/worker.test.mjs
+        run: node --test cloudflare/xfinity-bridge/worker.test.mjs cloudflare/xfinity-bridge/public-data.test.mjs
       - name: Check standalone Worker can bundle without changing the live sports board
         working-directory: cloudflare/xfinity-bridge
         run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/xfinity-worker-dryrun
