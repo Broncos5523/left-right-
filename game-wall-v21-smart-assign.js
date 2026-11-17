@@ -190,7 +190,8 @@ function isSundayAfternoonNFL(game){
  if(game.league!=='NFL')return false;
  const d=eastern(game.start);
  if(d.weekday!=='Sun'||d.minutes<13*60||d.minutes>=19*60)return false;
- const knownRegular=game.seasonType===2||game.seasonSlug==='regular-season';
+ const knownRegular=game.seasonType===2||game.seasonSlug==='regular-season'||
+   (game.seasonType===0&&!game.seasonSlug&&[9,10,11,12].includes(d.month));
  // No Sunday Ticket assumption for postseason or games with indeterminate season classification.
  return knownRegular;
 }
@@ -360,6 +361,6 @@ async function openAssign(id){
  };
 }
 onAuthStateChanged(auth,user=>{state.user=user;state.paired.clear();state.pairChecked=false;});
-window.ManCaveRealGames={state,refresh:()=>refresh(true),ensureLoaded,showStats,openAssign};
+window.ManCaveRealGames={state,refresh:()=>refresh(true),ensureLoaded,showStats,openAssign,routeFor};
 setInterval(()=>{if(!document.hidden&&document.querySelector('[data-tab="games"].active')&&Date.now()-state.lastFetch>90000)refresh();},30000);
 })();
