@@ -38,6 +38,10 @@ try{
    {waitUntil:'domcontentloaded',timeout:40000});
  assert.equal(response?.status(),200,'V45 controller not served locally');
  await page.waitForFunction(()=>window.ManCaveBridge?.wingStatus?.()?.connected===true,null,{timeout:25000});
+ // V45 renders the Live TV Link only after entering the Screens tab;
+ // the initial home view intentionally starts on Games.
+ await page.locator('button.tab[data-nav="screens"]').click();
+ await page.waitForSelector('#liveBridge [data-live-action="sendThird"]',{timeout:15000});
  assert.ok(await page.locator('#liveBridge').count(),'Existing Live TV Link section missing');
  const label=await page.locator('#liveBridge').innerText();
  assert.ok(label.includes('Cloudflare TV3 receiver'),'Old Render receiver text remains');
