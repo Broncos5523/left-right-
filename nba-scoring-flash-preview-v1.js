@@ -7,7 +7,7 @@ const team=qs.get('team')||'',eventId=qs.get('eventId')||'';
 const preview=qs.get('preview')==='1';
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const val=x=>Number.isFinite(Number(x))?Number(x):null;
+const val=x=>x===null||x===undefined||x===''?null:Number.isFinite(Number(x))?Number(x):null;
 const id=p=>String(p?.participants?.[0]?.athlete?.id||p?.participants?.[0]?.id||p?.athletesInvolved?.[0]?.id||p?.athletesInvolved?.[0]?.athlete?.id||p?.athletes?.[0]?.id||p?.athlete?.id||p?.athleteId||'');
 const teamId=p=>String(p?.team?.id||p?.teamId||'');
 const ft=p=>/free\s*throw/i.test((p?.text||'')+' '+(p?.type?.text||''));
@@ -78,13 +78,15 @@ function plot(shots,lastKey){
   return '<g transform="translate('+x+' '+y+')"><circle r="'+(recent?7:5)+'" fill="'+(good?'#45e4a2':'#fa6a81')+'" stroke="#020d19" stroke-width="2"'+(recent?' class="f-last"':'')+'/>'+
    (good?'<path d="M-2 0 l2 2 l4 -5" fill="none" stroke="#082c24" stroke-width="1.4"/>':'<path d="M-2 -2 L2 2 M2 -2 L-2 2" stroke="#360e1a" stroke-width="1.3"/>')+'</g>';
  }).join('');
+ const located=shots.filter(e=>loc(e.p)).length;
  return '<svg viewBox="0 0 320 210" role="img" aria-label="Green made shots, red missed shots">'+
  '<rect width="320" height="210" rx="12" fill="#122d44"/>'+
  '<g fill="none" stroke="#81b1c7" stroke-width="1.5" opacity=".9"><rect x="16" y="10" width="288" height="188"/>'+
  '<path d="M16 177 H304"/><rect x="107" y="127" width="106" height="71"/>'+
  '<path d="M107 127 A53 53 0 0 1 213 127" stroke-dasharray="4 3"/>'+
  '<path d="M47 198 V172 A113 113 0 0 1 273 172 V198"/>'+
- '<circle cx="160" cy="174" r="7"/><path d="M150 182 H170"/></g>'+dots+'</svg>';
+ '<circle cx="160" cy="174" r="7"/><path d="M150 182 H170"/></g>'+dots+
+ (located===0?'<text x="160" y="90" fill="#d5e6f0" font-family="Arial" font-size="11" font-weight="bold" text-anchor="middle">SHOT LOCATIONS UNAVAILABLE</text>':'')+'</svg>';
 }
 function display(entry,c,sample=false){
  const p=entry?.p,player=c?.shooter(entry);
@@ -99,7 +101,7 @@ function display(entry,c,sample=false){
  overlay.style.setProperty('--flash-accent',getComputedStyle(document.getElementById('app')||document.body).getPropertyValue('--accent').trim()||'#54cee5');
  const quarter=p.period?.displayValue||('Q'+(p.period?.number||'')),clock=p.clock?.displayValue||'';
  overlay.innerHTML='<div class="f-top"><span>'+(isThree?'THREE-POINTER':'MADE BASKET')+'</span><span>'+esc(quarter+' '+clock)+'</span></div>'+
- '<div class="f-person"><div class="f-head">'+(photo?'<img alt="" src="'+esc(photo)+'">':'HEADSHOT UNAVAILABLE')+'</div>'+
+ '<div class="f-person"><div class="f-head">'+(photo?'<img alt="" src="'+esc(photo)+'" onerror="this.style.display=\'none\';this.parentElement.textContent=\'HEADSHOT UNAVAILABLE\'">':'HEADSHOT UNAVAILABLE')+'</div>'+
  '<div><div class="f-name">'+esc(player.name)+'</div><div class="f-pts">'+(pts===null?'—':esc(pts))+'<small>PTS</small></div>'+
  '<div class="f-plus">+'+(isThree?'3':'2')+' POINTS</div></div></div>'+
  '<div class="f-label">PLAYER SHOT CHART</div><div class="f-court">'+plot(attempts,entry.key)+'</div>'+
@@ -132,21 +134,27 @@ async function poll(){
  if(!/^\d{6,15}$/.test(eventId)||busy||document.hidden||(loaded&&phase==='post'))return;
  busy=true;
  try{
+  // Use the locally archived historical game in design review only, no network dependency.
+  // The physical TV receivers never load this archive unless explicitly given the archive ID + preview=1.
+  if(eventId==='401585607'&&preview){
+   try{
+    const saved=await fetch('./nba-scoring-archive-401585607.json',{cache:'force-cache'});
+    if(!saved.ok)throw Error('Archive HTTP '+saved.status);
+    usingArchive=true;process(await saved.json());failure='';
+    const lab=document.getElementById('nbaFeedStatus');
+    if(lab)lab.textContent='Historical ESPN game ready · Replay latest basket';
+    return;
+   }catch(error){
+    // Try the ESPN historical summary only if our archived test fixture cannot be read.
+    failure='Archive unavailable: '+String(error.message||error);
+   }
+  }
   const res=await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event='+encodeURIComponent(eventId),{cache:'no-store'});
   if(!res.ok)throw Error('ESPN HTTP '+res.status);
   usingArchive=false;process(await res.json());failure='';
  }catch(e){
-  if(eventId==='401585607'&&!loaded){
-   try{
-    const fallback=await fetch('./nba-scoring-archive-401585607.json',{cache:'force-cache'});
-    if(!fallback.ok)throw Error('Archive HTTP '+fallback.status);
-    usingArchive=true;process(await fallback.json());failure='';
-    const lab=document.getElementById('nbaFeedStatus');
-    if(lab)lab.textContent='Archived authentic game loaded · Replay latest basket';
-    return;
-   }catch(error){failure='Live feed: '+String(e.message||e)+'; archive: '+String(error.message||error);}
-  }else failure=String(e.message||e);
-  const lab=document.getElementById('nbaFeedStatus');if(lab)lab.textContent=failure;
+  failure=String(e.message||e);
+  const lab=document.getElementById('nbaFeedStatus');if(lab)lab.textContent='Play-by-play unavailable: '+failure;
  }
  finally{busy=false;}
 }
