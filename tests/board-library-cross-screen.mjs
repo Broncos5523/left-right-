@@ -32,8 +32,8 @@ const page=await context.newPage();
 const issues=[],records=[];
 page.on('pageerror',e=>issues.push(String(e).slice(0,300)));
 try{
- const response=await page.goto('http://127.0.0.1:8877/game-wall-v45-home-screen.html',
-  {waitUntil:'domcontentloaded',timeout:35000});
+ const url=process.env.CONTROLLER_URL||'http://127.0.0.1:8877/game-wall-v45-home-screen.html';
+ const response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:35000});
  assert.equal(response?.status(),200);
  await page.waitForFunction(()=>window.ManCaveBridge?.wingStatus?.()?.connected===true,null,{timeout:20000});
  await page.locator('button.tab[data-nav="boards"]').click();
