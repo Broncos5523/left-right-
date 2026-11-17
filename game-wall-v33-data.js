@@ -160,7 +160,10 @@ async function refresh(force=false){
  const games=new Map();
  for(const r of successes)for(const g of r.value)games.set(g.id,g);
  // Only favorite teams can contribute one upcoming game outside the general windows.
- const favoriteResults=await Promise.allSettled((policy?.FAVORITES||[]).map(f=>fetchFavoriteNext(f,now,force)));
+ const favoritesNeedingLookup=(policy?.FAVORITES||[]).filter(f=>![...games.values()].some(g=>
+  g.league===f.league&&g.state==='upcoming'&&Date.parse(g.start)>now&&
+  (g.away.fullName===f.name||g.home.fullName===f.name)));
+ const favoriteResults=await Promise.allSettled(favoritesNeedingLookup.map(f=>fetchFavoriteNext(f,now,force)));
  let favoriteErrors=0;
  for(const result of favoriteResults){
   if(result.status==='fulfilled')for(const g of result.value)if(!games.has(g.id))games.set(g.id,g);
