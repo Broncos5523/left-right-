@@ -20,8 +20,9 @@ test('Providence listing accepts only published exact Sunday and explicit CBS/FO
   assert.equal(res.status,200);
   assert.equal((await res.json()).verifiedForRequestedDate,true);
   const no=await worker.fetch(new Request(url+'/nfl-local-coverage?date=2026-11-22',{headers:{Origin:origin}}),{});
-  assert.equal((await no.json()).verifiedForRequestedDate,false);
-  assert.equal((await no.clone().json()).games.length,0);
+  const noPayload=await no.json();
+  assert.equal(noPayload.verifiedForRequestedDate,false);
+  assert.equal(noPayload.games.length,0);
   const bad=await worker.fetch(new Request(url+'/nfl-local-coverage?date=bad',{headers:{Origin:origin}}),{});
   assert.equal(bad.status,400);
   assert.equal(calls,1,'Local broadcast caching should not need a second publisher fetch');
