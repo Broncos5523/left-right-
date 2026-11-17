@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071724">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Man Cave · Private Encryption Key Setup</title>
+<style>
+:root{color-scheme:dark;font:16px/1.5 -apple-system,BlinkMacSystemFont,Arial,sans-serif;background:#061523;color:#eaf7ff}
+*{box-sizing:border-box}body{margin:0;padding:22px 17px 50px;max-width:620px;margin-inline:auto}
+header{margin-bottom:20px}.eyebrow{font-size:12px;letter-spacing:2px;color:#76dcff;font-weight:900}h1{line-height:1.16;font-size:28px;margin:10px 0}p{color:#b6d0dd}
+section{padding:20px;border:1px solid #426987;border-radius:17px;background:linear-gradient(155deg,#132c44,#0a1c30)}
+h2{font-size:18px}button{border:0;border-radius:11px;padding:13px 14px;font-size:15px;font-weight:850;cursor:pointer}
+.primary{background:#4fd3f3;color:#061e32;width:100%;margin:7px 0}
+.secondary{background:#193c56;color:#eaf7ff;width:100%;margin-top:10px;border:1px solid #49819f}
+label{font-weight:800;font-size:13px;display:block;margin:13px 0 5px}
+input{display:block;width:100%;padding:14px 10px;background:#0b2034;color:#eaf9ff;border:1px solid #6ba5ba;border-radius:10px;font:14px/1.5 ui-monospace,monospace;overflow:auto}
+input:focus-visible,button:focus-visible{outline:3px solid #f9db83;outline-offset:3px}
+#keySection[hidden]{display:none}
+.status{font-size:13px;min-height:24px;color:#a4efda}
+.note{margin-top:16px;font-size:13px;padding:15px;border-left:3px solid #f0c773;background:#1e2b3a}
+ol{padding-left:21px}li{margin-bottom:10px;color:#c5deea}
+</style>
+<script defer src="./xfinity-cloudflare-key.js"></script>
+</head>
+<body>
+<header><div class="eyebrow">MAN CAVE SPORTS BOOK · CLOUDflare</div>
+<h1>Private Xfinity encryption key</h1>
+<p>Generate the 32-byte secret that Cloudflare needs to protect your <strong>new</strong> Xfinity pairings. Generated entirely in this iPhone browser.</p></header>
+<section>
+<h2>Generate a new encryption key</h2>
+<p>This is for a <strong>fresh pairing setup</strong>. It cannot decrypt the old Firebase pairing tokens. Your existing boards and controller aren't changed.</p>
+<button id="generate" class="primary" type="button">Generate new private key</button>
+<div id="keySection" hidden>
+<label for="secret">Generated key · copy directly into Cloudflare</label>
+<input id="secret" readonly spellcheck="false" autocomplete="off" autocapitalize="none">
+<button id="copy" class="secondary" type="button">Copy secret</button>
+<p id="status" class="status" role="status"></p>
+</div>
+<div class="note"><strong>Important:</strong> Don't paste the value into this chat, GitHub, or screenshots. Add it to Cloudflare as a <strong>Secret</strong> named <code>TOKEN_ENCRYPTION_KEY</code>, and save a private backup in your password manager. Never generate a replacement after pairing unless you intend to pair the boxes again.</div>
+</section>
+<ol>
+<li>Tap <strong>Generate new private key</strong>.</li>
+<li>Tap <strong>Copy secret</strong>.</li>
+<li>Return to Cloudflare's <strong>Production → Add environment variable</strong> dialog.</li>
+<li>Key: <code>TOKEN_ENCRYPTION_KEY</code>. Value: paste the copied secret. Tick <strong>Secret</strong>.</li>
+</ol>
+<p class="status">This page makes no network calls for key generation and stores no secrets. You can inspect its source in your GitHub repository.</p>
+</body></html>
