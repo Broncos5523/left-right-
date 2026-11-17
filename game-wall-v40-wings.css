@@ -1,0 +1,67 @@
+/* V40 — Optional wing player-board selection inside the existing Game Finder TV picker.
+   Uses approved dark navy/cyan/gold design; doesn't restyle the Screen Wall or game cards. */
+#modalBody .realWingPanel{
+ margin:17px 0 15px;padding:14px 12px;
+ border:1px solid #426680;border-radius:15px;
+ background:linear-gradient(135deg,#122740 0%,#0c1e31 100%);
+ box-shadow:inset 0 1px 0 #ffffff0b;
+}
+#modalBody .realWingTop{
+ display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;
+}
+#modalBody .realWingTop>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+#modalBody .realWingTop strong{
+ color:#f0d080;font-size:11px;font-weight:950;letter-spacing:1.2px;
+}
+#modalBody .realWingTop small{font-size:11px;color:#a9c4d7;line-height:1.35}
+#modalBody .realWingBoth{
+ flex:0 0 auto;padding:8px 10px;border:1px solid #5587a6;border-radius:9px;
+ background:#183650;color:#aee9f8;font-size:11px;font-weight:850;
+}
+#modalBody .realWingGrid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+}
+#modalBody .realWingChoice{
+ min-width:0;min-height:91px;display:flex;flex-direction:column;justify-content:center;align-items:center;
+ gap:7px;text-align:center;padding:12px 8px;border:1px solid #476580;border-radius:13px;
+ background:linear-gradient(150deg,#1b304a,#122238);color:#e7f2fc;
+}
+#modalBody .realWingChoice strong{font-size:14px;font-weight:950}
+#modalBody .realWingChoice small{font-size:11px;color:#bbd1e1;line-height:1.25;overflow-wrap:anywhere}
+#modalBody .realWingChoiceHint{font-size:9px;color:#819fb8;font-weight:800;letter-spacing:.4px}
+#modalBody .realWingChoice.selected{
+ background:linear-gradient(140deg,#20526c,#14394e);
+ border-color:#55d4e9;box-shadow:inset 0 0 0 1px #50cbe4,0 0 14px #1dc8e633;
+}
+#modalBody .realWingChoice.selected::before{
+ content:'✓ SELECTED';font-size:10px;letter-spacing:.8px;font-weight:950;color:#a1f2ff;
+}
+#modalBody .realWingControls{
+ display:flex;justify-content:space-between;align-items:center;gap:9px;margin-top:12px;
+}
+#modalBody .realWingSwap{
+ border:1px solid #906e39;background:#33291e;color:#f4d08a;
+ border-radius:10px;padding:9px 11px;font-size:11px;font-weight:900;
+}
+#modalBody .realWingConnection{
+ font-size:10px;font-weight:800;color:#a7c3d5;text-align:right;line-height:1.3;
+}
+#modalBody .realWingSettings{
+ background:transparent;color:#8ce2ef;font-size:11px;font-weight:900;
+ border:0;padding:7px 0;text-decoration:underline;text-underline-offset:2px;
+}
+#modalBody .realWingHelp{
+ margin:11px 0 0;color:#93b0c7;font-size:11px;line-height:1.45;
+}
+#modalBody .realWingPanel button:focus-visible{
+ outline:2px solid #f4ce7b;outline-offset:3px;
+}
+@media(max-width:380px){
+ #modalBody .realWingPanel{padding:12px 9px}
+ #modalBody .realWingChoice{padding:11px 6px}
+ #modalBody .realWingChoice strong{font-size:12px}
+ #modalBody .realWingChoice small{font-size:10px}
+ #modalBody .realWingTop strong{font-size:10px}
+ #modalBody .realWingTop small{font-size:10px}
+ #modalBody .realWingConnection{font-size:9px}
+}
