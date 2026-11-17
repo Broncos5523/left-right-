@@ -163,7 +163,7 @@ async function refresh(force=false){
  const favoriteResults=await Promise.allSettled((policy?.FAVORITES||[]).map(f=>fetchFavoriteNext(f,now,force)));
  let favoriteErrors=0;
  for(const result of favoriteResults){
-  if(result.status==='fulfilled')for(const g of result.value)games.set(g.id,g);
+  if(result.status==='fulfilled')for(const g of result.value)if(!games.has(g.id))games.set(g.id,g);
   else favoriteErrors++;
  }
  state.games=policy?policy.select([...games.values()],now):[...games.values()];
