@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07101e">
+<title>Man Cave Sports Book · Game Wall V29 · National Broadcast Fallback</title>
+<style>
+:root{--bg:#070d19;--panel:#111d2e;--panel2:#14223a;--edge:#26364c;--text:#f3f7ff;--muted:#8c9db4;--cyan:#28d4f3;--lime:#91edbe;--gold:#eac16b;--red:#ff777d;--shadow:0 16px 42px rgba(0,0,0,.25)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(90% 55% at 100% -10%,#123552 0,transparent 67%),linear-gradient(180deg,#091321,#070d18 46%,#060d18 100%);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.42}button,select{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.shell{width:min(1080px,100%);margin:auto;padding:18px 16px 110px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0 20px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{width:46px;height:46px;display:grid;place-items:center;border:1px solid #3a6683;border-radius:15px;background:linear-gradient(135deg,#193f63,#101b32);box-shadow:inset 0 0 0 1px #16304c;font-size:21px;flex:0 0 auto}.brand-kicker{font-size:10px;letter-spacing:2.1px;color:var(--cyan);font-weight:900}.brand-name{font-size:19px;line-height:1.16;font-weight:950;letter-spacing:-.45px}.previewTag{border:1px solid #83683e;background:#2e2619;color:#f7d48d;border-radius:999px;padding:6px 9px;font-size:9px;font-weight:900;letter-spacing:1px;white-space:nowrap}.hero{border:1px solid #244359;border-radius:22px;padding:14px 14px 16px;position:relative;overflow:hidden;background:linear-gradient(111deg,#132f45,#122039 52%,#10192b);box-shadow:var(--shadow)}.hero:after{content:"";position:absolute;width:200px;height:200px;right:-62px;top:-95px;border:38px solid #203d56;border-radius:50%;opacity:.3}.heroHeader{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;position:relative;z-index:1;margin-bottom:10px}.heroTitle{font-size:12px;font-weight:950;letter-spacing:1px;text-transform:uppercase}.heroMeta{font-size:11px;color:#9eb2c8;text-align:right;white-space:nowrap}.wallPreview{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1;align-items:stretch}.wallCard{border:1px solid #34526d;border-radius:16px;padding:10px;background:linear-gradient(145deg,#162b42,#0e1829);min-width:0;box-shadow:inset 0 0 0 1px #ffffff08}.wallCard.purple{border-color:#694b84;background:linear-gradient(145deg,#312043,#172133)}.wallCard.gold{border-color:#8d6f34;background:linear-gradient(145deg,#18314d,#101a2c)}.wallCard.wide{grid-column:span 2}.wallFrame{height:66px;border:1px solid #406078;border-radius:11px;padding:8px;background:radial-gradient(80% 90% at 50% 0,#254764,#081220);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}.wallFrame:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#ffffff12,transparent 28%,transparent 70%,#00000020);pointer-events:none}.wallCard.purple .wallFrame{background:radial-gradient(80% 90% at 50% 0,#51306b,#181529)}.wallPoster{background:linear-gradient(145deg,#5d1746,#1d2442 70%,#171a2b);justify-content:flex-start;padding:10px}.wallPoster b{font-size:13px;line-height:.95;letter-spacing:-.5px;text-shadow:0 2px 6px #000}.wallPoster small{display:block;font-size:7px;letter-spacing:1.1px;font-weight:900;color:#f1c771;margin-bottom:5px}.matchMini{display:grid;grid-template-columns:1fr 20px 1fr;gap:8px;width:100%;align-items:end}.miniTeam{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}.miniLogo{width:44px;height:28px;border:1px solid #5d7892;border-radius:4px;background:linear-gradient(145deg,#234d70,#112238);display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px;box-shadow:inset 0 0 0 1px #8db6cf26;position:relative}.miniLogo:after{content:"";position:absolute;inset:0;border-radius:4px;box-shadow:inset 0 -8px 18px #0000002c}.miniLogo.single{height:36px;width:36px}.miniVs{font-size:10px;font-weight:900;color:var(--gold);align-self:center}.miniBar{width:46px;height:4px;border-radius:99px;background:linear-gradient(90deg,#ef5f7a,#49d0ff)}.miniAbbr{font-size:11px;font-weight:900;letter-spacing:.5px;line-height:1}.wallLabel{margin-top:8px;font-size:11px;line-height:1.15}.wallLabel strong{display:block;font-size:12px}.wallLabel span{display:block;color:#a2b5cb;margin-top:2px}.wallLegend{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-top:11px;position:relative;z-index:1}.legendItems{display:flex;gap:16px;flex-wrap:wrap}.legendItem{font-size:11px;color:#afc1d5;display:flex;align-items:center;gap:6px}.legendDot{width:12px;height:12px;border-radius:999px;display:inline-block}.legendDot.tv{background:#55b8ff}.legendDot.board{background:#eac16b}.legendTail{font-size:11px;color:#9eb2c8}.eyebrow,.hero h1,.hero p,.kpis,.kpi{display:none}.tabs{display:flex;gap:7px;margin:20px 0 14px;overflow:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{flex:1;background:#122033;border:1px solid #283c54;color:#b1bfd1;min-width:94px;border-radius:12px;padding:11px 10px;font-size:12px;font-weight:800;white-space:nowrap}.tab.active{background:#e7f6ff;color:#092136;border-color:#e7f6ff}.tab small{display:block;font-size:9px;opacity:.55;margin-top:2px}.sectionTitle{display:flex;justify-content:space-between;align-items:end;gap:8px;margin:17px 0 12px}.sectionTitle h2{font-size:20px;letter-spacing:-.5px;margin:0}.sectionTitle p{font-size:12px;color:var(--muted);margin:3px 0 0}.chip{padding:6px 10px;border-radius:100px;background:#152b3b;border:1px solid #2b5061;font-size:10px;font-weight:900;color:#84d8e7;white-space:nowrap}.screenGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.screenCard{appearance:none;text-align:left;width:100%;min-height:150px;border:1px solid #314257;background:linear-gradient(145deg,#17283e,#111c2c);padding:13px;border-radius:16px;color:inherit;display:flex;flex-direction:column;gap:10px;position:relative;transition:border .12s,transform .12s}.screenCard:active{transform:scale(.987)}.screenCard.selected{border:2px solid var(--cyan);background:linear-gradient(145deg,#1a364d,#122337);padding:12px}.screenCard .check{position:absolute;right:12px;top:12px;width:19px;height:19px;border:1px solid #60758e;border-radius:6px;display:grid;place-items:center;color:#091a2b;font-size:13px}.screenCard.selected .check{background:var(--cyan);border-color:var(--cyan)}.screenTop{padding-right:23px}.screenTop strong{display:block;font-size:14px}.screenTop span{color:#879db6;font-size:11px}.screenType{font-size:9px;letter-spacing:1px;font-weight:900;color:#9ecce2}.screenType.board{color:#dac591}.screenDisplay{flex:1;min-height:58px;padding:10px;border-radius:9px;border:1px solid #2c4a5a;background:radial-gradient(90% 80% at 50% 0,#22415f,#07121f);display:flex;flex-direction:column;justify-content:center}.screenDisplay strong{font-size:12px}.screenDisplay span{color:#91a8bd;font-size:10px;margin-top:3px}.screenFoot{display:flex;justify-content:space-between;gap:6px;color:#9db2c8;font-size:10px}.screenCard.mainscreen{grid-column:span 1}.screenCard.mainscreen .screenDisplay{min-height:72px}.screenCard.boardcard .screenDisplay{background:linear-gradient(110deg,#2c2335,#142038 80%)}.infoBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;margin-top:13px;border:1px solid #314a5a;border-radius:13px;background:#101e2f}.infoBar span{font-size:11px;color:#bbcad9}.infoBar strong{font-size:12px}.btn{padding:10px 13px;border-radius:11px;border:1px solid #41536c;background:#1d3049;color:#fff;font-weight:800;font-size:12px}.btn.primary{background:var(--cyan);color:#092033;border-color:var(--cyan)}.btn.subtle{background:#132239}.btn:disabled{opacity:.4;cursor:not-allowed}.muted{color:var(--muted)}.note{background:#131e2b;border-left:3px solid var(--gold);padding:11px 13px;border-radius:6px 12px 12px 6px;font-size:12px;color:#e8dcbf;line-height:1.5;margin-top:13px}.filterRow{display:flex;gap:7px;margin-bottom:13px;overflow:auto}.filter{border:1px solid #34465c;background:#132237;color:#a8bed3;padding:8px 12px;border-radius:50px;font-weight:800;font-size:11px;white-space:nowrap}.filter.active{border-color:#75b8cf;color:#e5faff;background:#183f54}.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.gameCard{background:#111e2f;border:1px solid #2b3b51;border-radius:15px;padding:13px;min-width:0}.gameMeta{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:11px}.league{font-size:10px;font-weight:900;letter-spacing:1px;color:#b6cce1}.status{font-size:9px;letter-spacing:.5px;font-weight:900;padding:4px 8px;border-radius:999px;background:#243145;color:#b2c5d8}.status.live{background:#49303a;color:#ff9aa7}.status.final{background:#273f43;color:#a6e4c9}.status.upcoming{background:#353449;color:#d0c5f3}.matchup{display:grid;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);align-items:center;gap:4px;text-align:center}.team{min-width:0}.team img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 2px 3px #0005)}.teamName{font-size:11px;font-weight:900;line-height:1.1;margin-top:4px;overflow-wrap:anywhere}.score{font-size:22px;font-weight:950;line-height:1.1}.score small{display:block;font-size:9px;letter-spacing:.3px;font-weight:700;color:#849bb2;margin-top:5px}.gameActions{display:flex;gap:8px;margin-top:13px}.gameActions button{flex:1;padding:9px 6px;border-radius:9px;font-size:11px;font-weight:800;border:1px solid #3b506a;color:#d5e5f8;background:#1a2b41}.gameActions button.accent{background:#1b4855;border-color:#3b8598;color:#b2f3ff}.boardGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.boardTile{border:1px solid #39516a;background:#18243b;color:white;border-radius:17px;overflow:hidden;min-height:150px;display:flex;flex-direction:column;text-align:left;position:relative}.boardGraphic{height:109px;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;position:relative;overflow:hidden}.boardGraphic:after{content:"";position:absolute;inset:auto -20% -55% -20%;height:100px;border-top:1px solid #ffffff50;border-radius:50%}.boardGraphic b{font-size:19px;line-height:.96;letter-spacing:-.6px;text-shadow:0 2px 10px #0008;position:relative;z-index:1}.boardGraphic small{display:block;font-size:9px;letter-spacing:2px;line-height:1.7;font-weight:900}.boardTile:nth-child(1) .boardGraphic{background:radial-gradient(65% 110% at 50% 10%,#295c97,#092842 70%,#081528)}.boardTile:nth-child(2) .boardGraphic{background:radial-gradient(65% 130% at 50% 10%,#90582d,#5b271b 67%,#180d1c)}.boardTile:nth-child(3) .boardGraphic{background:radial-gradient(65% 120% at 50% 10%,#9c3041,#401629 70%,#180f1a)}.boardTile:nth-child(4) .boardGraphic{background:radial-gradient(65% 130% at 50% 10%,#136964,#0d3439 67%,#0b1c26)}.boardText{padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}.boardText strong{font-size:12px}.boardText span{color:#a2cadd;font-size:11px}.sourceGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.sourceCard{background:#152238;border:1px solid #304159;border-radius:14px;padding:15px}.sourceCard label{display:block;font-size:13px;font-weight:900;margin-bottom:8px}.sourceCard small{display:block;color:#97adbf;font-size:10px;margin-bottom:11px}.sourceCard select{background:#0c1726;color:#fff;border:1px solid #435a70;padding:10px;border-radius:9px;display:block;width:100%}.srcNote{font-size:11px;color:#9db5c9;margin:9px 0 0}.warning{border:1px solid #795c38;background:#2d261b;border-radius:13px;padding:12px;color:#e4c38c;margin-top:14px;font-size:12px}.warning strong{display:block;margin-bottom:3px}.presetGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.preset{background:#14273b;border:1px solid #32516a;color:#fff;padding:15px;border-radius:15px;text-align:left;min-height:100px}.preset b{display:block;font-size:15px}.preset p{font-size:11px;color:#b5c5d9;margin:7px 0 0}.preset .emoji{font-size:24px;margin-bottom:9px;display:block}.toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%) translateY(30px);opacity:0;pointer-events:none;z-index:60;color:#092336;background:#b4f4ff;border-radius:12px;padding:12px 16px;width:max-content;max-width:calc(100% - 30px);text-align:center;box-shadow:0 8px 35px #0008;font-weight:850;font-size:12px;transition:opacity .18s,transform .18s}.toast.show{opacity:1;transform:translateX(-50%)}.bottomNav{position:fixed;z-index:30;bottom:0;left:0;right:0;padding:8px max(12px,env(safe-area-inset-left)) calc(7px + env(safe-area-inset-bottom));background:#0b1522f2;border-top:1px solid #304055;backdrop-filter:blur(14px)}.bottomInner{max-width:700px;margin:auto;display:flex;gap:4px}.bottomBtn{border:0;background:transparent;color:#8497ae;flex:1;min-width:0;padding:4px 1px 7px;font-size:10px;letter-spacing:.1px;font-weight:800}.bottomBtn i{display:block;font-size:18px;font-style:normal;margin-bottom:2px}.bottomBtn.active{color:#60dcf5}.modalShade{display:none;position:fixed;inset:0;z-index:50;background:#030812b9;align-items:flex-end;justify-content:center}.modalShade.open{display:flex}.modal{background:#111e30;border:1px solid #466075;border-radius:23px 23px 0 0;padding:20px 18px calc(23px + env(safe-area-inset-bottom));width:min(620px,100%);max-height:90vh;overflow:auto;box-shadow:0 -20px 70px #0009}.modalGrip{width:48px;height:4px;border-radius:100px;background:#4b6576;margin:0 auto 16px}.modalHeader{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px}.modalHeader h3{margin:0;font-size:18px}.close{border:1px solid #41546c;border-radius:10px;background:#24374a;color:#fff;width:35px;height:35px;font-size:18px}.modalDesc{font-size:12px;color:#a7bbcf;margin:0 0 13px}.destList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.destItem{display:flex;align-items:center;gap:8px;border:1px solid #374d62;padding:10px;border-radius:10px;background:#17283a;font-size:12px;font-weight:750}.destItem input{accent-color:var(--cyan);width:17px;height:17px}.destItem.disabled{opacity:.35}.modalActions{display:flex;gap:9px;margin-top:16px}.modalActions button{flex:1}.statTable{width:100%;border-collapse:collapse;margin:12px 0}.statTable th,.statTable td{text-align:center;border-bottom:1px solid #2c4055;padding:10px 4px;font-size:12px}.statTable th:first-child,.statTable td:first-child{text-align:left}.statTable th{color:#a7bdce;font-size:10px}.statTable td{font-weight:700}.statTabs{display:flex;gap:8px}.statTabs button{background:#20334a;color:#c1d3e7;padding:8px 12px;border-radius:9px;border:1px solid #3e536b}.statTabs button.active{background:#d1f2fb;color:#14253e}.empty{padding:20px;text-align:center;color:var(--muted);background:#132034;border-radius:12px}@media(max-width:700px){.shell{padding:14px 12px 100px}.screenGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.screenCard.mainscreen,.screenCard.sideWide{grid-column:span 2}.games{grid-template-columns:1fr}.hero{padding:14px 12px 15px}.heroHeader{align-items:flex-start}.heroMeta{font-size:10px}.wallPreview{grid-template-columns:1fr 1fr;gap:8px}.wallFrame{height:58px;padding:7px}.wallCard.wide{grid-column:span 2}.miniLogo{width:38px;height:24px}.miniLogo.single{width:32px;height:32px}.miniBar{width:40px}.miniAbbr{font-size:11px}.wallLabel strong{font-size:11px}.wallLabel span{font-size:10px}.gameCard{padding:13px}.sourceGrid{grid-template-columns:1fr}.screenCard{min-height:142px}.screenCard .screenTop strong{font-size:12px}.boardGraphic{height:103px}.boardGraphic b{font-size:17px}}@media(min-width:701px){.bottomNav{display:none}.shell{padding-bottom:40px}}@media(max-width:360px){.brand-name{font-size:16px}.mark{width:40px;height:40px}.previewTag{padding:5px 6px;font-size:8px}.heroTitle{font-size:11px}.heroMeta{font-size:9px}.wallPreview{gap:7px}.wallCard{padding:8px}.wallCard.wide{grid-column:span 2}.wallFrame{height:52px;padding:6px}.miniLogo{width:32px;height:21px;font-size:12px}.miniLogo.single{width:28px;height:28px}.miniVs{font-size:9px}.miniBar{width:34px}.miniAbbr{font-size:10px}.wallLabel strong{font-size:10px}.wallLabel span{font-size:9px}.legendItem,.legendTail{font-size:10px}.screenCard{padding:10px}.screenCard.selected{padding:9px}.screenTop strong{font-size:11px}.boardGraphic b{font-size:15px}}
+
+/* Physical wall visualization: three rows mirror the photographed mounting pattern. */
+.realWallHero{padding:14px 12px 14px;background:linear-gradient(146deg,#10243b 0%,#0d182b 70%);}
+.realWallHero:after{opacity:.13;pointer-events:none}
+.goldSlash{color:var(--gold)}
+.wallPhysical{display:flex;flex-direction:column;gap:11px;position:relative;z-index:1}
+.physicalTop{display:grid;grid-template-columns:1fr 1.38fr;gap:10px;align-items:start}
+.physicalMiddle{display:grid;grid-template-columns:minmax(0,.68fr) minmax(0,2.65fr) minmax(0,.68fr);gap:6px;align-items:start}
+.physicalBottom{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.85fr);gap:12px;align-items:start;max-width:82%;margin:0 auto;width:100%}
+.physicalUnit{min-width:0;position:relative}
+.physicalTV{border:2px solid #51758e;border-radius:5px;position:relative;overflow:hidden;background:#030914;box-shadow:0 0 0 1px #142b42,0 9px 17px #0009,0 0 18px #1f628725}
+.physicalTV.landscape{aspect-ratio:16/9;width:100%}
+.physicalTV.portrait{aspect-ratio:9/16;width:100%}
+.mainUnit .physicalTV{border-color:#cda65c;box-shadow:0 0 0 1px #52431e,0 0 24px #ecbc4527,0 10px 15px #0009}
+.wingUnit .physicalTV,.lowerPortrait .physicalTV{border-color:#87629c;box-shadow:0 0 0 1px #311c4f,0 0 19px #bd61f22b}
+.wingUnit .physicalTV{margin:0 auto;max-width:83px}
+.lowerPortrait{max-width:94px;justify-self:center;width:100%}
+.lowerSide{align-self:center}
+.unitLabel{font-size:clamp(8px,1.7vw,12px);line-height:1.15;font-weight:900;letter-spacing:.2px;margin-top:5px;color:#f6f8ff;white-space:nowrap}
+.unitLabel span{color:#f0d397}
+.unitLabel small{display:block;margin-top:3px;color:#99b0c6;font-weight:500;letter-spacing:0;white-space:normal;font-size:clamp(8px,1.6vw,11px)}
+.wingUnit .unitLabel{font-size:clamp(7px,1.7vw,10px);text-align:center;letter-spacing:-.35px}
+.wingUnit .unitLabel small{font-size:clamp(7px,1.4vw,9px)}
+.lowerPortrait .unitLabel{text-align:center;white-space:normal}
+.broadcastContent{position:absolute;inset:0;color:white;padding:7%;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(ellipse at 40% 30%,#1b4b75,#08172a 70%),linear-gradient(100deg,#12283c,#07101c)}
+.broadcastContent.denKC,.broadcastContent.mainBroadcast{background:linear-gradient(112deg,#172f4f,#093353 40%,#8e2714 100%)}
+.broadcastContent.bosNYK{background:linear-gradient(112deg,#073927,#0e4541 48%,#c6691f 100%)}
+.broadcastContent.bosNYR{background:linear-gradient(112deg,#3f3212,#1f253a 45%,#143963 100%)}
+.mainBroadcast{background:linear-gradient(115deg,#072c4a,#134b68 46%,#aa3817 100%)}
+.broadTop{display:flex;justify-content:space-between;gap:2px;align-items:center}
+.leagueMini{font-size:clamp(6px,1.2vw,11px);letter-spacing:.4px;font-weight:950}
+.feedTag{font-size:clamp(5px,1vw,9px);font-weight:950;color:#dbeaff;background:#06111f88;border-radius:3px;padding:1px 3px;white-space:nowrap}
+.duel{display:grid;grid-template-columns:minmax(0,1fr) 17px minmax(0,1fr);gap:2px;align-items:center}
+.broadcastTeam{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.teamBadge{border-radius:7px;aspect-ratio:1;width:clamp(19px,4vw,51px);display:grid;place-items:center;color:white;font-size:clamp(7px,1.6vw,15px);font-weight:1000;border:1px solid #ffffff8c;box-shadow:0 3px 12px #0008;text-shadow:0 1px 3px #000a}
+.teamBadge.den,.portraitShield.den{background:linear-gradient(145deg,#f76a1e,#b54013)}
+.teamBadge.kc,.portraitShield.kc{background:linear-gradient(145deg,#dc3044,#8e1523)}
+.teamBadge.bos{background:linear-gradient(145deg,#19a663,#06482f)}
+.teamBadge.nyk{background:linear-gradient(145deg,#ea7c24,#1152a1)}
+.teamBadge.bruins{background:linear-gradient(145deg,#f6bb28,#594516)}
+.teamBadge.rangers{background:linear-gradient(145deg,#2568b9,#bd3c48)}
+.broadcastTeam b{font-weight:900;font-size:clamp(5px,1.1vw,9px);white-space:nowrap}
+.vsMini{font-size:clamp(7px,1.2vw,12px);font-weight:1000;color:#f0c46f;text-align:center}
+.broadcastRail{height:3px;border-radius:10px;background:linear-gradient(90deg,#f86d70,#eccb6e 45%,#50bfff)}
+.portraitContent{position:absolute;inset:0;padding:9% 6%;display:flex;flex-direction:column;align-items:center;justify-content:space-around;gap:3px;background:radial-gradient(ellipse at 40% 40%,#264b7a,#101528 70%);color:white;text-align:center}
+.leftPortrait{background:linear-gradient(180deg,#0d3864,#111f39 60%,#f15d24)}
+.rightPortrait{background:linear-gradient(180deg,#781b30,#111f39 60%,#ae283c)}
+.portraitLeague{font-size:clamp(5px,.85vw,8px);letter-spacing:.3px;font-weight:900;line-height:1.1}
+.portraitShield{aspect-ratio:1;width:67%;display:grid;place-items:center;border-radius:50%;border:2px solid #ffffffa0;box-shadow:0 4px 16px #0009;color:white;font-size:clamp(9px,2.2vw,18px);font-weight:950}
+.portraitContent strong{font-size:clamp(7px,1.15vw,10px);line-height:1.1}
+.portraitBars{width:100%;display:flex;flex-direction:column;gap:3px}.portraitBars i{height:2px;width:100%;background:#bad5f38a;border-radius:5px}.portraitBars i:nth-child(2){width:75%;align-self:center}.portraitBars i:nth-child(3){width:88%;align-self:center}
+.portraitContent small{font-size:clamp(6px,1vw,9px);font-weight:850;opacity:.85}
+.wrestlingPortrait{background:radial-gradient(ellipse at center,#6b2253,#14122e 65%,#060c1a)}
+.wrestlingPortrait .portraitLeague{font-size:clamp(5px,.76vw,8px);color:#e6bf70}
+.wrestlingArt{font-size:clamp(7px,1.05vw,12px);font-style:italic;font-weight:1000;color:#e8edf9;line-height:1.3;text-shadow:0 0 8px #ef6aa6}
+.wrestlingArt strong{font-size:1.35em;color:#f5f5fa}
+.ringLines{display:block;width:90%;height:12%;border-top:2px solid #cd93d5;border-bottom:2px solid #cd93d5;transform:perspective(30px) rotateX(35deg);opacity:.8}
+@media(max-width:700px){.wallPhysical{gap:9px}.physicalTop{gap:8px}.physicalMiddle{gap:5px}.physicalBottom{gap:10px;max-width:86%}.realWallHero{padding:14px 12px}.teamBadge{width:clamp(16px,6vw,32px);font-size:clamp(7px,2vw,10px)}.mainUnit .teamBadge{width:clamp(22px,8vw,36px)}.broadcastContent{padding:5%}.broadcastTeam{gap:2px}.duel{grid-template-columns:minmax(0,1fr) 13px minmax(0,1fr)}.unitLabel{font-size:10px}.unitLabel small{font-size:9px}.wingUnit .unitLabel{font-size:9px}.wingUnit .unitLabel small{font-size:8px}.portraitShield{font-size:10px}.portraitContent strong{font-size:7px}.portraitLeague{font-size:5px}.lowerPortrait .portraitLeague{font-size:5px}.wrestlingArt{font-size:7px}}
+@media(max-width:370px){.realWallHero{padding:12px 9px}.physicalTop{gap:7px}.physicalMiddle{gap:4px}.physicalBottom{gap:8px}.unitLabel{font-size:9px}.unitLabel small{font-size:8px}.wingUnit .unitLabel{font-size:8px}.heroMeta{font-size:9px}}
+
+/* Independent status and league filters for the Games view */
+.gameFilterGroup{margin:0 0 13px}.gameFilterLabel{font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#94acc3;margin:0 0 7px}.gameFilterGroup .filterRow{margin-bottom:0;padding-bottom:4px;scroll-snap-type:x proximity}.gameFilterGroup .filter{scroll-snap-align:start;flex:0 0 auto}.gameFilterGroup .filter.leagueActive{border-color:#e1b96f;background:#3b3025;color:#ffe5ad}.filterResults{display:flex;justify-content:space-between;align-items:center;gap:9px;margin:2px 0 13px;font-size:11px;color:#a8c0d2}.filterResults strong{color:#e9f5ff;font-weight:900}.emptyGames{border:1px dashed #415770;border-radius:15px;padding:21px 16px;text-align:center;background:#101d2e}.emptyGames strong{display:block;color:#f0f7ff;font-size:14px}.emptyGames p{font-size:11px;color:#9fb4c9;margin:6px 0 13px}
+/* Show every league option on phones; no hidden horizontal scrolling. */
+.gameFilterGroup .filterRow[aria-label="Filter by sports league"]{flex-wrap:wrap;overflow:visible;row-gap:8px}
+#content{scroll-margin-top:14px}
+
+.liveBridge{margin-top:15px;padding:16px;border-radius:16px;border:1px solid #316d81;background:linear-gradient(145deg,#132c3d,#101e31)}
+.liveHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.liveEyebrow{font-size:10px;font-weight:950;letter-spacing:1.5px;color:#55daf2}
+.liveHead h3{font-size:22px;margin:4px 0 5px;line-height:1.1}
+.liveHead p,.liveBridge p{font-size:12px;line-height:1.5;color:#aac3d5;margin:0}
+.liveTag{font-size:9px;color:#b4eafa;font-weight:900;background:#162e3f;border:1px solid #446879;padding:6px 9px;border-radius:20px;white-space:nowrap}
+.liveStatus{background:#0a1a29;border:1px solid #35586e;border-radius:10px;padding:10px;margin:12px 0;color:#c8e4f0;font-size:12px}
+#liveAuthForm{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
+#liveAuthForm label,.livePair label,.liveGameSelect{display:block;font-size:11px;color:#b5cbdc;font-weight:800}
+#liveAuthForm input,.liveBridge select{display:block;width:100%;padding:10px;margin-top:6px;min-height:42px;background:#081828;border:1px solid #45677d;border-radius:10px;color:white;font-size:13px}
+#liveAuthForm button{min-height:42px}
+.liveWho{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:#d2e6f2}
+.liveWho button{padding:8px;border:1px solid #41657e;border-radius:9px;color:#e2f2f6;background:#183148}
+.liveReadback,.livePair{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.liveReadback>div{padding:11px;border:1px solid #355c73;border-radius:10px;background:#0d1e2e;min-height:69px}
+.liveReadback b{display:block;font-size:11px;letter-spacing:.7px;color:#55daf2}
+.liveReadback span{display:block;font-size:12px;color:#c6d9e8;margin-top:5px;overflow-wrap:anywhere}
+.liveBridge h4{font-size:12px;letter-spacing:1px;margin:17px 0 8px;color:#effaff}
+.liveBridge hr{border:0;border-top:1px solid #37536b;margin:18px 0}
+.liveWide{width:100%;margin-top:10px;min-height:42px}
+.liveSmall{font-size:11px;color:#aac7d7;margin:9px 0}
+.liveGameSelect{margin:12px 0}
+.liveSwap{display:flex;gap:8px;align-items:center;font-size:12px;color:#c6dce9;margin:13px 0}
+.liveSwap input{accent-color:#28d4f3}
+.liveTarget{padding:9px 11px;border:1px solid #375a73;border-radius:10px;background:#0d2031;color:#d4f4ff;font-size:12px}
+.liveBridge .liveFoot{font-size:11px;color:#91acc0;margin-top:14px}
+@media(max-width:700px){#liveAuthForm{grid-template-columns:1fr 1fr}#liveAuthForm button{grid-column:span 2}}
+@media(max-width:380px){#liveAuthForm{grid-template-columns:1fr}#liveAuthForm button{grid-column:span 1}}
+
+/* V7 adds Onn TV 3 control without changing the approved V5 presentation */
+.liveReadback>div:last-child{border-color:#7c6938;background:linear-gradient(135deg,#292618,#142236)}
+.liveBridge a{color:#6fe8fa}
+@media(min-width:701px){.liveReadback{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.liveReadback>div:last-child{grid-column:span 2}}
+
+/* V8: Additive controls under approved Boards and existing assignment modal */
+.liveLibrary{border:1px solid #355e79;border-radius:16px;background:linear-gradient(135deg,#14283e,#101e30);padding:15px;margin-top:16px}
+.liveLibraryTop h3{font-size:19px;margin:4px 0}
+.liveLibraryTop p,.liveLibraryHint{color:#a8c1d6;font-size:11px;margin:4px 0 9px;line-height:1.5}
+.liveLibraryFilters{display:flex;gap:7px;overflow-x:auto;padding:6px 1px 12px;scrollbar-width:none}
+.liveLibraryFilters button{flex-shrink:0;border:1px solid #3e526e;background:#0e2034;border-radius:99px;color:#c4d7e9;padding:8px 10px;font-size:11px;font-weight:850}
+.liveLibraryFilters button.active{background:#cff3fc;color:#102435;border-color:#cff3fc}
+.liveLibraryPages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.liveLibraryPages button{border:1px solid #405f77;background:linear-gradient(145deg,#1b3853,#101e32);color:#f1faff;border-radius:11px;padding:12px;text-align:left;min-height:88px}
+.liveLibraryPages small,.liveLibraryPages b,.liveLibraryPages span{display:block}
+.liveLibraryPages small{font-size:10px;color:#9bbdd2}
+.liveLibraryPages b{font-size:17px;margin:4px 0}
+.liveLibraryPages span{font-size:10px;color:#78dbed}
+.liveModalRows{display:grid;gap:11px;margin:12px 0}
+.liveModalRows label{display:block;font-size:12px;font-weight:850;color:#d6eaf8}
+.liveModalSelect{width:100%;margin-top:5px;padding:11px;border-radius:10px;border:1px solid #456179;background:#0c1d2d;color:#fff}
+.liveModalChecks{display:grid;gap:9px;margin:12px 0}
+.liveModalChecks label{border:1px solid #35586f;border-radius:10px;padding:12px;background:#12273c;font-size:13px}
+.liveModalChecks input{accent-color:#28d4f3}
+.liveModalStatus{color:#aad6e4;font-size:12px;margin:13px 0 0}
+.liveModalWarning{padding:10px;border-radius:9px;color:#f1cea1;border:1px solid #7b6545;font-size:12px}
+
+/* V9 official Xfinity Web Remote launcher. Cable Map remains a manual, non-command mapping preview. */
+.xfinityLaunch{background:linear-gradient(135deg,#17334c,#101e30);border:1px solid #3b728c;border-radius:17px;padding:17px;margin:0 0 16px;box-shadow:0 10px 25px #0003}
+.xfinityLaunchHeading{display:flex;align-items:flex-start;gap:12px}
+.xfinityLaunchIcon{display:grid;place-items:center;border-radius:13px;width:43px;height:43px;background:linear-gradient(145deg,#33b4e4,#1a5080);box-shadow:inset 0 0 0 1px #ffffff2c;font-size:23px;flex:0 0 auto}
+.xfinityLaunchEyebrow{font-size:10px;color:#6ae3ff;font-weight:900;letter-spacing:1.1px}
+.xfinityLaunchHeading h3{font-size:19px;line-height:1.1;margin:5px 0 7px;color:#f4faff}
+.xfinityLaunchHeading p{font-size:12px;color:#aec6d7;line-height:1.45;margin:0}
+.xfinityLaunchButton{display:block;border-radius:11px;background:#55d4fa;color:#071e31;text-align:center;text-decoration:none;padding:12px 10px;font-size:13px;font-weight:950;margin:15px 0 12px;border:1px solid #9af1ff}
+.xfinityLaunchButton:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.xfinityLaunchSteps{border:1px solid #3b5c74;background:#0d2131;padding:11px 12px;border-radius:11px;display:grid;gap:4px}
+.xfinityLaunchSteps strong{font-size:11px;letter-spacing:.3px}
+.xfinityLaunchSteps span{font-size:12px;line-height:1.5;color:#bcd0e2}
+.xfinityLaunchNote{color:#a8bacb;font-size:11px;line-height:1.5;margin-top:11px}
+@media(min-width:701px){.xfinityLaunch{max-width:660px}}
+
+/* V12 adds Quick Tune to Cable Map without altering locked controller layouts */
+.xTune{background:linear-gradient(145deg,#142d41,#101d30);border:1px solid #377b8e;border-radius:17px;padding:15px;margin:16px 0}
+.xTuneKicker{font-size:10px;font-weight:950;color:#65e1f4;letter-spacing:1.25px}
+.xTune h3{font-size:22px;margin:5px 0;letter-spacing:-.5px}
+.xTuneIntro,.xTuneFoot{color:#adc5d8;font-size:12px;line-height:1.5;margin:4px 0 11px}
+.xTune h4{font-size:12px;margin:17px 0 9px;letter-spacing:.4px;color:#e9f5ff}
+.xTuneTvs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.xTuneTvs button{background:#102338;border:1px solid #45677e;border-radius:10px;padding:10px 3px;color:#d6e9f4;min-width:0}
+.xTuneTvs button.active{background:#b9f5ff;color:#0d2435;border-color:#e2fcff}
+.xTuneTvs b,.xTuneTvs small{display:block;text-align:center}
+.xTuneTvs b{font-size:11px}.xTuneTvs small{font-size:9px;margin-top:3px;opacity:.8}
+.xTuneBoxHint{background:#0e2234;border-radius:8px;padding:8px 10px;color:#bdd8e6;font-size:11px;margin-top:9px}
+.xTuneRefresh{width:100%;margin:0 0 8px}
+.xTuneStatus{font-size:11px;color:#b0d4e1;margin:4px 0 10px;line-height:1.4}
+.xTuneFilterRow{display:flex;gap:6px;overflow-x:auto;padding:5px 0;scrollbar-width:none}
+.xTuneFilterRow button{flex:0 0 auto;background:#0d2035;color:#c4d9e7;border:1px solid #34526d;border-radius:99px;padding:7px 10px;font-size:10px;font-weight:850}
+.xTuneFilterRow button.active{background:#d5f7ff;color:#102234;border-color:#d5f7ff}
+.xTuneLabel{display:block;font-size:12px;font-weight:800;color:#d9eaf5;margin:12px 0}
+.xTuneLabel select,.xTuneLabel input{display:block;width:100%;border:1px solid #45667d;border-radius:10px;padding:11px 9px;margin-top:6px;background:#071b2c;color:#fff;font-size:12px;min-height:43px}
+.xTuneGame{border:1px solid #335977;background:#0d2235;padding:10px 12px;border-radius:10px;margin:9px 0}
+.xTuneGame b,.xTuneGame span,.xTuneGame small{display:block}
+.xTuneGame b{font-size:13px}.xTuneGame span{font-size:11px;margin-top:4px;color:#b3d9e6}
+.xTuneGame small{font-size:10px;margin-top:5px;color:#9eafc4}
+.xTuneEmpty{color:#acc0d2;font-size:11px;padding:14px;background:#0d2132;border-radius:9px}
+.xTuneCommand{border:1px solid #507996;background:linear-gradient(125deg,#153b51,#14283c);border-radius:11px;padding:12px;margin:13px 0}
+.xTuneCommand small{display:block;color:#7ce2f6;font-size:10px;letter-spacing:1px;font-weight:900}
+.xTuneCommand strong{display:block;font-size:16px;color:#f6faff;margin-top:6px;overflow-wrap:anywhere}
+.xTuneActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.xTuneActions .btn,.xTuneActions a{min-height:44px;display:flex;justify-content:center;align-items:center;text-align:center;font-size:12px}
+.xTuneActions a{border-radius:11px;background:#274f68;border:1px solid #547d98;color:#f5fbff;padding:10px;text-decoration:none;font-weight:850}
+.xTuneFoot{font-size:11px;margin:11px 0 0}
+@media(max-width:440px){.xTuneTvs{grid-template-columns:repeat(2,minmax(0,1fr))}.xTuneActions{grid-template-columns:1fr}}
+
+/* V13 Beta server pairing launch within the existing Cable Map */
+.directXfinity{background:linear-gradient(125deg,#172d41,#11263a);border:1px solid #527790;border-radius:16px;padding:16px;margin:16px 0}
+.directXfinityTop span{display:block;font-size:10px;font-weight:950;color:#75e5ff;letter-spacing:1.1px}
+.directXfinityTop h3{margin:6px 0;font-size:20px;letter-spacing:-.025em}
+.directXfinityTop p{font-size:12px;line-height:1.5;color:#b5d2e4;margin:6px 0 12px}
+.directXfinityButton{display:flex;justify-content:center;text-decoration:none;text-align:center;padding:13px;background:#c0f6ff;border:1px solid #d0faff;color:#11283b;border-radius:11px;font-weight:900;font-size:12px}
+.directXfinityFoot{font-size:11px;color:#a4becf;line-height:1.5;margin-top:11px}
+
+/* V14 localized Xfinity direct channel panel – no changes to approved V13 components */
+.localDirect{background:linear-gradient(135deg,#0d2134,#153751);border:1px solid #418498;border-radius:18px;padding:15px;margin:16px 0;box-shadow:0 10px 30px #0004}
+.localDirectHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.localDirectEyebrow{color:#75e1fb;letter-spacing:1px;font-size:10px;font-weight:950}
+.localDirectHead h3{font-size:23px;line-height:1.1;letter-spacing:-.5px;margin:5px 0 8px;color:#f4fbff}
+.localDirectHead p{font-size:11px;line-height:1.5;color:#bed3e4;margin:0 0 14px}
+.localDirectZip{font-size:12px;border-radius:9px;background:#2e5f78;border:1px solid #9bd5e9;padding:7px;font-weight:950;color:#f3fcff;flex:0 0 auto}
+.localDirectStatus{font-size:11px;border-left:3px solid #61c9e8;background:#091d30;border-radius:6px;padding:9px;color:#c4dce9;margin:2px 0 15px}
+.localDirectLabel{font-size:11px;font-weight:950;letter-spacing:.6px;color:#f2f9ff;margin:17px 0 9px}
+.localDirectBoxes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.localDirectBoxes button{background:#10273b;border:1px solid #43677f;border-radius:10px;padding:11px 3px;color:#e7f6fc}
+.localDirectBoxes button.active{background:#b9f5ff;color:#092337;border-color:#fff}
+.localDirectBoxes button b,.localDirectBoxes button small{display:block;font-size:11px;text-align:center}
+.localDirectBoxes button small{font-size:9px;margin-top:5px;opacity:.85}
+.localDirectSearch{display:block;color:#bcd5e6;font-size:11px;font-weight:850}
+.localDirectSearch input{display:block;width:100%;min-height:42px;border:1px solid #486980;background:#0b2134;color:#f5fbff;border-radius:10px;padding:9px 11px;margin:6px 0 9px;font-size:13px}
+.localDirectChannels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:265px;overflow:auto;padding:1px}
+.localDirectCh{background:#10273a;color:#e0f3ff;border:1px solid #375870;border-radius:9px;padding:10px;text-align:left;min-height:59px}
+.localDirectCh.active{background:#234b63;border-color:#77d9f1;box-shadow:inset 0 0 0 1px #77d9f1}
+.localDirectCh strong,.localDirectCh span{display:block;font-size:11px}
+.localDirectCh span{font-size:11px;color:#b3d1e5;margin-top:5px;font-variant-numeric:tabular-nums}
+.localDirectCh small{font-size:9px}
+.localDirectGame,.localDirectGameDisabled{display:block;width:100%;padding:11px;border-radius:9px;background:#14354c;border:1px solid #48718d;margin-top:9px;text-align:left;color:#e5f6ff;font-size:11px}
+.localDirectGame b,.localDirectGame span{display:block}
+.localDirectGame span{color:#bdd8e5;margin-top:6px;line-height:1.4}
+.localDirectGameDisabled{color:#a9c0d0;line-height:1.5}
+.localDirectSelected{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0 9px}
+.localDirectSelected>div{padding:11px;border:1px solid #3c627c;border-radius:9px;background:#091f32}
+.localDirectSelected small,.localDirectSelected b{display:block}
+.localDirectSelected small{font-size:9px;color:#89cce0;letter-spacing:.6px;font-weight:900}
+.localDirectSelected b{font-size:19px;color:#f8fcff;margin-top:6px}
+.localDirectQuality{display:flex;gap:7px}
+.localDirectQuality button{background:#11283e;color:#cbe8f9;border:1px solid #42657a;border-radius:7px;flex:1;min-height:36px;font-size:12px;font-weight:900}
+.localDirectQuality button.active{background:#d5f9ff;color:#0a2234}
+.localDirectEdit{display:block;color:#b5d9ea;font-size:11px;font-weight:850;margin:11px 0}
+.localDirectEdit input{display:block;width:100%;border:1px solid #4b708a;border-radius:9px;padding:10px;margin-top:5px;background:#071a2b;color:#fff;font-size:14px;min-height:42px}
+.localDirectConfirm{background:transparent;border:1px solid #3f6e7c;color:#a9e6f6;border-radius:8px;padding:9px 11px;font-size:11px;font-weight:850;width:100%}
+.localDirectTune{display:grid;grid-template-columns:2fr 1fr;gap:7px}
+.localDirectMain,.localDirectDigits{border-radius:11px;padding:13px 8px;min-height:48px;font-size:12px;font-weight:950}
+.localDirectMain{background:#b0f4ff;border:1px solid #e3fdff;color:#0b263b}
+.localDirectDigits{background:#264e6a;border:1px solid #477997;color:#f2fcff}
+.localDirectTune button:disabled{opacity:.5}
+.localDirectNotice{padding:10px 11px;border-left:3px solid #78cadb;background:#0b2234;color:#c5dce9;border-radius:8px;margin-top:9px;font-size:11px;line-height:1.4}
+.localDirectBottom{display:flex;gap:9px;align-items:center;justify-content:space-between;margin-top:12px}
+.localDirectBottom button,.localDirectBottom a{font-size:11px;color:#89dbeb;text-decoration:underline;border:0;background:transparent;padding:6px 0}
+.localDirectFoot{font-size:10px;line-height:1.55;color:#9fb8c7;margin:11px 0 0}
+.localDirectFoot a{color:#8edbe8}
+@media(max-width:450px){.localDirectBoxes{grid-template-columns:repeat(2,minmax(0,1fr))}.localDirectCh strong{font-size:11px}.localDirectTune{grid-template-columns:1fr 1fr}}
+
+/* V16 channel shortcuts and duplicate dial locations */
+.localDirectFavorites{display:flex;gap:6px;overflow-x:auto;padding:3px 0 10px;scrollbar-width:thin}
+.localDirectFavorites button{flex:0 0 auto;border:1px solid #4b7a8e;border-radius:18px;color:#c1e8f7;background:#112f44;padding:8px 10px;font-size:11px;font-weight:850;white-space:nowrap}
+.localDirectFavorites button.active{color:#092338;background:#aaf0ff;border-color:#aaf0ff}
+.localDirectAlternates{font-size:10px;color:#b3cbd8;padding:9px 10px;background:#0b2638;border:1px solid #31576c;border-radius:8px;margin:10px 0}
+.localDirectCh span{line-height:1.5}
+
+/* V17 · NESN and NBC Sports Boston spotlight. All V16 controls remain unchanged. */
+.regionalSports{margin:15px 0 19px;padding:15px;background:linear-gradient(130deg,#102c40,#173c52);border:1px solid #4e95af;border-radius:14px}
+.regionalSportsHead{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.regionalSportsHead strong{font-size:12px;letter-spacing:.75px;color:#a6ecfe}
+.regionalSportsHead span{font-size:10px;letter-spacing:.4px;color:#eacb8d;font-weight:900}
+.regionalSports p{font-size:11px;line-height:1.5;color:#bacfe0;margin:8px 0 12px}
+.regionalSportsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.regionalSportsCard{background:#081b2b;border:1px solid #3e6c85;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:11px;justify-content:space-between}
+.regionalSportsCard strong{font-size:13px;color:#f4fbff;display:block;line-height:1.25}
+.regionalSportsCard small{font-size:10px;color:#aed4e7;display:block;margin-top:6px;font-variant-numeric:tabular-nums}
+.regionalSportsCardActions{display:grid;gap:6px}
+.regionalSportsCardActions button{min-height:38px;border-radius:8px;font-weight:900;font-size:11px}
+.regionalChoose{background:#173b52;border:1px solid #568398;color:#ceecf7}
+.regionalWatch{background:#b5f3fe;border:1px solid #e0fcff;color:#0d263b}
+.regionalWatch:disabled,.regionalChoose:disabled{opacity:.45}
+.regionalSportsNote{font-size:10px;line-height:1.45;color:#aec5d4;display:block;margin-top:12px}
+@media(max-width:340px){.regionalSportsGrid{grid-template-columns:1fr}}
+
+/* V18 — voice-style Xfinity streaming launcher, scoped to its own panel */
+.streamLaunchPanel{background:radial-gradient(circle at 80% -20%,#244c7b 0,transparent 60%),linear-gradient(138deg,#091c30,#132d43);border:1px solid #398ba8;border-radius:18px;margin:16px 0 22px;padding:16px;box-shadow:0 12px 30px #0005;color:#ecfaff}
+.streamLaunchHeader{display:flex;gap:11px;align-items:flex-start;justify-content:space-between}
+.streamEyebrow{font-size:10px;letter-spacing:1px;font-weight:950;color:#76eaff}
+.streamLaunchHeader h3{font-size:clamp(21px,5.2vw,28px);letter-spacing:-.65px;line-height:1.13;margin:7px 0;color:#f5fcff}
+.streamLaunchHeader h3 span{color:#9feaf6}
+.streamLaunchHeader p{font-size:11px;color:#b8d0df;line-height:1.55;margin:6px 0 16px}
+.streamCount{flex:0 0 auto;min-width:72px;text-align:center;border:1px solid #4d90a8;background:#17465f;border-radius:9px;padding:9px 7px;color:#aef5ff;font-size:10px;letter-spacing:.3px;font-weight:950;line-height:1.6}
+.streamLine{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:5px 0 9px;font-size:11px;font-weight:950;letter-spacing:.6px}
+.streamLine strong{color:#c5def0}
+.streamLine span{font-size:12px;color:#d1f5ff;letter-spacing:0}
+.streamTvGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.streamTvGrid button{background:#0c263d;border:1px solid #3a6e86;color:#c8e9fa;border-radius:10px;padding:10px 4px;min-height:58px}
+.streamTvGrid button.active{background:#c3f8ff;border-color:#e8fcff;color:#123044}
+.streamTvGrid b,.streamTvGrid small{display:block;text-align:center;white-space:normal}
+.streamTvGrid b{font-size:11px;line-height:1.25}
+.streamTvGrid small{font-size:9px;opacity:.83;margin-top:5px}
+.streamStatus{margin:12px 0 17px;background:#09263a;border-left:3px solid #73dbe9;border-radius:6px;padding:9px 11px;font-size:11px;line-height:1.4;color:#bfe7ee}
+.streamSectionLabel{font-size:10px;color:#8de3ef;font-weight:950;letter-spacing:1px;margin:17px 0 10px}
+.streamGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.streamAppCard{min-width:0;background:linear-gradient(145deg,#142d46,#0a2236);border:1px solid #32566b;border-radius:12px;min-height:137px;padding:10px 8px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:9px;color:#f8feff;box-shadow:0 5px 13px #0003}
+.streamAppCard:disabled{opacity:.55}
+.streamAppCard:not(:disabled):active{transform:scale(.985);border-color:#a1ebff}
+.streamLogo{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:#244d69;color:#ecfaff;font-size:15px;font-weight:1000;letter-spacing:-.6px}
+.streamLogo[data-app=netflix]{background:#a20b18;color:white}
+.streamLogo[data-app=prime]{background:#086990;color:#e4f8ff;font-size:11px}
+.streamLogo[data-app=appletv]{background:#353b46;color:#fff}
+.streamLogo[data-app=paramount]{background:#1349b9;color:#fff}
+.streamLogo[data-app=disney]{background:#153d86;color:white}
+.streamLogo[data-app=espnplus]{background:#a50d20;color:#fff}
+.streamLogo[data-app=youtube]{background:#c51724;color:#fff;font-size:12px}
+.streamLogo[data-app=peacock]{background:#5b3378;color:#fff}
+.streamLogo[data-app=hulu]{background:#195b42;color:#a3ffd0}
+.streamAppTexts{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.streamAppTexts b{font-size:12px;line-height:1.22;color:#f7fcff}
+.streamAppTexts small{font-size:9px;color:#a6cadc}
+.streamAppTexts em{font-size:9px;color:#7ebbd2;font-style:normal;line-height:1.35;overflow-wrap:anywhere;margin-top:5px}
+.streamAction{font-size:10px;font-weight:950;color:#a8f2ff;letter-spacing:.3px}
+.streamRedzone{background:linear-gradient(116deg,#421522,#1e1b28);border:1px solid #9a475a;border-radius:13px;padding:14px}
+.streamRedTitle{display:flex;align-items:center;gap:10px}
+.streamRedTitle strong{font-size:17px;color:#fff7f8;display:block}
+.streamRedTitle small{font-size:10px;color:#ffcad1;margin-top:4px;display:block;line-height:1.4}
+.streamRedIcon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:#b90f28;color:#fff;font-size:15px;font-weight:1000;flex:0 0 auto}
+.streamRedzone p{font-size:11px;line-height:1.5;color:#efc1c7;margin:11px 0}
+.streamRedActions{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.streamRedActions button{min-height:45px;border-radius:9px;font-size:11px;font-weight:950;padding:10px 7px}
+.streamRedActions button:first-child{background:#ffc1c7;color:#40121c;border:1px solid #ffe1e3}
+.streamRedActions button:last-child{background:#57222e;color:#ffe8eb;border:1px solid #9a6070}
+.streamRedActions button:disabled{opacity:.46}
+.streamReceipt{background:#0a2638;border-left:3px solid #7ae4f4;border-radius:6px;padding:11px;margin:13px 0;color:#cce5ee;font-size:11px;line-height:1.5}
+.streamFooter{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.streamFooter button,.streamFooter a{background:transparent;border:0;color:#9deeff;text-decoration:underline;font-size:11px;padding:4px 0}
+.streamFine{font-size:10px;color:#a9c3d0;line-height:1.5;margin:12px 0 0}
+@media(max-width:420px){.streamGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.streamTvGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.streamRedActions{grid-template-columns:1fr 1fr}}
+
+/* V19 · isolated live-game mapping panel. Approved V18 visual sections stay intact. */
+.gameMap{border-radius:18px;border:1px solid #3d8aa6;background:linear-gradient(145deg,#0b2538,#123952);padding:16px;margin:16px 0;box-shadow:0 12px 30px #0004}
+.gameMapHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.gameMapHead span{font-size:10px;letter-spacing:1px;font-weight:950;color:#89e8fd}
+.gameMapHead h3{font-size:clamp(22px,5.8vw,30px);margin:6px 0 7px;color:#f4fcff}
+.gameMapHead p{font-size:11px;color:#b7d4e4;line-height:1.5;max-width:520px;margin:0 0 14px}
+.gameMapHead>b{background:#1b4c60;color:#b1f6e8;border:1px solid #539daf;border-radius:11px;padding:8px 10px;font-size:11px;flex:0 0 auto}
+.gameMapTV{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px}
+.gameMapTV button{min-width:0;background:#0f2c43;border:1px solid #517f98;border-radius:9px;padding:10px 4px;color:#deeff9;font-size:11px;font-weight:900}
+.gameMapTV button.active{background:#baf6fe;color:#08293c;border-color:#e4fdff}
+.gameMapFilters{display:flex;gap:5px;overflow-x:auto;padding:6px 0;scrollbar-width:thin}
+.gameMapFilters button{flex:0 0 auto;border-radius:20px;background:#0f2b41;border:1px solid #456d83;color:#b7ddeb;font-size:10px;font-weight:900;padding:7px 10px}
+.gameMapFilters button.active{background:#b9effc;color:#0a2b41;border-color:#e4fbff}
+.gameMapInfo{font-size:11px;line-height:1.5;background:#0b2940;border-left:3px solid #71d9f0;padding:10px;border-radius:6px;color:#c3dce8;margin:10px 0}
+.gameMapList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:620px;overflow:auto;padding:2px 0}
+.gameMapCard{min-width:0;border:1px solid #406882;border-radius:12px;background:#081f31;padding:12px;display:flex;flex-direction:column;gap:8px}
+.gameMapTop{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;color:#b7dce9}
+.gameMapTop b{font-weight:950;color:#f0f7ff}
+.gameMapLive{color:#a0f9c9;font-weight:950}
+.gameMapTeams strong{font-size:13px;line-height:1.3;color:#f4fbff}
+.gameMapTeams em{font-style:normal;color:#f5d985;font-size:10px;white-space:nowrap}
+.gameMapWhen{font-size:10px;color:#b1e1f1}
+.gameMapSource{font-size:10px;color:#b9cadc;line-height:1.45}
+.gameMapCard select{display:block;width:100%;min-width:0;min-height:40px;background:#112c43;border:1px solid #547b90;color:#ecfaff;border-radius:9px;padding:8px;font-size:11px}
+.gameMapAction{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:auto}
+.gameMapAction small{font-size:10px;color:#a1d8e8;line-height:1.3;min-width:0}
+.gameMapAction button{min-width:96px;min-height:40px;border:1px solid #e1fcff;background:#a8ecfa;color:#0c3143;border-radius:9px;font-size:11px;font-weight:950;padding:8px}
+.gameMapAction button:disabled{opacity:.42}
+.gameMapWarn{font-size:9px;line-height:1.35;color:#91aebd}
+.gameMapReceipt{margin-top:12px;background:#082b3e;border-left:3px solid #7ed7ee;border-radius:6px;padding:11px;color:#ccedfa;font-size:11px;line-height:1.5}
+.gameMapButtons{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.gameMapButtons button{border:1px solid #6095a8;border-radius:8px;padding:9px;background:#123c54;color:#d2f5ff;font-size:11px;font-weight:850}
+@media(max-width:560px){.gameMapList{grid-template-columns:1fr;max-height:570px}.gameMapTV{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* V20 real feed, preserve approved cards */
+.realGamesStatus{display:flex;justify-content:space-between;align-items:center;gap:9px;margin:9px 0 16px;padding:11px 12px;background:#142a41;border:1px solid #395c75;border-radius:10px;color:#b9d9e7;font-size:11px}
+.realGamesStatus button{border:1px solid #64a6bd;border-radius:8px;background:#1a4157;color:#d2f8ff;padding:8px 12px;font-size:11px;font-weight:900}
+.realGamesStatus button:disabled{opacity:.55}
+.realGameNetwork{font-size:10px;color:#9db9d0;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:-3px 4px 11px}
+.gameCard .score{font-size:23px;white-space:normal;text-align:center}
+.gameCard .score small{font-size:10px;line-height:1.3}
+.gameCard .teamName{overflow-wrap:anywhere}
+
+/* V21: iPhone-first one-tap game to multi-TV picker. Approved game cards are retained. */
+.realGameShort{display:grid;gap:6px;margin-bottom:16px}
+.realGameShort strong{font-size:15px;color:#f4f8ff;line-height:1.35}
+.realGameShort span{font-size:11px;color:#aac8df}
+.realTvHeading{font-size:13px;letter-spacing:.4px;font-weight:950;margin:13px 0 11px;color:#deeffe}
+.realTvGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.realTvChoice{min-height:100px;border-radius:15px;border:1px solid #4c6b86;background:linear-gradient(145deg,#1a304b,#101e35);color:#e0eaf8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px 7px;transition:background .1s ease,border-color .1s ease}
+.realTvChoice strong{font-size:16px;font-weight:950}
+.realTvChoice small{font-size:11px;color:#9dcee1}
+.realTvChoice.selected{background:linear-gradient(140deg,#24637a,#14435b);border:2px solid #78d9f0;box-shadow:inset 0 0 0 1px #3889a5}
+.realTvChoice.selected::after{content:'✓ SELECTED';font-size:10px;letter-spacing:.5px;color:#c4ffec;font-weight:950}
+.realTvChoice:disabled{opacity:.45}
+.realTvChoice:focus-visible{outline:3px solid #9df1ff;outline-offset:2px}
+.realAutoNetwork{margin:17px 0 8px;background:#102d3c;border:1px solid #30687f;border-radius:11px;padding:13px;display:grid;gap:6px}
+.realAutoNetwork small{font-size:12px;font-weight:900;color:#91e9fc}
+.realAutoNetwork strong{font-size:11px;color:#c9dbe6;font-weight:500;line-height:1.5}
+.realGameFine{font-size:11px;color:#dfc28e;line-height:1.5;margin:8px 0}
+.realGameReceipt{margin:14px 0;color:#d9eaff;background:#142336;border-left:3px solid #7cbfe0;padding:11px;border-radius:7px;font-size:12px;line-height:1.5}
+.realGameReceipt:empty{display:none}
+#realGameTune:disabled{opacity:.48}
+@media(max-width:360px){.realTvChoice{min-height:84px}.realTvChoice strong{font-size:13px}}
+
+/* V25 Broadcast logo surfaces. Keep the approved TV, Games and board layouts untouched. */
+.networkLogoBadge{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:0;max-width:100%;vertical-align:middle;color:#d8eaf6;font-weight:800;line-height:1.25}
+.networkLogoBadge img{display:block;flex:0 0 auto;width:auto;height:29px;max-width:86px;object-fit:contain}
+.networkLogoBadge span{display:block;overflow-wrap:anywhere}
+.networkLogoBadge.is-compact{font-size:11px}
+.realGameNetwork{display:flex;align-items:center;justify-content:center;white-space:normal;overflow:visible;text-overflow:clip;min-height:33px;margin:-2px 2px 11px}
+.realGameNetwork .networkLogoBadge img{max-width:76px;height:26px}
+.realAutoNetworkBadge{display:flex;justify-content:center;align-items:center;padding:6px 0 3px}
+.realAutoNetworkBadge .networkLogoBadge{font-size:14px}
+.realAutoNetworkBadge .networkLogoBadge img{max-width:108px;height:42px}
+.gameMapSource .networkLogoBadge{font-size:11px}
+.gameMapSource .networkLogoBadge img{max-width:82px;height:27px}
+.regionalSportsCard .networkLogoBadge{font-size:12px}
+.regionalSportsCard .networkLogoBadge img{max-width:94px;height:29px}
+.localDirectCh .networkLogoBadge{font-size:11px}
+.localDirectCh .networkLogoBadge img{max-width:68px;height:22px}
+.localDirectSelected .networkLogoBadge{font-size:14px}
+.localDirectSelected .networkLogoBadge img{height:33px;max-width:92px}
+.streamRedIcon:has(.networkLogoBadge){width:60px;height:50px;background:transparent}
+.streamRedIcon .networkLogoBadge img{height:46px;max-width:58px}
+.streamLogo:has(.networkLogoBadge){width:54px;padding:3px;background:transparent}
+.streamLogo .networkLogoBadge img{height:29px;max-width:52px}
+@media(max-width:380px){.networkLogoBadge img{max-width:60px}.networkLogoBadge.is-compact{font-size:10px}}
+
+/* V26: logos only. Sunday Ticket ticket-shaped artwork needs more vertical room. */
+.realGameNetwork .networkLogoBadge img[src*="nfl_sundayticket-logo.png"]{
+ height:53px;max-width:81px;
+}
+.realGameNetwork:has(img[src*="nfl_sundayticket-logo.png"]){min-height:56px}
+.gameMapSource .networkLogoBadge img[src*="nfl_sundayticket-logo.png"]{
+ height:49px;max-width:75px;
+}
+.realAutoNetworkBadge .networkLogoBadge img[src*="nfl_sundayticket-logo.png"]{
+ height:72px;max-width:105px;
+}
+.networkLogoBadge:has(> img[hidden]){display:none}
+
+/* V28 · Real team and network artwork inside the approved Screen Wall preview.
+   No change to wall positions, dimensions, screen counts, or gradients. */
+.wallPhysical .teamBadge:has(.wallTeamLogo):not(.wallLogoFallback),
+.wallPhysical .portraitShield:has(.wallTeamLogo):not(.wallLogoFallback){
+ background:transparent;border-color:transparent;box-shadow:none;text-shadow:none;
+}
+.wallPhysical .wallTeamLogo{
+ display:block;width:100%;height:100%;object-fit:contain;
+ filter:drop-shadow(0 2px 3px #0008);
+}
+.wallPhysical .wallLogoInitials{display:none}
+.wallPhysical .wallLogoFallback .wallLogoInitials{display:grid;place-items:center;width:100%;height:100%}
+.wallPhysical .wallTeamLogo[hidden]{display:none}
+.wallPhysical .wallBroadcastLogo{display:inline-flex;vertical-align:middle;margin-left:4px;align-items:center;max-width:65px}
+.wallPhysical .wallBroadcastLogo .networkLogoBadge img{height:14px;max-width:58px;width:auto;object-fit:contain}
+.wallPhysical .wallBroadcastLogo .networkLogoBadge{font-size:0;max-width:100%}
+.wallPhysical .unitLabel small{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.wallPhysical .lowerPortrait .unitLabel small{justify-content:center}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><div class="brand"><div class="mark">🏟️</div><div><div class="brand-kicker">MAN CAVE SPORTS BOOK</div><div class="brand-name">GAME WALL <span style="color:var(--cyan)">/ CONTROL</span></div></div></div><span class="previewTag">DESIGN PREVIEW</span></header>
+<section class="hero realWallHero" aria-label="Seven-screen wall layout preview">
+  <div class="heroHeader"><div class="heroTitle">SCREEN WALL <span class="goldSlash">/ 07</span></div><div class="heroMeta">Your wall layout · demo content</div></div>
+  <div class="wallPhysical" aria-label="Top left and right screens above a main TV flanked by two portrait wing screens; 32-inch portrait and 40-inch side TV below">
+    <div class="physicalTop">
+      <div class="physicalUnit topLeft">
+        <div class="physicalTV landscape"><div class="broadcastContent denKC"><div class="broadTop"><span class="leagueMini">NFL</span><span class="feedTag">GAME DAY</span></div><div class="duel"><div class="broadcastTeam"><span class="teamBadge den"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nfl/500/den.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">DEN</span></span><b>BRONCOS</b></div><span class="vsMini">VS</span><div class="broadcastTeam"><span class="teamBadge kc"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nfl/500/kc.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">KC</span></span><b>CHIEFS</b></div></div><div class="broadcastRail"></div></div></div>
+        <div class="unitLabel">TOP LEFT <span>40”</span><small>Broncos <span class="wallBroadcastLogo" data-wall-network="FOX"></span></small></div>
+      </div>
+      <div class="physicalUnit topRight">
+        <div class="physicalTV landscape"><div class="broadcastContent bosNYK"><div class="broadTop"><span class="leagueMini">NBA</span><span class="feedTag">GAME DAY</span></div><div class="duel"><div class="broadcastTeam"><span class="teamBadge bos"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nba/500/bos.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">BOS</span></span><b>CELTICS</b></div><span class="vsMini">VS</span><div class="broadcastTeam"><span class="teamBadge nyk"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nba/500/ny.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">NYK</span></span><b>KNICKS</b></div></div><div class="broadcastRail"></div></div></div>
+        <div class="unitLabel">TOP RIGHT <span>55”</span><small>Celtics <span class="wallBroadcastLogo" data-wall-network="NBC Sports Boston"></span></small></div>
+      </div>
+    </div>
+    <div class="physicalMiddle">
+      <div class="physicalUnit wingUnit">
+        <div class="physicalTV portrait"><div class="portraitContent leftPortrait"><span class="portraitLeague">NFL PLAYER BOARD</span><span class="portraitShield den"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nfl/500/den.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">DEN</span></span><strong>BRONCOS</strong><div class="portraitBars"><i></i><i></i><i></i></div><small>AWAY</small></div></div>
+        <div class="unitLabel">LEFT WING<small>DEN board</small></div>
+      </div>
+      <div class="physicalUnit mainUnit">
+        <div class="physicalTV landscape"><div class="broadcastContent mainBroadcast"><div class="broadTop"><span class="leagueMini">NFL</span><span class="feedTag">MAIN GAME</span></div><div class="duel"><div class="broadcastTeam"><span class="teamBadge den"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nfl/500/den.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">DEN</span></span><b>BRONCOS</b></div><span class="vsMini">VS</span><div class="broadcastTeam"><span class="teamBadge kc"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nfl/500/kc.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">KC</span></span><b>CHIEFS</b></div></div><div class="broadcastRail"></div></div></div>
+        <div class="unitLabel">MAIN TV <span>65”</span><small>Primary game</small></div>
+      </div>
+      <div class="physicalUnit wingUnit">
+        <div class="physicalTV portrait"><div class="portraitContent rightPortrait"><span class="portraitLeague">NFL PLAYER BOARD</span><span class="portraitShield kc"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nfl/500/kc.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">KC</span></span><strong>CHIEFS</strong><div class="portraitBars"><i></i><i></i><i></i></div><small>HOME</small></div></div>
+        <div class="unitLabel">RIGHT WING<small>KC board</small></div>
+      </div>
+    </div>
+    <div class="physicalBottom">
+      <div class="physicalUnit lowerPortrait">
+        <div class="physicalTV portrait"><div class="portraitContent wrestlingPortrait"><span class="portraitLeague">MAN CAVE SPORTS BOOK</span><span class="wrestlingArt">INSIDE THE<br><strong>SQUARED<br>CIRCLE</strong></span><span class="ringLines"></span></div></div>
+        <div class="unitLabel">PORTRAIT <span>32”</span><small>Wrestling board</small></div>
+      </div>
+      <div class="physicalUnit lowerSide">
+        <div class="physicalTV landscape"><div class="broadcastContent bosNYR"><div class="broadTop"><span class="leagueMini">NHL</span><span class="feedTag">GAME DAY</span></div><div class="duel"><div class="broadcastTeam"><span class="teamBadge bruins"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nhl/500/bos.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">BOS</span></span><b>BRUINS</b></div><span class="vsMini">VS</span><div class="broadcastTeam"><span class="teamBadge rangers"><img class="wallTeamLogo" src="https://a.espncdn.com/i/teamlogos/nhl/500/nyr.png" alt="" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add('wallLogoFallback')" /><span class="wallLogoInitials">NYR</span></span><b>RANGERS</b></div></div><div class="broadcastRail"></div></div></div>
+        <div class="unitLabel">SIDE TV <span>40”</span><small>Bruins <span class="wallBroadcastLogo" data-wall-network="NESN"></span></small></div>
+      </div>
+    </div>
+  </div>
+  <div class="wallLegend"><div class="legendItems"><span class="legendItem"><span class="legendDot tv"></span>4 cable TVs</span><span class="legendItem"><span class="legendDot board"></span>3 board screens</span></div><span class="legendTail">Visual preview only</span></div>
+</section>
+<nav class="tabs" aria-label="Controller views"><button class="tab active" data-nav="screens">Screens</button><button class="tab" data-nav="games">Games</button><button class="tab" data-nav="boards">Boards</button><button class="tab" data-nav="cable">Cable Map</button><button class="tab" data-nav="presets">Presets</button></nav>
+<div id="content" aria-live="polite">
+<!-- Pre-rendered preview: keeps the design visible in iOS attachment viewers where JavaScript is disabled. -->
+<div class="sectionTitle"><div><h2>TV Displays</h2><p>Your cable-fed screens, pre-mapped to the four Xfinity box names</p></div><span class="chip">4 TV ONLY</span></div>
+<div class="screenGrid"><div class="screenCard  "><span class="check"></span><div class="screenTop"><strong>Top Left</strong><span>40″ TV</span></div><div class="screenType ">▣ CABLE TV</div><div class="screenDisplay"><strong>Cable / Not mapped</strong><span>Cable source not mapped</span></div><div class="screenFoot"><span>Manual hold</span><span>SETTINGS ›</span></div></div><div class="screenCard  "><span class="check"></span><div class="screenTop"><strong>Top Right</strong><span>55″ TV</span></div><div class="screenType ">▣ CABLE TV</div><div class="screenDisplay"><strong>Cable / Not mapped</strong><span>Cable source not mapped</span></div><div class="screenFoot"><span>Manual hold</span><span>SETTINGS ›</span></div></div><div class="screenCard mainscreen "><span class="check"></span><div class="screenTop"><strong>Main</strong><span>65″ TV</span></div><div class="screenType ">▣ CABLE TV</div><div class="screenDisplay"><strong>Cable / Not mapped</strong><span>Cable source not mapped</span></div><div class="screenFoot"><span>Manual hold</span><span>SETTINGS ›</span></div></div><div class="screenCard sideWide "><span class="check"></span><div class="screenTop"><strong>Side</strong><span>40″ TV</span></div><div class="screenType ">▣ CABLE TV</div><div class="screenDisplay"><strong>Cable / Not mapped</strong><span>Cable source not mapped</span></div><div class="screenFoot"><span>Manual hold</span><span>SETTINGS ›</span></div></div></div>
+<div class="sectionTitle"><div><h2>Board Displays</h2><p>These screens stay dedicated to your custom sports boards</p></div><span class="chip">3 BOARDS</span></div>
+<div class="screenGrid"><div class="screenCard  boardcard"><span class="check"></span><div class="screenTop"><strong>Left Wing</strong><span>Portrait board</span></div><div class="screenType board">● BOARD DISPLAY</div><div class="screenDisplay"><strong>Upcoming Games</strong><span>Board content</span></div><div class="screenFoot"><span>Manual hold</span><span>SETTINGS ›</span></div></div><div class="screenCard  boardcard"><span class="check"></span><div class="screenTop"><strong>Right Wing</strong><span>Portrait board</span></div><div class="screenType board">● BOARD DISPLAY</div><div class="screenDisplay"><strong>Man Cave Sports Book Live Lookin</strong><span>Board content</span></div><div class="screenFoot"><span>Manual hold</span><span>SETTINGS ›</span></div></div><div class="screenCard  boardcard"><span class="check"></span><div class="screenTop"><strong>32″ Portrait</strong><span>Board-only</span></div><div class="screenType board">● BOARD DISPLAY</div><div class="screenDisplay"><strong>League Deep Dive</strong><span>Board content</span></div><div class="screenFoot"><span>Manual hold</span><span>SETTINGS ›</span></div></div></div>
+<div class="infoBar"><div><strong>7-screen controller layout</strong><br><span>Open in a browser for interactive assignments</span></div><span class="chip">PREVIEW</span></div>
+<div class="note">Your device's built-in HTML viewer may block interactive JavaScript. This static fallback shows the full design. Your current TV controller is unchanged.</div>
+</div>
+</div>
+<nav class="bottomNav" aria-label="Quick tabs"><div class="bottomInner"><button class="bottomBtn active" data-nav="screens"><i>▣</i>Screens</button><button class="bottomBtn" data-nav="games"><i>◉</i>Games</button><button class="bottomBtn" data-nav="boards"><i>▤</i>Boards</button><button class="bottomBtn" data-nav="cable"><i>⇄</i>Cable</button><button class="bottomBtn" data-nav="presets"><i>✦</i>Presets</button></div></nav>
+<div class="modalShade" id="modalShade"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalGrip"></div><div class="modalHeader"><h3 id="modalTitle">Details</h3><button class="close" id="closeModal" aria-label="Close">×</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast" role="status"></div>
+<script src="./game-wall-v27-tnf-logos.js"></script>
+<script>
+(() => {
+'use strict';
+const boards=[
+{id:'live-lookin',name:'Man Cave Sports Book Live Lookin',short:'LIVE LOOKIN',sub:'MAN CAVE SPORTS BOOK',detail:'Live games and results'},
+{id:'upcoming',name:'Upcoming Games',short:'UPCOMING GAMES',sub:'MAN CAVE SPORTS BOOK',detail:'Your next games'},
+{id:'wrestling',name:'Presents Inside the Squared Circle',short:'INSIDE THE\nSQUARED CIRCLE',sub:'MAN CAVE SPORTS BOOK PRESENTS',detail:'Wrestling board'},
+{id:'deep-dive',name:'League Deep Dive',short:'LEAGUE\nDEEP DIVE',sub:'MAN CAVE SPORTS BOOK',detail:'League standings and stats'}
+];
+const screens=[
+{id:'top-left',name:'Top Left',size:'40″ TV',kind:'tv',source:'Top Left',content:'Cable · Top Left',hold:'Manual hold'},
+{id:'top-right',name:'Top Right',size:'55″ TV',kind:'tv',source:'Top Right',content:'Cable · Top Right',hold:'Manual hold'},
+{id:'main',name:'Main',size:'65″ TV',kind:'tv',source:'Center',content:'Cable · Center',hold:'Manual hold'},
+{id:'side',name:'Side',size:'40″ TV',kind:'tv',source:'Side',content:'Cable · Side',hold:'Manual hold'},
+{id:'left-wing',name:'Left Wing',size:'Portrait board',kind:'board',source:null,content:'Upcoming Games',hold:'Manual hold'},
+{id:'right-wing',name:'Right Wing',size:'Portrait board',kind:'board',source:null,content:'Man Cave Sports Book Live Lookin',hold:'Manual hold'},
+{id:'portrait-32',name:'32″ Portrait',size:'Board-only',kind:'board',source:null,content:'League Deep Dive',hold:'Manual hold'}
+];
+// Cable source mapping is browser-local only; it is never published or sent to Firebase.
+const cableMapStoreKey='mancave-v11-named-xfinity-boxes';
+try{
+ const saved=JSON.parse(localStorage.getItem(cableMapStoreKey)||'null');
+ if(saved&&typeof saved==='object')screens.filter(s=>s.kind==='tv').forEach(s=>{
+  const value=saved[s.id];
+  if(['Top Left','Top Right','Center','Side'].includes(value)){s.source=value;s.content='Cable · '+value;}
+ });
+}catch(e){/* Storage may be disabled; controls still work in memory. */}
+// V20: real ESPN matchups loaded by the Games tab, no bundled demo games.
+const $=id=>document.getElementById(id);const chosen=new Set();let active='screens',filter='all',leagueFilter='all',modalMode=null,chosenItem=null,statsTab='team';let toastTimer;
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const byid=id=>screens.find(s=>s.id===id);
+window.ManCaveClearSelection=()=>{chosen.clear();if(active==='screens')renderScreens();};
+window.addEventListener('man-cave-board-update',event=>{
+ const keys={left:'left-wing',right:'right-wing',third:'portrait-32'};
+ const screen=byid(keys[event.detail?.side]);if(!screen)return;
+ screen.content=event.detail.label||'No assignment';
+ const labelElement=document.querySelector('[data-screen="'+screen.id+'"] .screenDisplay strong');
+ if(labelElement)labelElement.textContent=screen.content;
+});
+function toast(message){$('toast').textContent=message;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2400)}
+function go(page){active=page;document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('active',n.dataset.nav===page));render();if(page==='games')window.ManCaveRealGames?.ensureLoaded?.();if(page==='screens'){window.scrollTo({top:0,behavior:'auto'});}else{$('content').scrollIntoView({behavior:'auto',block:'start'});}}
+document.querySelectorAll('[data-nav]').forEach(n=>n.addEventListener('click',()=>go(n.dataset.nav)));
+function header(title,subtitle,chip=''){return `<div class="sectionTitle"><div><h2>${title}</h2><p>${subtitle}</p></div>${chip?`<span class="chip">${chip}</span>`:''}</div>`}
+function screenCard(s){const isBoard=s.kind==='board',picked=chosen.has(s.id),shared=s.kind==='tv'&&s.source&&screens.filter(t=>t.source===s.source&&t.kind==='tv').length>1;
+return `<button class="screenCard ${s.id==='main'?'mainscreen':s.id==='side'?'sideWide':''} ${isBoard?'boardcard':''} ${picked?'selected':''}" data-screen="${s.id}" aria-pressed="${picked}"><span class="check">${picked?'✓':''}</span><div class="screenTop"><strong>${s.name}</strong><span>${s.size}</span></div><div class="screenType ${isBoard?'board':''}">${isBoard?'● BOARD DISPLAY':'▣ CABLE TV'}</div><div class="screenDisplay"><strong>${escapeHtml(s.content)}</strong><span>${isBoard?'Board content':s.source?'Source '+s.source:'Cable source not mapped'}</span></div><div class="screenFoot"><span>${s.hold}</span><span>${shared?'⚠ SHARED':'SETTINGS ›'}</span></div></button>`}
+function renderScreens(){const first=screens.filter(s=>s.kind==='tv'),other=screens.filter(s=>s.kind==='board');$('content').innerHTML=header('TV Displays','Your cable-fed screens and their source assignments','4 TV ONLY')+`<div class="screenGrid">${first.map(screenCard).join('')}</div>`+header('Board Displays','These screens stay dedicated to your custom sports boards','3 BOARDS')+`<div class="screenGrid">${other.map(screenCard).join('')}</div><div class="infoBar"><div><strong>${chosen.size} screen${chosen.size===1?'':'s'} selected</strong><br><span>Tap multiple screen cards to group them</span></div><button class="btn primary" id="bulkAction" ${!chosen.size?'disabled':''}>Assign content</button></div><div class="note">Some screen-card assignments and presets remain previews; Games now uses real ESPN matchups. The Live TV Link below can send real commands to the existing Left/Right wing players.</div><div id="liveBridge"></div>`;
+document.querySelectorAll('[data-screen]').forEach(n=>n.addEventListener('click',()=>{const id=n.dataset.screen;if(chosen.has(id))chosen.delete(id);else chosen.add(id);renderScreens()}));$('bulkAction').addEventListener('click',()=>openAssignment(null));window.ManCaveBridge?.render?.();}
+// V24: keep exact approved team-card dimensions but support every ESPN-approved logo host
+// plus alternate sources before falling back to the team's official abbreviation.
+function approvedTeamLogo(value){
+ if(typeof value!=='string'||value.length>1000)return '';
+ const url=value.trim();
+ return /^https:\/\/(?:a\.espncdn\.com|a\.espn\.com)\/(?:i|combiner)\/[^\s<>"'\x60]{1,980}$/i.test(url)?url:'';
+}
+window.ManCaveLogoFallback=img=>{
+ let remaining=[];
+ try{remaining=JSON.parse(img.getAttribute('data-fallbacks')||'[]');}catch{}
+ if(!Array.isArray(remaining))remaining=[];
+ let next='';
+ while(remaining.length&&!next)next=approvedTeamLogo(remaining.shift());
+ img.setAttribute('data-fallbacks',JSON.stringify(remaining));
+ if(next){img.src=next;return;}
+ img.onerror=null;img.style.display='none';
+ const abbreviation=img.nextElementSibling;
+ if(abbreviation)abbreviation.style.display='block';
+};
+function team(t){
+ const urls=[t.logo,...(Array.isArray(t.logoAlternates)?t.logoAlternates:[])]
+  .map(approvedTeamLogo).filter(Boolean);
+ const sources=[...new Set(urls)],src=sources[0]||'';
+ const abbr=escapeHtml(String(t.abbr||'').slice(0,4)),name=escapeHtml(t.name||'Team');
+ const fallback=escapeHtml(JSON.stringify(sources.slice(1)));
+ return '<div class="team">'+(src?
+  '<img src="'+escapeHtml(src)+'" alt="" width="48" height="48" loading="lazy" decoding="async" data-fallbacks="'+fallback+'" onerror="window.ManCaveLogoFallback(this)"/>':'')+
+  '<span style="'+(src?'display:none;':'')+'font-weight:950;font-size:22px">'+abbr+'</span><div class="teamName">'+name+'</div></div>';
+}
+function renderGames(){
+ const state=window.ManCaveRealGames?.state;
+ const leagues=[['all','All leagues'],['NFL','NFL'],['NBA','NBA'],['NHL','NHL'],['MLB','MLB'],['WNBA','WNBA'],['NCAAF','NCAA FB'],['NCAAB','NCAA BB']];
+ const games=(state?.games||[]).filter(g=>(filter==='all'||g.state===filter)&&(leagueFilter==='all'||g.league===leagueFilter));
+ let body=header('Game Finder',state?.lastFetch?'Real ESPN games · Updated '+new Date(state.lastFetch).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'Real ESPN games · seven sports','LIVE DATA');
+ body+='<div class="gameFilterGroup"><div class="gameFilterLabel">Game status</div><div class="filterRow">'+
+  ['all','live','final','upcoming'].map(v=>'<button type="button" class="filter '+(filter===v?'active':'')+'" data-filter="'+v+'">'+(v==='all'?'All games':v[0].toUpperCase()+v.slice(1))+'</button>').join('')+'</div></div>';
+ body+='<div class="gameFilterGroup"><div class="gameFilterLabel">League</div><div class="filterRow">'+
+  leagues.map(([id,label])=>'<button type="button" class="filter '+(leagueFilter===id?'leagueActive':'')+'" data-league-filter="'+id+'">'+label+'</button>').join('')+'</div></div>';
+ const selectedLeague=leagues.find(x=>x[0]===leagueFilter)?.[1]||'All leagues';
+ body+='<div class="filterResults"><span><strong>'+games.length+'</strong> real game'+(games.length===1?'':'s')+' shown</span><span>'+escapeHtml(selectedLeague)+' · '+(filter==='all'?'All statuses':filter.toUpperCase())+'</span></div>';
+ body+='<div class="realGamesStatus" role="status">'+escapeHtml(state?.message||'Connecting to ESPN…')+
+  '<button id="refreshRealGames" type="button"'+(state?.loading?' disabled':'')+'>'+(state?.loading?'Refreshing…':'Refresh')+'</button></div>';
+ if(games.length){
+  body+='<div class="games">'+games.map(g=>{
+   const started=g.state!=='upcoming';
+   const score=started?escapeHtml((g.away.score??'–')+' – '+(g.home.score??'–')):'vs';
+   const time=started?escapeHtml(g.detail||g.state.toUpperCase()):
+    escapeHtml(new Date(g.start).toLocaleString('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'}));
+   const smart=window.ManCaveRealGames?.routeFor?.(g);
+   // No verified/available network means no badge, text, or empty container.
+   const badge=smart?.status==='ready'?(window.ManCaveNetworkLogos?.badge?.(smart)||''):'';
+   const broadcastRow=badge?'<div class="realGameNetwork">'+badge+'</div>':'';
+   return '<div class="gameCard"><div class="gameMeta"><span class="league">'+escapeHtml(g.league)+(g.favorite?' · ★ FAVORITE':'')+'</span><span class="status '+g.state+'">'+g.state.toUpperCase()+'</span></div>'+
+    '<div class="matchup">'+team(g.away)+'<div class="score">'+score+'<small>'+time+'</small></div>'+team(g.home)+'</div>'+
+    broadcastRow+
+    '<div class="gameActions"><button type="button" data-stats="'+escapeHtml(g.id)+'">Stats</button><button type="button" class="accent" data-assign-game="'+escapeHtml(g.id)+'">Tune to TV</button></div></div>';
+  }).join('')+'</div>';
+ }else{
+  body+='<div class="emptyGames"><strong>'+(state?.loading?'Loading games…':state?.loaded?'No games match this filter':'Connecting to ESPN…')+'</strong>'+
+   '<p>'+(state?.loaded?'Choose another league or status.':'Live data will appear when ESPN responds. No sample matchups are substituted.')+'</p>'+
+   '<button type="button" class="btn subtle" id="clearGameFilters">Clear filters</button></div>';
+ }
+ body+='<div class="note">Scores and matchups are provided by ESPN. Broadcasts and package availability may differ. Tune to TV sends a voice-style Xfinity command to your selected boxes whenever possible. Your recorded channel numbers remain a manual backup. Broadcasts and subscriptions still require verification.</div>';
+ $('content').innerHTML=body;
+ document.querySelectorAll('[data-filter]').forEach(el=>el.onclick=()=>{filter=el.dataset.filter;renderGames();});
+ document.querySelectorAll('[data-league-filter]').forEach(el=>el.onclick=()=>{leagueFilter=el.dataset.leagueFilter;renderGames();});
+ document.querySelectorAll('[data-stats]').forEach(el=>el.onclick=()=>window.ManCaveRealGames?.showStats?.(el.dataset.stats));
+ document.querySelectorAll('[data-assign-game]').forEach(el=>el.onclick=()=>window.ManCaveRealGames?.openAssign?.(el.dataset.assignGame));
+ $('clearGameFilters')?.addEventListener('click',()=>{filter='all';leagueFilter='all';renderGames();});
+ $('refreshRealGames')?.addEventListener('click',()=>window.ManCaveRealGames?.refresh?.());
+}
+function renderBoards(){$('content').innerHTML=header('Board Library','Your approved content, organized by board name','4 APPROVED')+`<div class="boardGrid">${boards.map(b=>`<button class="boardTile" data-board="${b.id}"><div class="boardGraphic"><div><small>${escapeHtml(b.sub)}</small><b style="white-space:pre-line">${escapeHtml(b.short)}</b></div></div><div class="boardText"><div><strong>${escapeHtml(b.name)}</strong><div style="font-size:10px;color:#91a7bd;margin-top:3px">${escapeHtml(b.detail)}</div></div><span>›</span></div></button>`).join('')}</div><div class="note">Tap a supported banner to choose a connected board display. League Deep Dive remains preview-only until its destination is connected. Approved board artwork is unchanged.</div><div id="boardExtras"></div>`;document.querySelectorAll('[data-board]').forEach(n=>n.addEventListener('click',()=>openAssignment({type:'board',id:n.dataset.board})));window.ManCaveBridge?.renderBoardExtras?.();}
+function renderCable(){const tvs=screens.filter(s=>s.kind==='tv'),grouped={};tvs.forEach(s=>{if(s.source){(grouped[s.source]??=[]).push(s.name)}});const dupe=Object.entries(grouped).filter(([_,ids])=>ids.length>1);$('content').innerHTML=header('Cable Source Map','Four cable displays · four independently tested Xfinity boxes','4 VERIFIED')+`<section class="xfinityLaunch" aria-label="Xfinity cable box remote"><div class="xfinityLaunchHeading"><span class="xfinityLaunchIcon">▣</span><div><span class="xfinityLaunchEyebrow">OFFICIAL XFINITY CONTROL</span><h3>Xfinity Web Remote</h3><p>Control each cable box independently over Xfinity's secure remote. No Harmony or IR required.</p></div></div><a class="xfinityLaunchButton" href="https://remote.xfinity.com/" target="_blank" rel="noopener noreferrer">Open Xfinity Web Remote ↗</a><div class="xfinityLaunchSteps"><strong>From your iPhone</strong><span>Open remote → sign in if needed → choose the Xi6 box → change channels or type “Watch ESPN”.</span></div><div class="xfinityLaunchNote">The official Xfinity remote selects the box after opening. These links cannot preselect an Xi6 or tune a channel from our dashboard. TV power, volume, mute, and inputs are unavailable through Xfinity Web Remote.</div></section><div class="sourceGrid">${tvs.map(s=>`<div class="sourceCard"><label for="source-${s.id}">${s.name} · ${s.size}</label><small>Xfinity box confirmed to control this display</small><select id="source-${s.id}" data-source="${s.id}"><option value="">Not mapped yet</option>${['Top Left','Top Right','Center','Side'].map(box=>`<option ${s.source===box?'selected':''} value="${box}">${box}</option>`).join('')}</select><p class="srcNote">${s.source?'Linked to '+s.source:'Choose the Xfinity box that controls this TV'}</p></div>`).join('')}</div><div class="warning"><strong>${dupe.length?'⚠ Shared cable source':'ℹ Hardware dependency'}</strong>${dupe.length?dupe.map(([src,names])=>`${escapeHtml(src)} feeds ${escapeHtml(names.join(' + '))}; those TVs must show the same source/channel unless your HDMI setup allows independent feeds.`).join('<br>'):'All four boxes were tested independently, and each changed a different TV. Your supplied labels are now preassigned to the matching displays.'}</div><section class="directXfinity"><div class="directXfinityTop"><span>EXPERIMENTAL · PRIVATE CLOUD CONTROL</span><h3>Direct Xfinity Remote</h3><p>All four Xfinity boxes have successfully changed channels directly from our controller. Manage pairing and testing here.</p></div><a class="directXfinityButton" href="./xfinity-pairing-v13.html">Open secure pairing setup ›</a><div class="directXfinityFoot">The private Render bridge is deployed and all four boxes were confirmed working. Direct channel tuning and your local sports guide appear below; the older Web Remote remains available as backup.</div></section><div id="xfinityLiveGameMap"></div><div id="xfinityStreamingPanel"></div><div id="xfinityDirectPanel"></div><div id="xfinityTuneGuide"></div><div class="note">The four box names reflect the names you supplied: Top Left, Top Right, Center, and Side. This mapping is saved on this iPhone browser only; no Eero IPs or MAC addresses are published. Xfinity Web Remote handles channel changes; this page does not control TV power, volume, or inputs.</div>`;document.querySelectorAll('[data-source]').forEach(n=>n.addEventListener('change',()=>{const s=byid(n.dataset.source);s.source=n.value||null;s.content=s.source?'Cable · '+s.source:'Cable / Not mapped';try{localStorage.setItem(cableMapStoreKey,JSON.stringify(Object.fromEntries(screens.filter(x=>x.kind==='tv').map(x=>[x.id,x.source||'']))));}catch(e){}renderCable();toast('Cable map updated on this device')}));window.XfinityTune?.render?.();window.XfinityDirect?.render?.();window.XfinityStreaming?.render?.();window.XfinityGameMap?.mount?.();}
+function renderPresets(){$('content').innerHTML=header('One-Tap Presets','Use prepared layouts without reselecting every screen','DESIGN CONCEPTS')+`<div class="presetGrid"><button class="preset" data-preset="game"><span class="emoji">🏈</span><b>Game Day</b><p>Main cable TV + supporting boards</p></button><button class="preset" data-preset="sports"><span class="emoji">📊</span><b>Sports Everywhere</b><p>Sports boards across all portrait displays</p></button><button class="preset" data-preset="wrestling"><span class="emoji">🥊</span><b>Wrestling Night</b><p>Inside the Squared Circle on board TVs</p></button><button class="preset" data-preset="reset"><span class="emoji">↺</span><b>Clear Selection</b><p>Release multi-screen selection only</p></button></div><div class="note">Preset actions are simulated, with no effect on your actual televisions. Manual Hold / Auto Return behavior will be wired to devices once the controller commands are implemented.</div>`;document.querySelectorAll('[data-preset]').forEach(n=>n.addEventListener('click',()=>{const p=n.dataset.preset;if(p==='reset'){chosen.clear();toast('Screen selection cleared')}else if(p==='wrestling'){screens.filter(s=>s.kind==='board').forEach(s=>s.content=boards[2].name);toast('Wrestling layout preview applied')}else if(p==='sports'){screens.filter(s=>s.kind==='board').forEach((s,i)=>s.content=boards[[0,1,3][i]].name);toast('Sports layout preview applied')}else{screens.filter(s=>s.kind==='board').forEach((s,i)=>s.content=boards[[0,1,3][i]].name);toast('Game Day layout preview applied')}if(p!=='reset')go('screens')}));}
+function render(){if(active==='screens')renderScreens();if(active==='games')renderGames();if(active==='boards')renderBoards();if(active==='cable')renderCable();if(active==='presets')renderPresets();}
+function closeModal(){$('modalShade').classList.remove('open');modalMode=null;chosenItem=null}
+$('closeModal').addEventListener('click',closeModal);$('modalShade').addEventListener('click',e=>{if(e.target===$('modalShade'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+function openAssignment(item){if(item?.type==='game'){window.ManCaveRealGames?.openAssign?.(item.id);return;}
+if(item?.type==='board' && item.id!=='deep-dive'){
+  if(window.ManCaveBridge?.openLibraryBoard?.(item.id))return;
+  toast('Live controller loading. Try again in a moment.');return;
+}
+if(!item && chosen.size && [...chosen].every(id=>['left-wing','right-wing','portrait-32'].includes(id))){
+  if(window.ManCaveBridge?.openScreenAssignment?.([...chosen]))return;
+  toast('Live controller loading. Try again in a moment.');return;
+}
+modalMode='assign';chosenItem=item;const targetType=item?.type==='game'?'tv':item?.type==='board'?'board':null;const board=item?.type==='board'?boards.find(b=>b.id===item.id):null;const game=null;const ids=targetType?screens.filter(s=>s.kind===targetType):screens;let proposed=chosen.size?[...chosen].filter(id=>ids.some(s=>s.id===id)):[];if(!proposed.length)proposed=[];
+$('modalTitle').textContent=item?.type==='game'?'Assign game to TV':item?.type==='board'?'Assign board to screens':'Assign selected screens';
+$('modalBody').innerHTML=`<p class="modalDesc">${game?`Sample: ${game.away.name} vs ${game.home.name}. Assigning a matchup is a visual preview; actual tuning requires provider and source mapping.`:board?`Choose the board displays for ${escapeHtml(board.name)}.`:'Choose the destinations and content. TV and board displays have distinct capabilities.'}</p><div class="destList">${ids.map(s=>`<label class="destItem"><input type="checkbox" value="${s.id}" ${proposed.includes(s.id)?'checked':''}><span>${s.name}<small style="display:block;color:#8ca5bc">${s.kind==='tv'?'Cable TV':'Portrait board'}</small></span></label>`).join('')}</div>${!item?`<div style="margin-top:14px"><label style="display:block;font-size:12px;margin-bottom:7px">Board content for selected board displays</label><select id="bulkBoard" style="background:#102235;border:1px solid #46667b;color:#fff;padding:12px;width:100%;border-radius:10px">${boards.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('')}</select></div>`:''}<div class="modalActions"><button class="btn subtle" id="cancelAssign">Cancel</button><button class="btn primary" id="applyAssign">Apply preview</button></div>`;
+$('modalShade').classList.add('open');$('cancelAssign').addEventListener('click',closeModal);$('applyAssign').addEventListener('click',()=>{const dest=[...$('modalBody').querySelectorAll('input[type=checkbox]:checked')].map(x=>byid(x.value)).filter(Boolean);if(!dest.length){toast('Select a destination');return;}if(item?.type==='board'){dest.forEach(s=>s.content=board.name);}else if(item?.type==='game'){dest.forEach(s=>s.content=`${game.away.name} vs ${game.home.name} · SAMPLE`);}else{const b=boards.find(b=>b.id===$('bulkBoard').value);dest.forEach(s=>{if(s.kind==='board')s.content=b.name;});}const n=dest.length;closeModal();chosen.clear();render();toast(`Preview assignment updated · ${n} screen${n===1?'':'s'}`)});}
+function openStats(id){window.ManCaveRealGames?.showStats?.(id);}
+
+function renderWallBroadcastLogos(){
+ document.querySelectorAll('.wallBroadcastLogo[data-wall-network]').forEach(el=>{
+  const badge=window.ManCaveNetworkLogos?.badge?.({status:'ready',name:el.dataset.wallNetwork})||'';
+  if(badge)el.innerHTML=badge;
+  else el.remove();
+ });
+}
+window.addEventListener('mancave-real-games-change',()=>{if(active==='games')renderGames();});
+renderWallBroadcastLogos();
+render();
+})();
+</script>
+<script type="module" src="./game-wall-v8-remote.js"></script>
+<script src="./game-wall-v12-tune.js" defer></script>
+<script type="module" src="./game-wall-v25-logo-lineup.js"></script>
+<script type="module" src="./game-wall-v25-streaming-logos.js"></script>
+<script type="module" src="./game-wall-v25-live-game-logos.js"></script>
+<script type="module" src="./game-wall-v29-national-fallback.js"></script>
+</body>
+</html>
