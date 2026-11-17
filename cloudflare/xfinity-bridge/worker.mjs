@@ -250,7 +250,20 @@ async function dispatch(req,cfg,path){
   const rows=await Promise.all(Object.keys(BOXES).map(async box=>{
    const [record,pairing]=await Promise.all([
     db(cfg,recordPath(box)),db(cfg,pairingPath(box))]);
-   return {name:box,paired:!!record.data?.encryptedToken,
+   let paired=false;
+   if(typeof record.data?.encryptedToken==='string'){
+    try{
+     // A Firebase record encrypted with the former Render key is NOT a usable
+     // pairing with a newly generated Cloudflare key. Report it as unpaired
+     // while preserving the original ciphertext for possible later recovery.
+     await decrypt(record.data.encryptedToken,cfg);
+     paired=true;
+    }catch(error){
+     if(!['PAIRING_KEY_MISMATCH','INVALID_SAVED_PAIRING'].includes(error?.code))
+      throw error;
+    }
+   }
+   return {name:box,paired,
     pairing:Number(pairing.data?.expiresAt||0)>Date.now()};
   }));
   return json(req,{ok:true,boxes:rows});
