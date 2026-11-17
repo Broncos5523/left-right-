@@ -15,7 +15,7 @@ const STREAM=[
 const LOCAL=/^(ABC|CBS|FOX|NBC|ION|The CW) · /;
 const REGIONAL=/^(NBC Sports Boston|NESN)/;
 const FOURK=/\b4K\b/;
-const NATIONAL=/^(ESPN|FS[12]|FOX Sports|NFL|NBA TV|NHL Network|MLB Network|CBS Sports|ACC |Big Ten|SEC |TBS|TNT|truTV|USA Network|Golf |Tennis |Sportsman |TUDN|Telemundo)/;
+const NATIONAL=/^(ESPN|FS[12]|FOX Sports|NBC Sports Network|NFL|NBA TV|NHL Network|MLB Network|CBS Sports|ACC |Big Ten|SEC |TBS|TNT|truTV|USA Network|Golf |Tennis |Sportsman |TUDN|Telemundo)/;
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state={user:null,checked:false,paired:new Set(),selected:new Set(['Center']),current:null,loading:false,filter:'',message:'Connect to the Xfinity bridge to use network tuning.',receipt:''};
 function catalog(){
