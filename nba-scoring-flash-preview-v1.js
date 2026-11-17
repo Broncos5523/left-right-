@@ -23,7 +23,7 @@ const css=[
 '#nbaFlash .f-top{background:color-mix(in srgb,var(--flash-accent,#32cbd3) 26%,#071321);padding:1.5vh 5vw;display:flex;justify-content:space-between;gap:8px;font-size:clamp(12px,1.6vh,22px);font-weight:900;letter-spacing:.1em}',
 '#nbaFlash .f-person{display:flex;gap:4%;align-items:center;min-height:0;padding:1vh 5vw}',
 '#nbaFlash .f-head{width:36%;aspect-ratio:1/1.08;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:2px solid #536e83;border-radius:12px;background:#13273b;font-size:11px;text-align:center;color:#b4cbda}',
-'#nbaFlash .f-head img{width:114%;height:114%;object-fit:contain;object-position:center center}',
+'#nbaFlash .f-head img{width:100%;height:100%;object-fit:contain;object-position:center center;transform:translateY(-31%) scale(1.75);transform-origin:center center;will-change:transform}',
 '#nbaFlash .f-name{font-weight:950;font-size:clamp(19px,3.2vh,44px);line-height:1.04;overflow-wrap:anywhere}',
 '#nbaFlash .f-pts{font-weight:950;font-size:clamp(60px,10vh,125px);line-height:1}',
 '#nbaFlash .f-pts small{font-size:.22em;margin-left:6px;color:#aac7d9}',
