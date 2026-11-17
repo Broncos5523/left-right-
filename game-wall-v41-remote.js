@@ -1,5 +1,5 @@
 
-import {db,auth,ref,update,onValue,signInWithEmailAndPassword,onAuthStateChanged,signOut} from './firebase.js';
+import {db,auth,ref,set,update,onValue,signInWithEmailAndPassword,onAuthStateChanged,signOut} from './firebase.js';
 const state={user:null,busy:false,message:'Checking Firebase session...',left:null,right:null,third:null,thirdMode:'keep',
  leftMode:'keep',rightMode:'keep',games:[],gameId:'',swap:false,gamesStatus:'Use Refresh to load actual ESPN games.'};
 const el=()=>document.getElementById('liveBridge');
@@ -89,7 +89,14 @@ onAuthStateChanged(auth,user=>{
 async function send(patch,msg){
  if(!state.user||state.busy||!Object.keys(patch).length)return;
  state.busy=true;state.message='Saving assignments to Firebase...';render();
- try{await update(ref(db,'screens'),patch);state.message=msg+' Database write succeeded; no TV receipt verified.';
+ try{
+  // Target TV3 directly when sending a single 32-inch board assignment.
+  // This is the same authorized screens/third path/protocol as the original
+  // working Game Wall TV3 controller. Never touch wing assignments here.
+  if(Object.keys(patch).length===1&&Object.prototype.hasOwnProperty.call(patch,'third'))
+   await set(ref(db,'screens/third'),patch.third);
+  else await update(ref(db,'screens'),patch);
+  state.message=msg+' Database write succeeded; no TV receipt verified.';
   state.leftMode='keep';state.rightMode='keep';state.thirdMode='keep';return true;
  }catch(err){state.message='Send failed: '+(err.code||err.message);return false;}
  finally{state.busy=false;render();}
