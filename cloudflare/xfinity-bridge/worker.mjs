@@ -1,3 +1,4 @@
+import {handlePublic} from './public-data.mjs';
 /*
  * MAN CAVE SPORTS BOOK — Cloudflare Xfinity X1 bridge
  * Staging migration of the approved Render bridge. No Node runtime/dependencies.
@@ -352,6 +353,11 @@ export default{
    return json(req,{ok:true,service:'man-cave-xfinity-bridge',
     runtime:'cloudflare-workers',configured});
   }
+  // These previously shared the Render host with the private bridge.
+  // Preserve their strict read-only behavior on Cloudflare without requiring
+  // a user's Firebase session or exposing any remote control token.
+  if(path==='/nfl-local-coverage'||path==='/nhl-team-leaders')
+   return handlePublic(req,path,url);
   if(!path.startsWith('/api/'))return fail(req,404,'Not found.');
   if(!['/api/boxes','/api/pair/start','/api/pair/status','/api/send'].includes(path))
    return fail(req,404,'Not found.');
