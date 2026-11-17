@@ -45,7 +45,7 @@ header,.notice{grid-column:1/-1}.controls{grid-column:1;grid-row:3}.preview{grid
 <div class="notice">The NBA play-by-play feed supplies actual court coordinates where recorded. Missing or invalid shot locations are left out rather than invented.</div>
 <p class="meta"><b>For a physical Fire TV test later:</b> <a href="./left-nba-flash-preview.html" target="_blank">Left test receiver</a> · <a href="./right-nba-flash-preview.html" target="_blank">Right test receiver</a>. These are not your production receiver links.</p>
 </section>
-<section class="preview"><div class="tv"><iframe id="frame" title="NBA portrait scoring spotlight" src="./team-board-nba-flash-preview.html?sport=nba&amp;team=Orlando%20Magic&amp;eventId=401585607&amp;side=right&amp;tv=1&amp;preview=1" loading="eager"></iframe></div><div class="tvBase">9:16 PORTRAIT TV PREVIEW</div></section>
+<section class="preview"><div class="tv"><iframe id="frame" title="NBA portrait scoring spotlight" src="./team-board-nba-flash-preview.html?sport=nba&amp;team=Orlando%20Magic&amp;eventId=401585607&amp;side=right&amp;tv=1&amp;preview=1&amp;revision=headshot-crop-2" loading="eager"></iframe></div><div class="tvBase">9:16 PORTRAIT TV PREVIEW</div></section>
 </main>
 <script>
 (()=>{
@@ -61,7 +61,7 @@ header,.notice{grid-column:1/-1}.controls{grid-column:1;grid-row:3}.preview{grid
  function load(){
   const id=one.value;if(!/^\d+$/.test(id))return;
   const target='./team-board-nba-flash-preview.html?sport=nba&team='+encodeURIComponent(team.value)+
-   '&eventId='+encodeURIComponent(id)+'&side='+encodeURIComponent(wing.value)+'&tv=1&preview=1';
+   '&eventId='+encodeURIComponent(id)+'&side='+encodeURIComponent(wing.value)+'&tv=1&preview=1&revision=headshot-crop-2';
   $('frame').src=target;status.textContent='Preview selected · no TV command sent';
  }
  one.onchange=()=>{apply();load();};wing.onchange=()=>{apply();load();};team.onchange=load;$('load').onclick=load;
