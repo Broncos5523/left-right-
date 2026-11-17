@@ -1,0 +1,111 @@
+/* V32 · Games-only broadcast banner styling. Other sections stay locked. */
+.games .gameCard{
+ --away-team:#287bc3;--home-team:#ae6632;
+ position:relative;overflow:hidden;border-radius:16px;
+ border:1px solid #395170;
+ border-left:4px solid color-mix(in srgb,var(--away-team) 84%,#95dafa);
+ border-right:4px solid color-mix(in srgb,var(--home-team) 84%,#ffcc85);
+ padding:14px 13px 12px;
+ background:
+ radial-gradient(ellipse 76% 125% at 0% 44%,color-mix(in srgb,var(--away-team) 24%,transparent),transparent 72%),
+ radial-gradient(ellipse 76% 125% at 100% 44%,color-mix(in srgb,var(--home-team) 23%,transparent),transparent 72%),
+ linear-gradient(112deg,#1b2b42,#121f33 48%,#18293d);
+ box-shadow:0 7px 24px #0006,inset 0 1px 0 #ffffff12;
+}
+.games .gameCard::before{
+ content:"";position:absolute;top:0;left:0;right:0;height:2px;
+ background:linear-gradient(90deg,var(--away-team),#efc46c 50%,var(--home-team));opacity:.94;
+}
+.games .gameCard.is-favorite{box-shadow:0 7px 24px #0006,0 0 0 1px #e5b95838,inset 0 1px 0 #ffffff12}
+.games .gameCard .gameMeta{margin-bottom:12px}
+.games .gameCard .league{font-size:11px;letter-spacing:1.35px;font-weight:950;color:#d4e6fa}
+.games .gameCard.is-favorite .league{color:#f0c66e}
+.games .gameCard .status{
+ border:1px solid #62758d73;border-radius:999px;
+ background:#27384b;color:#e7f0fb;font-size:10px;letter-spacing:1px;
+ font-weight:950;padding:5px 10px;
+}
+.games .gameCard .status.live{background:#124236;color:#88f6cc;border-color:#36d7a477}
+.games .gameCard .status.live::before{
+ content:"";display:inline-block;width:6px;height:6px;border-radius:100%;
+ background:#49efb9;box-shadow:0 0 10px #49efb9;margin-right:5px;vertical-align:1px;
+}
+.games .gameCard .status.final{background:#28394a;color:#c8d6e3}
+.games .gameCard .status.upcoming{background:#3a3047;color:#e6cfed;border-color:#ad83b277}
+.games .gameCard .matchup{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(82px,.93fr) minmax(0,1fr);
+ min-height:92px;gap:3px;align-items:center;
+}
+.games .gameCard .team{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.games .gameCard .team img{
+ width:48px;height:48px;object-fit:contain;
+ filter:drop-shadow(0 3px 6px #000a);
+}
+.games .gameCard .teamName{
+ font-size:12px;line-height:1.17;margin-top:7px;
+ color:#f0f6ff;font-weight:950;
+}
+.games .gameCard .score{
+ font-size:clamp(20px,5.4vw,28px);font-weight:950;line-height:1.1;
+ white-space:nowrap;text-align:center;
+ font-variant-numeric:tabular-nums;letter-spacing:-.8px;
+ color:#fcfdff;text-shadow:0 2px 7px #0009;
+}
+.games .gameCard .score small{
+ display:block;white-space:normal;font-size:10px;line-height:1.3;
+ font-weight:850;letter-spacing:.2px;color:#aac5da;
+ margin-top:7px;text-shadow:none;
+}
+.games .gameCard .realGameNetwork{
+ display:flex;align-items:center;justify-content:center;
+ margin:3px 2px 5px;min-height:25px;overflow:visible;white-space:normal;
+}
+.games .gameCard .realGameNetwork .networkLogoBadge img{
+ height:26px;max-width:92px;width:auto;object-fit:contain;
+ filter:drop-shadow(0 2px 4px #0009);
+}
+.games .gameCard .gameBannerDivider{
+ display:flex;align-items:center;gap:10px;margin:6px 0 0;
+ padding-top:10px;border-top:1px solid #64809a55;
+ color:#a3bdcf;font-size:10px;font-weight:900;letter-spacing:.4px;
+}
+.games .gameCard .gameBannerDivider span{white-space:nowrap}
+.games .gameCard .gameBannerDivider i{
+ flex:1;height:2px;border-radius:5px;
+ background:linear-gradient(90deg,
+ color-mix(in srgb,var(--away-team) 78%,#fff),
+ #f4c76f 48%,
+ color-mix(in srgb,var(--home-team) 78%,#fff));
+}
+.games .gameCard .gameActions{margin-top:11px;gap:9px}
+.games .gameCard .gameActions button{
+ border:1px solid #4e6988;border-radius:11px;min-height:42px;
+ background:linear-gradient(145deg,#223755,#172a40);
+ color:#e4f1ff;font-size:12px;font-weight:900;
+ box-shadow:inset 0 1px 0 #ffffff10;
+}
+.games .gameCard .gameActions button.accent{
+ border-color:#4faab9;
+ background:linear-gradient(135deg,#1f6672,#164554);
+ color:#e0fbff;box-shadow:inset 0 1px 0 #85f3ff1d,0 0 12px #25aecb1b;
+}
+.games .gameCard .gameActions button:active{transform:scale(.984)}
+.games .gameCard .gameActions button:focus-visible{
+ outline:2px solid #f1c671;outline-offset:2px;
+}
+.gameStatusTile.active{
+ background:linear-gradient(135deg,#f0c96f,#be8e3d);
+ border-color:#f9d992;box-shadow:inset 0 1px 0 #fff5,0 3px 13px #8d681e4b;
+}
+.gameStatusTile.active strong{color:#122036}
+.gameStatusTile.active small{color:#3c372a}
+.gameFilterGroup .filter.leagueActive{
+ background:#46351f;color:#ffe4a9;border-color:#ecc579;
+}
+@media(max-width:380px){
+ .games .gameCard{padding:12px 9px 11px}
+ .games .gameCard .matchup{grid-template-columns:minmax(0,1fr) minmax(78px,.95fr) minmax(0,1fr)}
+ .games .gameCard .score{font-size:19px}
+ .games .gameCard .teamName{font-size:11px}
+ .games .gameCard .gameBannerDivider{font-size:9px}
+}
