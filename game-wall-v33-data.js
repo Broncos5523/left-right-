@@ -92,6 +92,38 @@ function parse(event,league,path){
   espnUrl:(event.links||[]).find(x=>/^https:\/\/www\.espn\.com\//.test(x.href||''))?.href||''};
 }
 const scoreboardCache=new Map(),favoriteScheduleCache=new Map();
+async function fetchFavoriteNext(favorite,now=Date.now(),force=false){
+ const path=LEAGUES.find(([name])=>name===favorite.league)?.[1];
+ if(!path)return [];
+ const key=favorite.league+':'+favorite.team;
+ const cached=favoriteScheduleCache.get(key);
+ if(!force&&cached&&now-cached.at<45*60000)return cached.games;
+ const base='https://site.api.espn.com/apis/site/v2/sports/'+path+
+  '/teams/'+encodeURIComponent(favorite.team)+'/schedule';
+ const request=async suffix=>{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),11500);
+  try{
+   const response=await fetch(base+suffix,{cache:'no-store',signal:controller.signal});
+   if(!response.ok)throw Error('ESPN team schedule '+response.status);
+   const data=await response.json();
+   return (data.events||[]).map(e=>parse(e,favorite.league,path)).filter(g=>
+    g?.state==='upcoming'&&Date.parse(g.start)>now&&
+    (g.away.fullName===favorite.name||g.home.fullName===favorite.name));
+  }finally{clearTimeout(timer);}
+ };
+ let games=[],failed=false;
+ try{games=await request('');}catch(e){failed=true;}
+ if(!games.length){
+  // ESPN may publish an off-season favorite's NEXT calendar-year schedule.
+  // Never invent a game if next season has not been announced.
+  const year=new Date(now).getUTCFullYear()+1;
+  try{games=await request('?season='+year);}catch(e){if(failed)throw e;}
+ }
+ const earliest=games.sort((a,b)=>Date.parse(a.start)-Date.parse(b.start))[0];
+ const out=earliest?[earliest]:[];
+ favoriteScheduleCache.set(key,{at:Date.now(),games:out});
+ return out;
+}
 async function refresh(force=false){
  if(state.loading)return;
  if(!force&&state.loaded&&Date.now()-state.lastFetch<90000)return;
