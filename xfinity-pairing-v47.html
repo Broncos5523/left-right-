@@ -116,8 +116,10 @@ const base=()=>{
  if(!TRUSTED_BRIDGE_ORIGIN)throw Error('Bridge has not been deployed and verified yet.');
  const input=TRUSTED_BRIDGE_ORIGIN;
  let url;try{url=new URL(input);}catch{throw Error('The configured bridge URL is invalid.');}
- if(url.protocol!=='https:'||!/^[a-z0-9-]+\.onrender\.com$/i.test(url.hostname)||url.username||url.password||url.port||url.pathname!=='/'&&url.pathname!=='')
-  throw Error('For safety, only a secure .onrender.com bridge URL is accepted.');
+ if(url.protocol!=='https:'||
+    url.origin!=='https://man-cave-xfinity-bridge.broncos5523.workers.dev'||
+    url.username||url.password||url.port||url.pathname!=='/'&&url.pathname!=='')
+  throw Error('For safety, only the dedicated Cloudflare Xfinity bridge URL is accepted.');
  return url.origin;
 };
 const busy=state=>{$('pairBtn').disabled=state||!currentUser||!bridgeReady;$('sendBtn').disabled=state||!currentUser||!bridgeReady||!paired.has(selected);};
@@ -209,7 +211,7 @@ $('loginForm').addEventListener('submit',async e=>{
 });
 $('logout').addEventListener('click',async()=>{stopPolling();await signOut(auth);});
 $('copyUid').addEventListener('click',async()=>{
- try{await navigator.clipboard.writeText(currentUser.uid);status('authStatus','Firebase UID copied. Paste it only into your private Render ADMIN_UIDS setting.','good');}
+ try{await navigator.clipboard.writeText(currentUser.uid);status('authStatus','Firebase UID copied. Paste it only into Cloudflare Worker runtime Secret ADMIN_UIDS.','good');}
  catch{status('authStatus','Copy blocked. Select the UID shown above and copy it manually.','warn');}
 });
 $('healthBtn').addEventListener('click',async()=>{
