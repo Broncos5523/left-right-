@@ -38,7 +38,8 @@ function previous(schedule,team,now=Date.now()){
  return out.sort((a,b)=>b.date-a.date).slice(0,5);
 }
 function leaders(data,league){
- const categories=arr(data?.leaders||data?.categories||data?.team?.leaders);
+ const root=data?.leaders||data?.categories||data?.team?.leaders||data?.statistics||[];
+ const categories=Array.isArray(root)?root:arr(root?.categories||root?.leaders||root?.items);
  const pref={
  NBA:['points','rebounds','assists'],WNBA:['points','rebounds','assists'],NCAAB:['points','rebounds','assists'],
  NFL:['passingyards','rushingyards','receivingyards'],NCAAF:['passingyards','rushingyards','receivingyards'],
@@ -51,7 +52,7 @@ function leaders(data,league){
   const rank=pref.findIndex(x=>norm.includes(x));
   for(const item of arr(c.leaders||c.athletes||c.entries).slice(0,1)){
    const ath=item.athlete||item.player||{},name=plain(ath.displayName||ath.fullName||item.displayName);
-   const val=plain(item.displayValue??item.value);
+   const val=plain(item.displayValue??item.statistics?.[0]?.displayValue??item.value);
    if(!name||!val)continue;
    const id=plain(ath.id||name);
    if(!playerMap.has(id))playerMap.set(id,{name,pic:logo(ath.headshot),stats:[],rank:999});
@@ -149,11 +150,12 @@ async function load(force=false){
  s.home=parts[1].status==='fulfilled'?parts[1].value:null;
  s.loading=false;render();
 }
+function deactivate(){s.serial++;s.game=null;s.loading=false;}
 function open(game){
  if(game?.state!=='upcoming'||!VALID.has(game.path)||!game.away||!game.home)return false;
  window.ManCaveStats?.deactivate?.();
  s.game=game;s.tab='compare';s.away=null;s.home=null;s.serial++;s.loading=false;
  render();load();return true;
 }
-window.ManCavePregame=Object.freeze({open,helpers:Object.freeze({teamID,previous,leaders,compare})});
+window.ManCavePregame=Object.freeze({open,deactivate,helpers:Object.freeze({teamID,previous,leaders,compare})});
 })();
