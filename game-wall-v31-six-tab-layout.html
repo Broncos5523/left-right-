@@ -596,7 +596,7 @@ window.addEventListener('man-cave-board-update',event=>{
  if(labelElement)labelElement.textContent=screen.content;
 });
 function toast(message){$('toast').textContent=message;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2400)}
-function go(page){active=page;document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('active',n.dataset.nav===page));render();if(page==='games')window.ManCaveRealGames?.ensureLoaded?.();if(page==='screens'){window.scrollTo({top:0,behavior:'auto'});}else{$('content').scrollIntoView({behavior:'auto',block:'start'});}}
+function go(page){active=page;document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('active',n.dataset.nav===page));render();if(page==='games')window.ManCaveRealGames?.ensureLoaded?.();$('content').scrollIntoView({behavior:'auto',block:'start'});}
 document.querySelectorAll('[data-nav]').forEach(n=>n.addEventListener('click',()=>go(n.dataset.nav)));
 function header(title,subtitle,chip=''){return `<div class="sectionTitle"><div><h2>${title}</h2><p>${subtitle}</p></div>${chip?`<span class="chip">${chip}</span>`:''}</div>`}
 function screenCard(s){const isBoard=s.kind==='board',picked=chosen.has(s.id),shared=s.kind==='tv'&&s.source&&screens.filter(t=>t.source===s.source&&t.kind==='tv').length>1;
