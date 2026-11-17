@@ -1,0 +1,35 @@
+name: Verify iPhone TV3 controller command path (mock Firebase, no writes)
+on:
+  push:
+    branches: [main]
+    paths:
+      - game-wall-v41-remote.js
+      - game-wall-v45-home-screen.html
+      - tests/controller-tv3-send.mjs
+      - .github/workflows/verify-tv3-controller.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-tv3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install headless browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve exact repo controller on local HTTP
+        run: |
+          python -m http.server 8877 --bind 127.0.0.1 > /tmp/man-cave-tv3-controller-http.log 2>&1 &
+          echo $! > /tmp/man-cave-tv3-controller-http.pid
+      - name: Verify all three TV3 modes without any real Firebase access
+        run: node tests/controller-tv3-send.mjs
+      - name: Save controller command evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tv3-controller-mock-contract
+          retention-days: 14
+          path: controller-tv3-send-result.json
