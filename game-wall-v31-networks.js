@@ -100,7 +100,10 @@ async function checkBoxes(){
   if(!state.selected.size&&state.paired.size)state.selected.add(state.paired.has('Center')?'Center':[...state.paired][0]);
   state.message=state.paired.size+' of 4 Xfinity boxes paired.';
  }catch(e){state.checked=false;state.paired.clear();state.message='Box check failed: '+e.message;}
- finally{state.loading=false;render();}
+ finally{
+  state.loading=false;render();
+  if(state.current&&document.getElementById('modalShade')?.classList.contains('open'))showPicker();
+ }
 }
 function openNetwork(id){
  const item=catalog().find(n=>n.id===id);if(!item)return;
@@ -146,7 +149,11 @@ async function send(){
  const command=item.app?{kind:'app',value:item.app}:{kind:'text',value:'Watch '+String(item.voice).trim()};
  const results=[];
  for(const box of tvs){
-  try{await bridge('/api/send',{box,...command});results.push(box+' ✓');}
+  try{
+   const response=await bridge('/api/send',{box,...command});
+   if(response.commandAccepted!==true)throw Error('Bridge did not acknowledge command.');
+   results.push(box+' ✓ accepted');
+  }
   catch(e){results.push(box+' — '+e.message);}
  }
  state.receipt=results.join(' · ')+' · Command sent, playback not verified.';
