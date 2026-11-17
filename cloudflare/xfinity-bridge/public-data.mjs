@@ -40,7 +40,7 @@ function parseCoverage(html){
  const month=new Date(date[1]+' 1, '+year).getUTCMonth()+1;
  if(!month||month>12||Number(date[2])>31)throw Error('Coverage date invalid');
  const iso=year+'-'+String(month).padStart(2,'0')+'-'+date[2].padStart(2,'0');
- const end=after.search(/National games(?:\s|\u00b7)|Not on TV in Providence/i);
+ const end=after.search(/National games(?:\b|\s|\u00b7)|Not on TV in Providence/i);
  if(end<0)throw Error('Coverage listing incomplete');
  const section=after.slice(date.index+date[0].length,end);
  const games=[];
