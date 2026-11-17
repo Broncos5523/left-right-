@@ -11,6 +11,7 @@ on:
       - tests/controller-tv3-send.mjs
       - tests/board-library-cross-screen.mjs
       - tests/wing-board-library.mjs
+      - tests/wing-28-live-embed.mjs
       - .github/workflows/verify-tv3-controller.yml
   workflow_dispatch:
 permissions:
@@ -45,3 +46,25 @@ jobs:
             controller-tv3-send-result.json
             board-library-cross-screen-result.json
             wing-board-library-result.json
+
+  live-wing-rotation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve current Fire TV receiver
+        run: |
+          python -m http.server 8877 --bind 127.0.0.1 > /tmp/man-cave-wing-http.log 2>&1 &
+      - name: Test actual Cloudflare 28-board embedded in Fire TV and visible 30-second transition
+        run: node tests/wing-28-live-embed.mjs
+      - name: Save live nested-player diagnosis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fire-tv-28-live-embed-diagnosis
+          retention-days: 7
+          path: wing-28-live-embed.json
