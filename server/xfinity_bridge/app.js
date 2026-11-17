@@ -180,6 +180,76 @@ app.get('/nfl-local-coverage',async(req,res)=>{
    games:[],status:'unavailable',error:'Providence NFL station assignments not confirmed at this time.'});
  }
 });
+// V37: Read-only NHL club statistical leaders. Never touches Xfinity/Firebase credentials.
+// Only serves public aggregated NHL player stats, restricted to legitimate team codes/seasons.
+const NHL_TEAMS=new Set('ANA BOS BUF CAR CBJ CGY CHI COL DAL DET EDM FLA LAK MIN MTL NJD NSH NYI NYR OTT PHI PIT SEA SJS STL TBL TOR UTA VAN VGK WPG WSH'.split(' '));
+const nhlStatsCache=new Map(),nhlStatsInflight=new Map();
+function nhlFullName(row){
+ const first=typeof row?.firstName==='string'?row.firstName:row?.firstName?.default||'';
+ const last=typeof row?.lastName==='string'?row.lastName:row?.lastName?.default||'';
+ return (String(first)+' '+String(last)).trim();
+}
+function calcNhlLeaders(payload){
+ const skaters=Array.isArray(payload?.skaters)?payload.skaters:[];
+ const goalies=Array.isArray(payload?.goalies)?payload.goalies:[];
+ const items=[];
+ const valid=(x,key)=>x&&nhlFullName(x)&&Number.isFinite(Number(x[key]));
+ const choose=(group,key,label,format=(v)=>String(v),ascending=false)=>{
+  const arr=group.filter(x=>valid(x,key)&&Number(x.gamesPlayed||0)>0)
+   .sort((a,b)=>ascending?Number(a[key])-Number(b[key]):Number(b[key])-Number(a[key]));
+  if(!arr.length)return;
+  const top=arr[0],value=Number(top[key]);
+  const headshot=typeof top.headshot==='string'&&/^https:\/\//.test(top.headshot)?top.headshot:'';
+  items.push({metric:label,name:nhlFullName(top),value:format(value),headshot,playerId:top.playerId});
+ };
+ choose(skaters,'points','Points');
+ choose(skaters,'goals','Goals');
+ choose(skaters,'assists','Assists');
+ choose(skaters,'plusMinus','Plus/Minus',v=>(v>0?'+':'')+v);
+ choose(skaters,'shots','Shots');
+ choose(goalies,'wins','Goalie Wins');
+ choose(goalies,'savePercentage','Save %',v=>(v>1?v:v*100).toFixed(1)+'%');
+ choose(goalies,'goalsAgainstAverage','Goals Against Avg',v=>v.toFixed(2),true);
+ choose(goalies,'saves','Saves');
+ return items;
+}
+app.get('/nhl-team-leaders',async(req,res)=>{
+ const team=String(req.query.team||'').toUpperCase();
+ const season=String(req.query.season||'');
+ const seasonStart=Number(season.slice(0,4)),seasonEnd=Number(season.slice(4));
+ if(!NHL_TEAMS.has(team)||!/^20\d{6}$/.test(season)||seasonEnd!==seasonStart+1||
+    seasonStart<2020||seasonStart>new Date().getUTCFullYear()+1)
+  return fail(res,400,'Invalid NHL team or season.');
+ const key=team+':'+season,now=Date.now(),cache=nhlStatsCache.get(key);
+ if(cache&&now-cache.at<15*60000){res.set('Cache-Control','public,max-age=300');return res.json(cache.data);}
+ try{
+  if(!nhlStatsInflight.has(key)){
+   const run=(async()=>{
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);
+    try{
+     const response=await fetch('https://api-web.nhle.com/v1/club-stats/'+team+'/'+season+'/2',
+      {headers:{Accept:'application/json','User-Agent':'ManCaveSportsBook/1.0 (public hockey stats)'},signal:controller.signal});
+     if(!response.ok)throw Error('NHL public statistics HTTP '+response.status);
+     const raw=await response.text();
+     if(raw.length>1500000)throw Error('Unexpected NHL response size');
+     const payload=JSON.parse(raw);
+     const result={ok:true,team,season,source:'NHL',leaders:calcNhlLeaders(payload)};
+     if(!result.leaders.length)throw Error('NHL has not published season statistics.');
+     nhlStatsCache.set(key,{at:Date.now(),data:result});
+     return result;
+    }finally{clearTimeout(timeout);}
+   })().finally(()=>nhlStatsInflight.delete(key));
+   nhlStatsInflight.set(key,run);
+  }
+  const value=await nhlStatsInflight.get(key);
+  res.set('Cache-Control','public,max-age=300');res.json(value);
+ }catch(error){
+  console.warn('NHL leaders unavailable:',team,season,error.message);
+  if(cache&&now-cache.at<3600000)return res.json({...cache.data,stale:true});
+  res.status(503).json({ok:false,team,season,error:'NHL club statistics are temporarily unavailable.'});
+ }
+});
+
 app.get('/health',(_,res)=>res.json({ok:true,service:'man-cave-xfinity-bridge',configured:!configError}));
 app.get('/',(_,res)=>res.type('text/plain').send('Man Cave Xfinity Remote Bridge. Open the private controller pairing page.'));
 app.use('/api',async(req,res,next)=>{
