@@ -100,6 +100,7 @@ const ALIASES=Object.freeze({
   "nbcs": "NBC Sports Boston"
 });
 const norm=value=>String(value||'').trim().replace(/^watch\s+/i,'').replace(/\s+·\s+(?:HD|SD|channel|numeric backup).*$/i,'')
+  .replace(/\s+·\s+(?:W[A-Z0-9]{3,6})(?:\s*\([^)]+\))?$/i,'')
   .replace(/\s+/g,' ').toLowerCase();
 const canon=new Map(Object.keys(SOURCES).map(name=>[norm(name),name]));
 function normalize(input){
