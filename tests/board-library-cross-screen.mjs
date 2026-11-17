@@ -48,6 +48,10 @@ try{
   const checks=page.locator('#modalBody [data-board-target]');
   assert.deepEqual(await checks.evaluateAll(nodes=>nodes.map(n=>n.dataset.boardTarget)),
    ['left','right','third'],'Each Board Library banner must offer all three physical TVs');
+  assert.equal(await page.locator('#modalBody .liveDestinationTile').count(),3,
+   'Expected large TV destination tiles instead of a dropdown');
+  assert.equal(await page.locator('#modalBody select').count(),0,
+   'Board Library destination screen selection must be all tiles');
   await page.locator('#modalBody [data-board-target="left"]').check();
   await page.locator('#modalBody [data-board-target="right"]').check();
   await page.locator('#modalBody [data-board-target="third"]').check();
@@ -72,6 +76,23 @@ try{
  assert.deepEqual(Object.keys(one.value),['right']);
  assert.equal(one.value.right.type,'wrestling');
  records.push({board:'wrestling',type:'wrestling',targets:['right'],result:'PASS'});
+ // Screens tab also uses the same big destination tiles instead of the old
+ // drop-down screen selectors. The chosen displays get ONE content mode.
+ await page.locator('button.tab[data-nav="screens"]').click();
+ await page.locator('[data-screen="left-wing"]').click();
+ await page.locator('[data-screen="right-wing"]').click();
+ await page.locator('#bulkAction').click();
+ await page.waitForSelector('#modalBody .liveDestinationGrid',{timeout:7000});
+ assert.deepEqual(await page.locator('#modalBody [data-bridge-target]').evaluateAll(nodes=>nodes.map(n=>n.dataset.bridgeTarget)),
+   ['left','right'],'Screens tab should offer the chosen two TV tiles');
+ assert.equal(await page.locator('#modalBody .liveModalSelect').count(),0,'Old dropdown selector must be removed from screen assignment');
+ await page.locator('#modalBody input[name="liveBoardContent"][value="rotation"]').check();
+ await page.locator('#liveModalSend').click();
+ await page.waitForFunction(()=>window.__BOARD_TEST_WRITES__?.length===6,null,{timeout:9000});
+ const screens=await page.evaluate(()=>window.__BOARD_TEST_WRITES__.at(-1));
+ assert.deepEqual(Object.keys(screens.value).sort(),['left','right']);
+ assert.equal(screens.value.left.type,'rotation');assert.equal(screens.value.right.type,'rotation');
+ records.push({board:'screens-tab-radio',type:'rotation',targets:['left','right'],result:'PASS'});
  console.log('PASS_ALL_BOARD_LIBRARY_BANNERS_REAL_THREE_SCREEN_FIREBASE_COMMANDS',JSON.stringify(records));
 }finally{
  fs.writeFileSync('board-library-cross-screen-result.json',
