@@ -16,11 +16,16 @@
 <div id="fallback" class="fallback"><h1>RIGHT TV</h1><p>MAN CAVE SPORTS BOOK · Player ready</p><p>Waiting for remote control setup</p></div><iframe id="board" class="hidden" title="Sports board" allowfullscreen></iframe>
 <script>
 const board=document.getElementById('board'),fallback=document.getElementById('fallback');
-const urls={upcoming:'https://caveup.pages.dev/',live:'https://testcave.pages.dev/'};
-function display(value){const url=urls[value];document.documentElement.dataset.boardMode=url?'other':'idle';if(!url){board.classList.add('hidden');fallback.classList.remove('hidden');board.removeAttribute('src');return}if(board.getAttribute('src')!==url)board.setAttribute('src',url);board.classList.remove('hidden');fallback.classList.add('hidden')}
+const urls={
+ upcoming:'https://caveup.pages.dev/',
+ live:'https://testcave.pages.dev/',
+ wrestling:'https://broncos5523.github.io/Inside-the-squared-circle/staging/?view=tv&mode=active&rotate=none',
+ rotation:'https://man-cave-28-page.broncos5523.workers.dev/staging/player.html?rotate=off'
+};
+function display(value){const url=urls[value];document.documentElement.dataset.boardMode=(value==='wrestling'||value==='rotation')?'team':url?'other':'idle';if(!url){board.classList.add('hidden');fallback.classList.remove('hidden');board.removeAttribute('src');return}if(board.getAttribute('src')!==url)board.setAttribute('src',url);board.classList.remove('hidden');fallback.classList.add('hidden')}
 const params=new URLSearchParams(location.search);const rotate=params.get('rotate');if(['cw','ccw','off'].includes(rotate))document.documentElement.dataset.rotation=rotate;display(params.get('board')||'');
 </script><script type="module">
 import {db,auth,ref,onValue,signInAnonymously} from './firebase.js';
 const fallback=document.getElementById('fallback');
-try{await signInAnonymously(auth);onValue(ref(db,'screens/right'),snapshot=>{const value=snapshot.val();if(!value)return;if(value.type==='upcoming'||value.type==='live')display(value.type);else if(value.type==='team' && value.team){const target='./team-board.html?sport='+encodeURIComponent((value.game||'').split('-')[0])+'&team='+encodeURIComponent(value.team)+'&eventId='+encodeURIComponent(value.eventId||'')+'&side=right&tv=1&build=cfb-possession-v4&assignment='+encodeURIComponent(value.updatedAt||'');document.documentElement.dataset.boardMode='team';if(board.getAttribute('src')!==target)board.setAttribute('src',target);board.classList.remove('hidden');fallback.classList.add('hidden');}else{display(null);fallback.querySelector('h1').textContent='Awaiting assignment';fallback.querySelectorAll('p')[1].textContent='No supported board selected';}},error=>{fallback.querySelectorAll('p')[1].textContent='Remote connection: '+error.code})}catch(error){fallback.querySelectorAll('p')[1].textContent='Authentication setup required'}
+try{await signInAnonymously(auth);onValue(ref(db,'screens/right'),snapshot=>{const value=snapshot.val();if(!value)return;if(['upcoming','live','wrestling','rotation'].includes(value.type))display(value.type);else if(value.type==='team' && value.team){const target='./team-board.html?sport='+encodeURIComponent((value.game||'').split('-')[0])+'&team='+encodeURIComponent(value.team)+'&eventId='+encodeURIComponent(value.eventId||'')+'&side=right&tv=1&build=cfb-possession-v4&assignment='+encodeURIComponent(value.updatedAt||'');document.documentElement.dataset.boardMode='team';if(board.getAttribute('src')!==target)board.setAttribute('src',target);board.classList.remove('hidden');fallback.classList.add('hidden');}else{display(null);fallback.querySelector('h1').textContent='Awaiting assignment';fallback.querySelectorAll('p')[1].textContent='No supported board selected';}},error=>{fallback.querySelectorAll('p')[1].textContent='Remote connection: '+error.code})}catch(error){fallback.querySelectorAll('p')[1].textContent='Authentication setup required'}
 </script></body></html>
