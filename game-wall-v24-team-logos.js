@@ -44,14 +44,10 @@ function broadcasters(e,c){
  return [...new Set(found)];
 }
 function cleanLogo(value){
- // Only ESPN-hosted HTTPS assets. The browser never loads logos from arbitrary data feeds.
+ // Allow only HTTPS ESPN CDN image paths, with no redirects to arbitrary hosts.
  if(typeof value!=='string'||value.length>1000)return '';
- try{
-  const u=new URL(value);
-  if(u.protocol!=='https:'||!['a.espncdn.com','a.espn.com'].includes(u.hostname))return '';
-  if(!(/^\/i\//.test(u.pathname)||/^\/combiner\//.test(u.pathname)))return '';
-  return u.href;
- }catch{return '';}
+ const url=value.trim();
+ return /^https:\/\/(?:a\.espncdn\.com|a\.espn\.com)\/(?:i|combiner)\/[^\s<>"'\x60]{1,980}$/i.test(url)?url:'';
 }
 function teamLogoCandidates(team,league){
  // Prefer the logo(s) ESPN supplied for this exact team.
