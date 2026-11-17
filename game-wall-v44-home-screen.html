@@ -571,6 +571,21 @@ header.centeredControllerHeader .brandLogo{
  body{background-color:#07101e;min-height:100dvh}
  .shell{padding-top:calc(14px + env(safe-area-inset-top));}
 }
+
+/* V45: unobtrusive connection controls within the existing Send Game modal only. */
+.realReconnectPanel{border:1px solid #3a758c;background:linear-gradient(145deg,#122b40,#101f31);border-radius:14px;padding:13px;margin:13px 0 16px;color:#e6f4ff;text-align:left}
+.realReconnectHeading{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.realReconnectHeading strong{font-size:12px;letter-spacing:1px;color:#7de2ee}
+.realReconnectHeading span{font-size:11px;font-weight:750;color:#e4c477}
+.realReconnectPanel p{font-size:12px;line-height:1.5;color:#c6dbea;margin:9px 0 11px}
+.realReconnectPanel form{display:grid;gap:9px}
+.realReconnectPanel label{font-size:11px;color:#d6e8f4;font-weight:800;display:grid;gap:5px}
+.realReconnectPanel input{display:block;width:100%;background:#0b1929;color:#fff;border:1px solid #46657d;border-radius:9px;padding:11px;font-size:16px;min-width:0}
+.realReconnectButton{width:100%;border-radius:10px;background:#42d1ea;color:#0b2132;border:1px solid #77e0f1;font-weight:900;font-size:12px;padding:12px 10px}
+.realReconnectButton:disabled{opacity:.55}
+.realReconnectStatus{color:#f0d195;font-size:11px;line-height:1.45;margin-top:8px}
+.realReconnectStatus:empty{display:none}
+.realReconnectSettings{padding:8px 2px 0;border:0;background:transparent;text-decoration:underline;color:#8bd6e9;font-size:11px;font-weight:800}
 </style>
 <link rel="stylesheet" href="./game-wall-v40-wings.css">
 <link rel="stylesheet" href="./game-wall-v41-wall-sync.css">
@@ -853,6 +868,7 @@ render();
 <script type="module" src="./game-wall-v42-streaming-peacock.js"></script>
 <script type="module" src="./game-wall-v25-live-game-logos.js"></script>
 <script type="module" src="./game-wall-v41-games.js"></script>
+<script type="module" src="./game-wall-v45-reconnect.js"></script>
 <script type="module" src="./game-wall-v42-networks.js"></script>
 </body>
 </html>
