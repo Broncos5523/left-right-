@@ -256,23 +256,55 @@ async function submitBridgeModal(patch){
   if(typeof window.ManCaveClearSelection==='function')window.ManCaveClearSelection();
  }
 }
+// Accessible, thumb-sized screen tiles matching the approved Game Finder's
+// "Send Game to TVs" modal. Explicit checkboxes remain the source of truth;
+// selecting a tile never sends a command or changes another display.
+function boardDestinationTiles(targets,attribute,selected=[]){
+ return '<div class="liveDestinationGrid" role="group" aria-label="Choose board TV destinations">'+
+  targets.map(([side,name])=>{
+   const checked=selected.includes(side);
+   return '<label class="liveDestinationTile">'+
+    '<input type="checkbox" '+attribute+'="'+safe(side)+'"'+(checked?' checked':'')+'>'+
+    '<span class="liveDestinationTick" aria-hidden="true">✓</span>'+
+    '<span class="liveDestinationTitle">'+safe(name)+'</span>'+
+    '<span class="liveDestinationHint">◯ '+(side==='third'?'Onn · portrait':'Fire TV · portrait')+'</span>'+
+    '</label>';
+  }).join('')+'</div>';
+}
+function boardContentTiles(current='live'){
+ const boards=[
+  ['live','LIVE LOOKIN','Live games / results'],
+  ['upcoming','UPCOMING GAMES','Upcoming matchups'],
+  ['wrestling','INSIDE THE SQUARED CIRCLE','Wrestling board'],
+  ['rotation','28-BOARD ROTATION','All 28 sports pages']
+ ];
+ return '<div class="liveDestinationGrid liveBoardContentGrid" role="radiogroup" aria-label="Choose board content">'+
+  boards.map(([id,name,description])=>'<label class="liveDestinationTile liveContentTile">'+
+   '<input type="radio" name="liveBoardContent" value="'+id+'"'+(current===id?' checked':'')+'>'+
+   '<span class="liveDestinationTick" aria-hidden="true">✓</span>'+
+   '<span class="liveDestinationTitle">'+name+'</span>'+
+   '<span class="liveDestinationHint">'+description+'</span></label>').join('')+'</div>';
+}
 function openScreenAssignment(screenIds){
  const targetMap={'left-wing':'left','right-wing':'right','portrait-32':'third'};
- const allowed=(screenIds||[]).filter(id=>targetMap[id]);
- if(!allowed.length)return false;
- const html='<div class="liveModalRows">'+allowed.map(id=>{
-   const side=targetMap[id],title=id==='portrait-32'?'32″ Portrait · Onn':id==='left-wing'?'Left Wing':'Right Wing';
-   const choices=side==='third'?[['keep','Keep current'],...thirdBoards]:[['keep','Keep current'],['upcoming','Upcoming Games'],['live','Live Games / Results']];
-   return '<label>'+safe(title)+'<select class="liveModalSelect" data-bridge-target="'+safe(side)+'">'
-     +choices.map(([value,name])=>'<option value="'+safe(value)+'">'+safe(name)+'</option>').join('')+'</select></label>';
- }).join('')+'</div>';
- if(!liveModalBase('Send content to selected screens','Only connected board displays can be changed here. Choose a new board for each destination; Keep current leaves it untouched.',html,'Send to selected TVs'))return false;
+ const chosen=[...new Set(screenIds||[])].filter(id=>targetMap[id]);
+ if(!chosen.length)return false;
+ const targets=[['left','Left Wing'],['right','Right Wing'],['third','32″ Portrait']]
+    .filter(([side])=>chosen.some(id=>targetMap[id]===side));
+ const html='<h4 class="liveDestinationHeading">Choose one or more board TVs</h4>'+
+  boardDestinationTiles(targets,'data-bridge-target',targets.map(([side])=>side))+
+  '<h4 class="liveDestinationHeading">Choose what they display</h4>'+
+  boardContentTiles('live')+
+  '<p class="liveDestinationHelp">Only the checked TVs will change. To show different boards on different screens, send each assignment separately.</p>';
+ if(!liveModalBase('Send Board to TVs','Select the destination TVs and the board content. Existing game boards and other screens are unchanged unless selected.',html,'Send board to selected TVs'))return false;
  document.getElementById('liveModalSend')?.addEventListener('click',()=>{
+   const selected=[...document.querySelectorAll('#modalBody [data-bridge-target]:checked')].map(el=>el.dataset.bridgeTarget);
+   const choice=document.querySelector('#modalBody input[name="liveBoardContent"]:checked')?.value;
+   if(!selected.length){document.getElementById('liveModalStatus').textContent='Select at least one TV first. No command sent.';return;}
    const patch={},now=Date.now();
-   document.querySelectorAll('#modalBody [data-bridge-target]').forEach(sel=>{
-     if(sel.value==='keep')return;
-     const command=choiceFor(sel.dataset.bridgeTarget,sel.value,now);
-     if(command)patch[sel.dataset.bridgeTarget]=command;
+   selected.forEach(side=>{
+     const command=choiceFor(side,choice,now);
+     if(command)patch[side]=command;
    });
    submitBridgeModal(patch);
  });
@@ -296,7 +328,9 @@ function openLibraryBoard(boardId,pageId){
   desc='Send this approved individual sports page to the 32″ Onn display.';
   targets=[['third','32″ Portrait · Onn']];
  }else return false;
- const html='<div class="liveModalChecks">'+targets.map(([side,name])=>'<label><input type="checkbox" data-board-target="'+safe(side)+'"> '+safe(name)+'</label>').join('')+'</div>';
+ const html='<h4 class="liveDestinationHeading">Choose one or more board TVs</h4>'+
+  boardDestinationTiles(targets,'data-board-target')+
+  '<p class="liveDestinationHelp">Select Left Wing, Right Wing or the 32″ portrait — or send to several at once. Unchecked TVs stay on their current board.</p>';
  if(!liveModalBase(title,desc,html,'Send board to TV'))return false;
  document.getElementById('liveModalSend')?.addEventListener('click',()=>{
    const selected=[...document.querySelectorAll('#modalBody [data-board-target]:checked')].map(el=>el.dataset.boardTarget);
