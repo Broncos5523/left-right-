@@ -45,7 +45,7 @@ const pending=[];
 let testPanel=null;
 if(preview){
  testPanel=document.createElement('div');testPanel.id='nbaFlashTest';
- testPanel.innerHTML='<button id="nbaReplay" type="button">Replay latest basket</button><button id="nbaDemo" type="button">Sample animation</button><span id="nbaFeedStatus">Loading…</span>';
+ testPanel.innerHTML='<button id="nbaReplay" type="button">Replay latest basket</button><button id="nbaLeader" type="button">Replay top scorer</button><button id="nbaDemo" type="button">Sample animation</button><span id="nbaFeedStatus">Loading…</span>';
  document.body.appendChild(testPanel);
 }
 function findPlayer(c,p){
@@ -161,6 +161,16 @@ async function poll(){
 const api={
  status:()=>({eventId,team,phase,initialized:loaded,error:failure,knownEvents:seen.size}),
  replay:()=>{if(!last||!latest)return false;display(last,latest);return true;},
+ leader:()=>{
+  if(!latest)return false;
+  const top=[...latest.players.values()].filter(p=>p.teamId===latest.selectedId)
+   .sort((a,b)=>(b.points??-1)-(a.points??-1));
+  for(const player of top){
+   const scoring=latest.shotMakes.filter(x=>id(x.p)===player.id);
+   if(scoring.length){display(scoring[scoring.length-1],latest);return true;}
+  }
+  return false;
+ },
  demo:()=>{
   const player={id:'demo',name:'SAMPLE PLAYER',headshot:'',points:24,teamId:'demo'};
   const shot=[
@@ -173,6 +183,7 @@ const api={
 };
 window.ManCaveNbaFlash=Object.freeze(api);
 document.getElementById('nbaReplay')?.addEventListener('click',()=>{if(!api.replay())document.getElementById('nbaFeedStatus').textContent='No confirmed made basket loaded yet';});
+document.getElementById('nbaLeader')?.addEventListener('click',()=>{if(!api.leader())document.getElementById('nbaFeedStatus').textContent='No scored shots available for this team';});
 document.getElementById('nbaDemo')?.addEventListener('click',api.demo);
 poll();setInterval(poll,12000);
 })();
