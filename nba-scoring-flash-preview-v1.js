@@ -8,7 +8,7 @@ const preview=qs.get('preview')==='1';
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const val=x=>Number.isFinite(Number(x))?Number(x):null;
-const id=p=>String(p?.athletesInvolved?.[0]?.id||p?.athletesInvolved?.[0]?.athlete?.id||p?.athletes?.[0]?.id||p?.athlete?.id||p?.athleteId||'');
+const id=p=>String(p?.participants?.[0]?.athlete?.id||p?.participants?.[0]?.id||p?.athletesInvolved?.[0]?.id||p?.athletesInvolved?.[0]?.athlete?.id||p?.athletes?.[0]?.id||p?.athlete?.id||p?.athleteId||'');
 const teamId=p=>String(p?.team?.id||p?.teamId||'');
 const ft=p=>/free\s*throw/i.test((p?.text||'')+' '+(p?.type?.text||''));
 const attempt=p=>!ft(p)&&(p?.shootingPlay===true||/\b(jumper|layup|dunk|hook shot|tip shot|three point|three-pointer)\b/i.test(p?.text||''));
@@ -93,7 +93,7 @@ function display(entry,c,sample=false){
  const makes=attempts.filter(x=>make(x.p));
  const threes=attempts.filter(x=>Number(x.p.pointsAttempted)===3||/3-pt|three point|three-pointer/i.test(x.p.text||''));
  const ptsScored=c.all.filter(x=>id(x.p)===player.id&&x.order<=entry.order&&x.p.scoringPlay===true);
- const pts=ptsScored.length?ptsScored.reduce((sum,x)=>sum+(val(x.p.scoreValue)||0),0):player.points;
+ const pts=sample?player.points:(ptsScored.length?ptsScored.reduce((sum,x)=>sum+(val(x.p.scoreValue)||0),0):player.points);
  const isThree=Number(p.scoreValue)===3;
  const photo=/^https:\/\//.test(player.headshot)?player.headshot:/^\d+$/.test(player.id)?'https://a.espncdn.com/i/headshots/nba/players/full/'+player.id+'.png':'';
  overlay.style.setProperty('--flash-accent',getComputedStyle(document.getElementById('app')||document.body).getPropertyValue('--accent').trim()||'#54cee5');
