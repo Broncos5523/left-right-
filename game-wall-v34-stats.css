@@ -1,0 +1,143 @@
+/* V34 Real Game Stats · scoped to existing phone modal; does not restyle any approved page. */
+#modalBody .statsHeaderCard{
+ background:radial-gradient(ellipse 90% 120% at 50% -30%,#2b4662,#122238 62%,#0c1727);
+ border:1px solid #3d5772;border-radius:16px;padding:13px 10px 17px;
+ box-shadow:inset 0 1px 0 #ffffff15;
+}
+#modalBody .statsTopline{
+ display:flex;align-items:center;justify-content:space-between;gap:6px;
+ color:#e7c272;letter-spacing:.6px;font-size:10px;font-weight:900;
+}
+#modalBody .statsTopline span:last-child{color:#a8bfd4;text-align:right;letter-spacing:0}
+#modalBody .statsMatch{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(94px,1.2fr) minmax(0,1fr);
+ gap:7px;align-items:center;margin-top:16px;
+}
+#modalBody .statsMatchTeam{min-width:0;display:flex;align-items:center;flex-direction:column;gap:8px}
+#modalBody .statsMatchTeam img{width:53px;height:53px;object-fit:contain;filter:drop-shadow(0 3px 5px #0008)}
+#modalBody .statsMatchTeam strong{
+ text-align:center;font-size:12px;line-height:1.15;overflow-wrap:anywhere;
+}
+#modalBody .statsTeamFallback{font-size:21px;font-weight:950}
+#modalBody .statsMatchScore{text-align:center;min-width:0}
+#modalBody .statsMatchScore strong{
+ display:block;font-size:clamp(21px,5vw,29px);font-weight:950;letter-spacing:-.8px;
+ font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+#modalBody .statsMatchScore small{display:block;font-size:10px;color:#9fbdd4;line-height:1.25;margin-top:7px}
+#modalBody .statsTabBar{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0 15px;
+}
+#modalBody .statsTabBar button{
+ border:1px solid #3d5773;border-radius:11px;background:#182a42;color:#c5d7e9;
+ padding:12px 5px;font-size:12px;font-weight:900;min-width:0;
+}
+#modalBody .statsTabBar button.active{
+ border-color:#edc877;color:#16263b;
+ background:linear-gradient(135deg,#f6d98b,#dfad58);box-shadow:0 2px 12px #f1ca5833;
+}
+#modalBody .statsTabBar button:focus-visible,
+#modalBody #refreshGameStats:focus-visible{
+ outline:2px solid #eec77c;outline-offset:2px;
+}
+#modalBody .statsTabContent{min-height:140px}
+#modalBody .statsTeamHeading{
+ display:flex;align-items:center;gap:9px;margin:18px 0 10px;padding-bottom:8px;
+ border-bottom:1px solid #314e69;
+}
+#modalBody .statsTeamHeading img{width:26px;height:26px;object-fit:contain}
+#modalBody .statsTeamHeading strong{font-size:13px;color:#e8f3ff}
+#modalBody .statsPlayerGroup{margin:0 0 20px}
+#modalBody .statsPlayerGroup h4{
+ font-size:10px;text-transform:uppercase;letter-spacing:1.1px;
+ color:#eac575;margin:10px 0 9px;font-weight:950;
+}
+#modalBody .statsTableScroll{
+ overflow-x:auto;overscroll-behavior-inline:contain;
+ border:1px solid #2d4761;border-radius:12px;background:#101e31;
+ -webkit-overflow-scrolling:touch;
+}
+#modalBody .statsTableScroll table{
+ border-spacing:0;border-collapse:separate;width:max-content;min-width:100%;
+ text-align:center;font-size:11px;
+}
+#modalBody .statsTableScroll th,#modalBody .statsTableScroll td{
+ border-bottom:1px solid #30445a66;padding:9px 11px;white-space:nowrap;
+ font-variant-numeric:tabular-nums;
+}
+#modalBody .statsTableScroll tr:last-child th,#modalBody .statsTableScroll tr:last-child td{border-bottom:0}
+#modalBody .statsTableScroll thead th{
+ background:#1a3450;color:#e2f4ff;font-size:10px;font-weight:900;letter-spacing:.45px;
+}
+#modalBody .statsTableScroll th:first-child{
+ position:sticky;left:0;z-index:1;background:#162c44;text-align:left;
+ max-width:145px;overflow:hidden;text-overflow:ellipsis;
+ box-shadow:2px 0 8px #0004;
+}
+#modalBody .statsTableScroll thead th:first-child{z-index:2;background:#233b55}
+#modalBody .statsTableScroll tbody th{font-size:11px;font-weight:850;color:#eaf6ff}
+#modalBody .statsTableScroll tbody th small{
+ display:block;font-size:9px;color:#91aac2;font-weight:700;margin-top:4px;
+}
+#modalBody .statsTableScroll td{color:#c7dae9}
+#modalBody .statsSectionTitle{
+ color:#f0c978;font-size:11px;letter-spacing:1px;font-weight:950;
+ margin:17px 0 11px;display:flex;justify-content:space-between;gap:9px;
+}
+#modalBody .statsSectionTitle small{color:#91aabf;font-weight:700;letter-spacing:0}
+#modalBody .statsCompareHead,#modalBody .statsCompareRow{
+ display:grid;grid-template-columns:minmax(56px,1fr) minmax(100px,1.8fr) minmax(56px,1fr);
+ gap:7px;align-items:center;text-align:center;
+}
+#modalBody .statsCompareHead{
+ background:#1d3550;padding:10px 7px;border-radius:11px 11px 0 0;
+ color:#f0d08e;font-size:11px;
+}
+#modalBody .statsCompareHead span{color:#a7bfd0;font-size:10px;font-weight:900}
+#modalBody .statsCompareRows{
+ border:1px solid #2d4862;border-top:0;border-radius:0 0 11px 11px;overflow:hidden;
+}
+#modalBody .statsCompareRow{
+ padding:10px 8px;background:#111f32;border-top:1px solid #2b456040;min-height:40px;
+}
+#modalBody .statsCompareRow:nth-child(even){background:#17263a}
+#modalBody .statsCompareRow strong{font-weight:900;color:#ecf8ff;font-size:12px}
+#modalBody .statsCompareRow span{font-size:10px;color:#a7bed2;line-height:1.35}
+#modalBody .statsPlayList{display:flex;flex-direction:column;gap:8px}
+#modalBody .statsPlay{
+ border-left:3px solid #4fa7bb;padding:11px;
+ background:#16283f;border-radius:0 11px 11px 0;
+}
+#modalBody .statsPlay span{color:#edc879;font-size:10px;font-weight:900;letter-spacing:.4px}
+#modalBody .statsPlay p{margin:5px 0 0;font-size:12px;line-height:1.45;color:#deecf8}
+#modalBody .statsEmpty{
+ padding:23px 16px;text-align:center;background:#13253a;border:1px dashed #4c6681;
+ border-radius:13px;color:#e1f2ff;
+}
+#modalBody .statsEmpty strong{display:block;font-size:13px}
+#modalBody .statsEmpty p{font-size:12px;line-height:1.5;color:#aabed2;margin:8px 0 0}
+#modalBody .statsLoading{
+ padding:24px 8px;display:flex;align-items:center;justify-content:center;gap:10px;
+ color:#aee7f7;font-size:12px;
+}
+#modalBody .statsLoader{width:17px;height:17px;border:2px solid #476e85;border-top-color:#f6cc78;border-radius:100%;animation:statspin .9s linear infinite}
+@keyframes statspin{to{transform:rotate(360deg)}}
+#modalBody .statsFooter{
+ border-top:1px solid #364f68;margin-top:16px;padding-top:14px;
+ display:flex;justify-content:space-between;gap:10px;align-items:center;
+}
+#modalBody .statsFooter small{color:#94b0c5;font-size:10px;line-height:1.4}
+#modalBody #refreshGameStats{
+ background:#175369;border:1px solid #4a9bad;color:#e2fbff;padding:10px 12px;
+ border-radius:10px;font-size:11px;font-weight:900;white-space:nowrap;
+}
+#modalBody #refreshGameStats:disabled{opacity:.5}
+#modalBody .statsEspnLink{display:block;color:#8ddcf1;font-size:12px;margin-top:13px;text-align:center}
+@media(max-width:380px){
+ #modalBody .statsTopline{font-size:9px}
+ #modalBody .statsMatch{grid-template-columns:minmax(0,1fr) minmax(86px,1fr) minmax(0,1fr)}
+ #modalBody .statsMatchScore strong{font-size:20px}
+ #modalBody .statsMatchTeam img{width:46px;height:46px}
+ #modalBody .statsTabBar button{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){#modalBody .statsLoader{animation:none}}
