@@ -68,7 +68,7 @@ function side(which){
  return {team:game[which],record:record(d.detail,game,which),last:previous(d.schedule,game[which]),players:leaders(d.leaders,game.league)};
 }
 function numberAvg(list,key){return list.length?(list.reduce((acc,r)=>acc+r[key],0)/list.length).toFixed(1):'—';}
-function form(list){if(!list.length)return '—';return list.filter(x=>x.result==='W').length+'-'+list.filter(x=>x.result==='L').length;}
+function form(list){if(!list.length)return '—';const w=list.filter(x=>x.result==='W').length,l=list.filter(x=>x.result==='L').length,t=list.filter(x=>x.result==='T').length;return w+'-'+l+(t?'-'+t:'');}
 function compare(){
  const away=side('away'),home=side('home');
  const metric=s.game.league==='NHL'?'Goals':s.game.league==='MLB'?'Runs':'Points';
@@ -95,7 +95,7 @@ function past(){
  return '<div class="pgSectionTitle">PREVIOUS FIVE GAMES</div>'+['away','home'].map(which=>{
   const team=side(which);
   return '<section class="pgTeamSection"><h4>'+photo(team.team)+esc(team.team.fullName)+'</h4>'+
-   (team.last.length?team.last.map(x=>'<div class="pgResult"><span class="pgResultTag '+(x.result==='W'?'win':'loss')+'">'+x.result+'</span>'+
+   (team.last.length?team.last.map(x=>'<div class="pgResult"><span class="pgResultTag '+(x.result==='W'?'win':x.result==='L'?'loss':'tie')+'">'+x.result+'</span>'+
     '<div><strong>'+(x.local?'vs ':'@ ')+esc(x.against)+'</strong><small>'+new Date(x.date).toLocaleDateString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric'})+'</small></div>'+
     '<strong>'+x.x+'–'+x.y+'</strong></div>').join(''):
    blank('ESPN has not published previous completed results for this team.'))+'</section>';
