@@ -40,7 +40,7 @@ const css=[
 ].join('');
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 const overlay=document.createElement('div');overlay.id='nbaFlash';document.body.appendChild(overlay);
-let latest=null,last=null,seen=new Set(),maxOrder=-1,loaded=false,busy=false,phase='',failure='',timer=null;
+let latest=null,last=null,seen=new Set(),maxOrder=-1,loaded=false,busy=false,phase='',failure='',timer=null,usingArchive=false;
 const pending=[];
 let testPanel=null;
 if(preview){
@@ -106,7 +106,7 @@ function display(entry,c,sample=false){
  '<div class="f-stats"><span>'+makes.length+'/'+attempts.length+'<small>FG</small></span>'+
  '<span>'+threes.filter(x=>make(x.p)).length+'/'+threes.length+'<small>3PT</small></span>'+
  '<span>'+attempts.filter(x=>loc(x.p)).length+'<small>LOCATED</small></span></div>'+
- '<div class="f-source">'+(sample?'SAMPLE GRAPHIC · NOT LIVE':'ESPN PLAY BY PLAY · PROVIDER DELAY POSSIBLE')+'</div>';
+ '<div class="f-source">'+(sample?'SAMPLE GRAPHIC · NOT LIVE':usingArchive?'RECORDED ESPN GAME · ARCHIVE REPLAY':'ESPN PLAY BY PLAY · PROVIDER DELAY POSSIBLE')+'</div>';
  overlay.classList.add('active');
  if(timer)clearTimeout(timer);
  timer=setTimeout(()=>{overlay.classList.remove('active');if(pending.length){const next=pending.shift();display(next.entry,next.c);}},isThree?8000:6000);
@@ -129,13 +129,25 @@ function process(data){
  else display(newest,c);
 }
 async function poll(){
- if(!/^\d{6,15}$/.test(eventId)||busy||document.hidden)return;
+ if(!/^\d{6,15}$/.test(eventId)||busy||document.hidden||(loaded&&phase==='post'))return;
  busy=true;
  try{
   const res=await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event='+encodeURIComponent(eventId),{cache:'no-store'});
   if(!res.ok)throw Error('ESPN HTTP '+res.status);
-  process(await res.json());failure='';
- }catch(e){failure=String(e.message||e);const lab=document.getElementById('nbaFeedStatus');if(lab)lab.textContent=failure;}
+  usingArchive=false;process(await res.json());failure='';
+ }catch(e){
+  if(eventId==='401585607'&&!loaded){
+   try{
+    const fallback=await fetch('./nba-scoring-archive-401585607.json',{cache:'force-cache'});
+    if(!fallback.ok)throw Error('Archive HTTP '+fallback.status);
+    usingArchive=true;process(await fallback.json());failure='';
+    const lab=document.getElementById('nbaFeedStatus');
+    if(lab)lab.textContent='Archived authentic game loaded · Replay latest basket';
+    return;
+   }catch(error){failure='Live feed: '+String(e.message||e)+'; archive: '+String(error.message||error);}
+  }else failure=String(e.message||e);
+  const lab=document.getElementById('nbaFeedStatus');if(lab)lab.textContent=failure;
+ }
  finally{busy=false;}
 }
 const api={
