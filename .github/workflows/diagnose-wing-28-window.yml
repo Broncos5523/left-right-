@@ -1,0 +1,17 @@
+name: Diagnose public 28-page nested player window and readiness
+on:
+  push:
+    paths:
+      - tests/wing-28-runtime-top-diagnose.mjs
+      - .github/workflows/diagnose-wing-28-window.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect deployed Cloudflare runtime references to top or parent
+        run: node tests/wing-28-runtime-top-diagnose.mjs
