@@ -173,8 +173,11 @@ async function verifyFirebaseIdToken(token,cfg){
  if(!jwk)throw new BridgeError('INVALID_ID_TOKEN',401);
  const key=await crypto.subtle.importKey('jwk',jwk,
   {name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['verify']);
- const ok=await crypto.subtle.verify('RSASSA-PKCS1-v1_5',key,
-  b64ToBytes(parts[2]),bytes(parts[0]+'.'+parts[1]));
+ let ok=false;
+ try{
+  ok=await crypto.subtle.verify('RSASSA-PKCS1-v1_5',key,
+   b64ToBytes(parts[2]),bytes(parts[0]+'.'+parts[1]));
+ }catch{throw new BridgeError('INVALID_ID_TOKEN',401);}
  if(!ok)throw new BridgeError('INVALID_ID_TOKEN',401);
  return payload;
 }
