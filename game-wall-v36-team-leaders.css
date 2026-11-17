@@ -1,0 +1,33 @@
+/* V36 Team Leaders: only the upcoming Stats team-leaders tab is restyled. */
+#modalBody .pgLeaders{display:flex;flex-direction:column;gap:9px}
+#modalBody .pgLeaderCategory{
+ display:flex;flex-direction:column;gap:7px;
+ padding:11px 12px;border:1px solid #365772;border-radius:11px;
+ background:linear-gradient(120deg,#1b3049,#13243a);
+}
+#modalBody .pgLeaderMetric{
+ font-size:10px;letter-spacing:.95px;text-transform:uppercase;
+ font-weight:950;color:#f2cb7b;
+}
+#modalBody .pgLeaderPerson{display:flex;gap:10px;align-items:center;min-width:0}
+#modalBody .pgLeaderPerson img{
+ width:42px;height:42px;border-radius:9px;object-fit:cover;
+ border:1px solid #4b6680;flex:0 0 auto;
+}
+#modalBody .pgLeaderFallback{
+ width:42px;height:42px;border-radius:9px;flex:0 0 auto;
+ display:grid;place-items:center;color:#eac47e;background:#26445e;font-size:17px;
+}
+#modalBody .pgLeaderPerson>strong{
+ flex:1;min-width:0;color:#e8f4ff;font-size:12px;line-height:1.25;
+ overflow-wrap:anywhere;
+}
+#modalBody .pgLeaderValue{
+ font-size:17px;font-weight:950;font-variant-numeric:tabular-nums;
+ color:#f3d28b;white-space:nowrap;margin-left:auto;
+}
+@media(max-width:380px){
+ #modalBody .pgLeaderCategory{padding:10px 8px}
+ #modalBody .pgLeaderPerson img,#modalBody .pgLeaderFallback{width:36px;height:36px}
+ #modalBody .pgLeaderValue{font-size:15px}
+}
