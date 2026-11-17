@@ -5,7 +5,12 @@ on:
     paths:
       - game-wall-v41-remote.js
       - game-wall-v45-home-screen.html
+      - game-wall-v43-wall-sync.js
+      - left.html
+      - right.html
       - tests/controller-tv3-send.mjs
+      - tests/board-library-cross-screen.mjs
+      - tests/wing-board-library.mjs
       - .github/workflows/verify-tv3-controller.yml
   workflow_dispatch:
 permissions:
@@ -26,10 +31,17 @@ jobs:
           echo $! > /tmp/man-cave-tv3-controller-http.pid
       - name: Verify all three TV3 modes without any real Firebase access
         run: node tests/controller-tv3-send.mjs
+      - name: Verify four Board Library cards can target all three TVs independently
+        run: node tests/board-library-cross-screen.mjs
+      - name: Verify both Fire TV receivers load all four board modes and preserve game player
+        run: node tests/wing-board-library.mjs
       - name: Save controller command evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tv3-controller-mock-contract
           retention-days: 14
-          path: controller-tv3-send-result.json
+          path: |
+            controller-tv3-send-result.json
+            board-library-cross-screen-result.json
+            wing-board-library-result.json
