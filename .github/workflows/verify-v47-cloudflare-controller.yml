@@ -1,0 +1,73 @@
+name: Verify published V47 Cloudflare Xfinity staging controller (Firebase mocked)
+on:
+  push:
+    branches: [main]
+    paths:
+      - game-wall-v47-home-screen.html
+      - game-wall-v47-*-cloudflare.js
+      - xfinity-pairing-v47.html
+      - .github/workflows/verify-v47-cloudflare-controller.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-v47:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify new public page, four cloud-routed Xfinity modules, and preserved V46 board controls
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          const root='https://broncos5523.github.io/left-right-';
+          const host='https://man-cave-xfinity-bridge.broncos5523.workers.dev';
+          const target=root+'/game-wall-v47-home-screen.html';
+          let ready=false;
+          for(let n=0;n<25;n++){
+            try{
+              const r=await fetch(target,{headers:{'Cache-Control':'no-cache'}});
+              const html=await r.text();
+              if(r.ok&&html.includes('game-wall-v47-games-cloudflare.js')&&
+                html.includes('game-wall-v47-networks-cloudflare.js')&&
+                html.includes('game-wall-v47-streaming-cloudflare.js')&&
+                html.includes('game-wall-v47-nhl-leaders-cloudflare.js')&&
+                html.includes('xfinity-pairing-v47.html')&&
+                html.includes('game-wall-v41-remote.js')&&
+                !html.includes('man-cave-xfinity-bridge.onrender.com')){
+                ready=true;console.log('PASS_PUBLISHED_V47_STAGING_WITH_V46_BOARD_COMPONENTS');break;
+              }
+              console.log('V47_PUBLISH_PENDING',n+1,r.status);
+            }catch(e){console.log('V47_PUBLISH_RETRY',n+1,String(e).slice(0,100));}
+            await new Promise(r=>setTimeout(r,8000));
+          }
+          if(!ready)throw Error('V47 not published');
+          for(const file of [
+            'game-wall-v47-games-cloudflare.js',
+            'game-wall-v47-networks-cloudflare.js',
+            'game-wall-v47-streaming-cloudflare.js',
+            'game-wall-v47-nhl-leaders-cloudflare.js',
+            'xfinity-pairing-v47.html'
+          ]){
+            const r=await fetch(root+'/'+file);
+            const src=await r.text();
+            if(!r.ok||!src.includes(host)||src.includes('man-cave-xfinity-bridge.onrender.com'))
+              throw Error('V47 endpoint mismatch '+file);
+          }
+          console.log('PASS_PUBLISHED_FIVE_CLOUDFLARE_ONLY_XFINITY_SOURCES');
+          JS
+      - name: Install Chromium for mobile board assignment regression
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Exercise board-library sends in V47 without real Firebase commands
+        env:
+          CONTROLLER_URL: https://broncos5523.github.io/left-right-/game-wall-v47-home-screen.html
+        run: node tests/board-library-cross-screen.mjs
+      - name: Keep test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v47-staging-no-write-test
+          retention-days: 14
+          path: board-library-cross-screen-result.json
