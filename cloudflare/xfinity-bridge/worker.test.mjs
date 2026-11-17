@@ -172,6 +172,13 @@ test('original encryption key mismatch fails closed without overwriting saved pa
   const old=await helpers.encrypt('old-secret',cfg);
   mock.records.set(helpers.recordPath('Center'),{data:{encryptedToken:old,refreshedAt:Date.now()},rev:1});
   const wrong={...config,TOKEN_ENCRYPTION_KEY:randomBytes(32).toString('base64')};
+  const before=await worker.fetch(api('/api/boxes'),wrong);
+  assert.equal(before.status,200);
+  const beforeRows=(await before.json()).boxes;
+  assert.equal(beforeRows.find(row=>row.name==='Center').paired,false,
+   'Old encrypted token cannot be considered paired under a new key');
+  assert.equal(mock.records.get(helpers.recordPath('Center')).data.encryptedToken,old,
+   'Old record preserved for possible recovery');
   const response=await worker.fetch(api('/api/send',{method:'POST',
    body:{box:'Center',kind:'key',value:'guide'}}),wrong);
   assert.equal(response.status,409);
