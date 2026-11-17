@@ -1,0 +1,41 @@
+/* V41 · Game assignment readback inside the existing seven-screen Wall ONLY. */
+.wallPhysical .broadcastContent.wallAssignedBroadcast{
+ background:linear-gradient(112deg,
+  color-mix(in srgb,var(--wall-away,#1d476a) 64%,#0a1b2d),
+  #0c253c 48%,
+  color-mix(in srgb,var(--wall-home,#54314b) 65%,#081727));
+}
+.wallPhysical .wallAssignedBroadcast .broadcastTeam b{
+ white-space:normal;text-align:center;
+ overflow-wrap:anywhere;max-width:100%;
+ font-size:clamp(5px,1.05vw,9px);line-height:1.1;
+}
+.wallPhysical .wallAssignedBroadcast .broadcastRail{
+ background:linear-gradient(90deg,var(--wall-away,#3c85c3),#f1cc76 49%,var(--wall-home,#b65e51));
+}
+.wallPhysical .portraitContent.wallAssignedPortrait{
+ background:linear-gradient(180deg,
+  color-mix(in srgb,var(--wall-team,#2f6684) 72%,#142438),
+  #152136 63%,#0c1324);
+}
+.wallPhysical .wallAssignedPortrait strong{
+ max-width:100%;overflow-wrap:anywhere;text-align:center;
+}
+.wallPhysical .wallAssignedPortrait .portraitShield{background:transparent}
+.wallPhysical .wallAssignedPortrait.wallGenericBoard{
+ background:radial-gradient(ellipse at 50% 20%,#215676,#101d32 72%);
+}
+.wallPhysical .wallSendState{
+ font-size:clamp(6px,1.1vw,8px);
+ color:#85d9e9;font-weight:850;
+}
+.wallPhysical .wallHasAssignment .physicalTV{
+ border-color:#71b9c6;
+ box-shadow:0 0 0 1px #58b3c04a,0 0 12px #3ca1bf42;
+}
+.wallPhysical .mainUnit.wallHasAssignment .physicalTV{border-color:#e7bd6b}
+@media(max-width:420px){
+ .wallPhysical .wallAssignedBroadcast .broadcastTeam b{font-size:5.6px}
+ .wallPhysical .wallSendState{font-size:6px}
+ .wallPhysical .wallHasAssignment .unitLabel small{line-height:1.2}
+}
