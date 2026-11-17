@@ -1,0 +1,84 @@
+/* V35 Pregame scouting — modal only. All approved cards and other tabs unchanged. */
+#modalBody .pgHero{
+ padding:14px 11px;border:1px solid #3e5673;border-radius:15px;
+ background:radial-gradient(ellipse 80% 120% at 50% -40%,#365472,#152942 60%,#0c192a);
+}
+#modalBody .pgHero>small{font-size:10px;letter-spacing:1.2px;font-weight:950;color:#f4d17e}
+#modalBody .pgMatch{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(96px,1.1fr) minmax(0,1fr);
+ align-items:center;gap:5px;margin-top:15px;
+}
+#modalBody .pgMatch>div{display:flex;align-items:center;flex-direction:column;gap:6px;min-width:0}
+#modalBody .pgMatch img{width:57px;height:57px;object-fit:contain;filter:drop-shadow(0 2px 6px #0009)}
+#modalBody .pgMatch b{font-size:12px;text-align:center;line-height:1.2;overflow-wrap:anywhere}
+#modalBody .pgMatch>strong{text-align:center;font-size:22px;color:#f8d183}
+#modalBody .pgMatch>strong small{display:block;color:#b5cad8;font-size:10px;line-height:1.35;font-weight:700;margin-top:5px}
+#modalBody .pgTabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:14px 0}
+#modalBody .pgTabs button{
+ border:1px solid #40607d;background:#172d46;color:#cfdfef;min-width:0;
+ font-size:11px;font-weight:900;line-height:1.15;border-radius:11px;
+ padding:13px 4px;min-height:54px;
+}
+#modalBody .pgTabs button.active{
+ color:#152438;background:linear-gradient(135deg,#f7d58a,#dca94e);
+ border-color:#f7db98;box-shadow:0 2px 10px #edbf6140;
+}
+#modalBody .pgTabs button:focus-visible,#modalBody .pgFoot button:focus-visible{outline:2px solid #f3d18a;outline-offset:2px}
+#modalBody .pgSectionTitle{font-size:11px;font-weight:950;letter-spacing:1px;color:#f3d081;margin:17px 0 11px}
+#modalBody .pgComparisonHead,#modalBody .pgComparisonRow{
+ display:grid;grid-template-columns:minmax(50px,1fr) minmax(110px,1.6fr) minmax(50px,1fr);
+ align-items:center;gap:6px;text-align:center;
+}
+#modalBody .pgComparisonHead{
+ border-radius:12px 12px 0 0;padding:12px 7px;background:#25415e;
+ font-size:12px;color:#efd28f;
+}
+#modalBody .pgComparisonHead span{color:#a8c4d8;font-size:10px}
+#modalBody .pgComparisonRow{
+ min-height:47px;padding:9px 7px;background:#142539;border:1px solid #324d6730;
+ font-variant-numeric:tabular-nums;
+}
+#modalBody .pgComparisonRow:nth-of-type(even){background:#1b2c42}
+#modalBody .pgComparisonRow strong{font-size:13px;color:#eff7ff;font-weight:950}
+#modalBody .pgComparisonRow span{font-size:11px;color:#bdd0df;line-height:1.32}
+#modalBody .pgFootnote{color:#94adc2;font-size:11px;line-height:1.5;margin:14px 0 0}
+#modalBody .pgTeamSection{padding:12px;background:#111f33;border:1px solid #314d69;border-radius:13px;margin-bottom:12px}
+#modalBody .pgTeamSection h4{display:flex;align-items:center;gap:9px;font-size:13px;margin:0 0 12px;color:#f3f8ff}
+#modalBody .pgTeamSection h4 img{width:32px;height:32px;object-fit:contain}
+#modalBody .pgTeamSection h4 b{font-weight:950;font-size:13px}
+#modalBody .pgPlayer{
+ display:flex;align-items:center;gap:10px;padding:11px 6px;border-top:1px solid #39536d60;
+}
+#modalBody .pgPlayer img{width:44px;height:44px;object-fit:cover;border-radius:9px;flex:0 0 auto}
+#modalBody .pgPlayer>span{width:42px;height:42px;border-radius:10px;background:#223d56;color:#f4ce83;display:grid;place-items:center}
+#modalBody .pgPlayer>div{min-width:0;flex:1}
+#modalBody .pgPlayer strong{display:block;color:#e8f4ff;font-size:13px}
+#modalBody .pgPlayer small{display:block;color:#a6c5d7;font-size:11px;line-height:1.5;margin-top:5px}
+#modalBody .pgPlayer small b{color:#f3d28b}
+#modalBody .pgResult{
+ display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;
+ gap:10px;padding:11px 4px;border-top:1px solid #3c546a66;
+}
+#modalBody .pgResult>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+#modalBody .pgResult>div strong{font-size:12px;color:#e8f3ff}
+#modalBody .pgResult>div small{font-size:10px;color:#9eb8d0}
+#modalBody .pgResult>strong{font-size:13px;color:#e9f5ff;font-variant-numeric:tabular-nums}
+#modalBody .pgResultTag{
+ width:27px;height:27px;border-radius:7px;display:grid;place-items:center;
+ background:#36404d;color:#e3eefb;font-size:12px;font-weight:950;
+}
+#modalBody .pgResultTag.win{background:#165743;color:#8ff3c8}
+#modalBody .pgResultTag.loss{background:#673039;color:#f5b4bb}
+#modalBody .pgEmpty{border:1px dashed #49617b;border-radius:10px;padding:15px 10px;font-size:12px;color:#aec5d8;line-height:1.45}
+#modalBody .pgLoading{text-align:center;color:#b9e2ee;font-size:12px;padding:32px 12px}
+#modalBody .pgFoot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #39536a;margin-top:18px}
+#modalBody .pgFoot span{font-size:10px;color:#9eb8cb}
+#modalBody .pgFoot button{border:1px solid #429eb6;border-radius:10px;padding:10px 14px;color:#dbf7ff;background:#185267;font-size:11px;font-weight:900}
+#modalBody .pgFoot button:disabled{opacity:.5}
+#modalBody .pgLink{display:block;text-align:center;margin-top:15px;font-size:12px;color:#8bdbef}
+@media(max-width:380px){
+ #modalBody .pgMatch{grid-template-columns:minmax(0,1fr) minmax(81px,1fr) minmax(0,1fr)}
+ #modalBody .pgMatch img{width:46px;height:46px}
+ #modalBody .pgTabs button{font-size:10px}
+ #modalBody .pgComparisonRow span{font-size:10px}
+}
