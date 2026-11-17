@@ -173,8 +173,11 @@ function paintThird(assignment,description){
  if(assignment.type==='wrestling'||(assignment.type==='board'&&assignment.board==='wrestling')){
   paintBoardArt('third','wrestling');return;
  }
- if(assignment.type==='deep-dive'||(assignment.type==='board'&&assignment.board==='deep-dive')){
+ if(assignment.type==='rotation'||assignment.type==='deep-dive'||(assignment.type==='board'&&assignment.board==='deep-dive')){
   paintBoardArt('third','deep-dive');return;
+ }
+ if(assignment.type==='live'||assignment.type==='upcoming'){
+  paintBoardArt('third',assignment.type);return;
  }
  const content=root.querySelector('.portraitContent'),label=root.querySelector('.unitLabel small');
  if(!content)return;
@@ -216,6 +219,10 @@ function paintWing(side,assignment){
   refreshScreenTab(side,(team.name||teamName)+' · board assigned');
  }else if(assignment.type==='upcoming'||assignment.type==='live'){
   paintBoardArt(side,assignment.type);
+ }else if(assignment.type==='wrestling'){
+  paintBoardArt(side,'wrestling');
+ }else if(assignment.type==='rotation'){
+  paintBoardArt(side,'deep-dive');
  }
 }
 function onGameAssigned(data){
