@@ -1,0 +1,43 @@
+name: Check new Xfinity Cloudflare Worker public health (read-only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/check-cloudflare-xfinity-health.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Check Worker health only - no secret values or Firebase commands
+        run: |
+          node --input-type=module <<'JS'
+          const uri='https://man-cave-xfinity-bridge.broncos5523.workers.dev/health';
+          let last='';
+          for(let i=0;i<12;i++){
+            try{
+              const res=await fetch(uri,{redirect:'manual',signal:AbortSignal.timeout(10000)});
+              const contentType=res.headers.get('content-type')||'';
+              let body={};
+              if(contentType.includes('application/json'))body=await res.json();
+              // Report only public health flags. Never dump returned HTML, authorization or secrets.
+              const status={attempt:i+1,http:res.status,runtime:body.runtime||null,
+                 service:body.service||null,configured:body.configured??null};
+              console.log('XFINITY_WORKER_HEALTH',JSON.stringify(status));
+              last=JSON.stringify(status);
+              if(res.ok&&body.service==='man-cave-xfinity-bridge'&&body.runtime==='cloudflare-workers'){
+                console.log('PASS_CLOUDFLARE_XFINITY_WORKER_PUBLIC_HEALTH',body.configured?'CONFIGURED':'SECRETS_NEEDED');
+                process.exit(0);
+              }
+            }catch(e){
+              last=String(e?.cause?.code||e?.name||'NetworkError');
+              console.log('XFINITY_WORKER_HEALTH_RETRY',i+1,last);
+            }
+            await new Promise(r=>setTimeout(r,10000));
+          }
+          console.log('CLOUDFLARE_WORKER_NOT_VERIFIED',last);
+          process.exitCode=1;
+          JS
