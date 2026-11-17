@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08121f">
+<title>Man Cave Sports Book · NBA Scoring Flash Preview</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#07111e;color:#e9f5ff;font-family:Arial,-apple-system,sans-serif}
+main{margin:auto;width:min(840px,100%);padding:18px 14px 55px}
+h1{margin:4px 0;font-size:clamp(22px,5vw,32px);letter-spacing:-.04em}
+h2{font-size:13px;letter-spacing:.09em;color:#79dded;margin:0 0 10px}
+.eyebrow{color:#6be9f0;letter-spacing:.18em;font-size:10px;font-weight:900}
+.meta,.notice{font-size:12px;line-height:1.55;color:#b3c9db}
+.notice{border-left:3px solid #e9c47e;padding:8px 12px;background:#13253a;border-radius:6px}
+.controls{padding:15px;background:#102338;border:1px solid #31516b;border-radius:15px;display:grid;gap:12px;margin:15px 0}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fields .full{grid-column:span 2}
+label{display:grid;gap:5px;color:#a4c6d9;font-size:11px;font-weight:900}
+select,input{min-width:0;width:100%;background:#091825;color:#fff;border:1px solid #49657d;border-radius:9px;padding:12px;font-size:14px}
+button{background:#28cee4;color:#071b2b;border:1px solid #69e8f1;border-radius:10px;font-weight:900;font-size:12px;padding:11px}
+a{color:#78dbe8}
+.preview{display:grid;justify-content:center;gap:8px}
+.tv{width:min(82vw,370px);aspect-ratio:9/16;background:#000;border:7px solid #1c2d44;box-shadow:0 10px 44px #000a;border-radius:8px;overflow:hidden}
+iframe{width:100%;height:100%;border:0;background:#000}
+.tvBase{text-align:center;font-size:11px;font-weight:900;letter-spacing:1px;color:#88a5bc}
+.error{color:#e9a9a9}
+.buttons{display:flex;gap:8px;flex-wrap:wrap}.buttons button{flex:1}
+small{font-size:11px}
+@media(min-width:700px){main{display:grid;grid-template-columns:minmax(300px,1fr) minmax(330px,400px);column-gap:24px;align-items:start}
+header,.notice{grid-column:1/-1}.controls{grid-column:1;grid-row:3}.preview{grid-column:2;grid-row:3}}
+</style>
+</head>
+<body><main>
+<header><div class="eyebrow">MAN CAVE SPORTS BOOK · LAB BUILD 01</div><h1>NBA SCORING FLASH</h1>
+<p class="meta">The approved portrait player board stays underneath. Made baskets temporarily display the scorer, game points and individual shot chart. This page sends <strong>no commands</strong> to your TVs.</p></header>
+<p class="notice">Preview only. Tap <b>Sample animation</b> inside the portrait screen to see the flash immediately, or load a completed game and tap <b>Replay latest basket</b>. Live games flash new scoring plays automatically.</p>
+<section class="controls">
+<h2>CHOOSE AN NBA MATCHUP</h2>
+<div class="fields">
+<label class="full">Game<select id="game"><option value="401585607">ARCHIVE · Toronto Raptors at Orlando Magic · Mar 17, 2024</option></select></label>
+<label>Team<select id="team"><option value="Orlando Magic">Orlando Magic</option><option value="Toronto Raptors">Toronto Raptors</option></select></label>
+<label>Wing TV<select id="wing"><option value="left">Left Wing</option><option value="right" selected>Right Wing</option></select></label>
+</div>
+<div class="buttons"><button id="load" type="button">Load Preview</button><button id="refresh" type="button">Find recent NBA games</button></div>
+<small id="status" class="meta">Archive game loaded by default. Use Refresh to select recent NBA games.</small>
+<div class="notice">The NBA play-by-play feed supplies actual court coordinates where recorded. Missing or invalid shot locations are left out rather than invented.</div>
+<p class="meta"><b>For a physical Fire TV test later:</b> <a href="./left-nba-flash-preview.html" target="_blank">Left test receiver</a> · <a href="./right-nba-flash-preview.html" target="_blank">Right test receiver</a>. These are not your production receiver links.</p>
+</section>
+<section class="preview"><div class="tv"><iframe id="frame" title="NBA portrait scoring spotlight" src="./team-board-nba-flash-preview.html?sport=nba&amp;team=Orlando%20Magic&amp;eventId=401585607&amp;side=right&amp;tv=1&amp;preview=1" loading="eager"></iframe></div><div class="tvBase">9:16 PORTRAIT TV PREVIEW</div></section>
+</main>
+<script>
+(()=>{
+ const $=s=>document.getElementById(s),one=$('game'),team=$('team'),wing=$('wing'),status=$('status');
+ const archive={id:'401585607',name:'ARCHIVE · Toronto Raptors at Orlando Magic · Mar 17, 2024',
+  away:'Toronto Raptors',home:'Orlando Magic'};
+ let events=new Map([[archive.id,archive]]);
+ function apply(){
+  const g=events.get(one.value);if(!g)return;
+  team.innerHTML=[g.away,g.home].map(t=>'<option value="'+t.replace(/"/g,'&quot;')+'">'+t+'</option>').join('');
+  team.value=wing.value==='left'?g.away:g.home;
+ }
+ function load(){
+  const id=one.value;if(!/^\d+$/.test(id))return;
+  const target='./team-board-nba-flash-preview.html?sport=nba&team='+encodeURIComponent(team.value)+
+   '&eventId='+encodeURIComponent(id)+'&side='+encodeURIComponent(wing.value)+'&tv=1&preview=1';
+  $('frame').src=target;status.textContent='Preview selected · no TV command sent';
+ }
+ one.onchange=()=>{apply();load();};wing.onchange=()=>{apply();load();};team.onchange=load;$('load').onclick=load;
+ const fmt=d=>{const x=new Date(d),p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(x).map(x=>[x.type,x.value]));return p.year+p.month+p.day};
+ $('refresh').onclick=async()=>{
+  status.textContent='Checking NBA schedule…';
+  const dates=[0,-1,-2].map(n=>fmt(Date.now()+n*86400000));
+  const results=await Promise.allSettled(dates.map(async date=>{
+   const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates='+date,{cache:'no-store'});
+   if(!r.ok)throw Error('ESPN '+r.status);const d=await r.json();return d.events||[];
+  }));
+  let found=0;
+  for(const result of results){
+   if(result.status!=='fulfilled')continue;
+   for(const g of result.value){
+    const competitors=g.competitions?.[0]?.competitors||[];
+    const away=competitors.find(x=>x.homeAway==='away')?.team?.displayName;
+    const home=competitors.find(x=>x.homeAway==='home')?.team?.displayName;
+    if(!away||!home||!g.id||events.has(String(g.id)))continue;
+    const val={id:String(g.id),name:(g.status?.type?.shortDetail||g.status?.type?.state||'NBA')+' · '+away+' at '+home,away,home};
+    events.set(val.id,val);found++;
+   }
+  }
+  const active=one.value;one.innerHTML=[...events.values()].sort((a,b)=>a.id===archive.id?1:b.id===archive.id?-1:0)
+   .map(g=>'<option value="'+g.id+'">'+g.name.replace(/</g,'&lt;')+'</option>').join('');
+  if(events.has(active))one.value=active;else one.selectedIndex=0;
+  status.textContent=found+' additional games found. Choose one, then Load Preview.';
+ };
+})();
+</script>
+</body></html>
