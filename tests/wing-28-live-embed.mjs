@@ -5,6 +5,24 @@
 import {chromium} from 'playwright';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+const cloud='https://man-cave-28-page.broncos5523.workers.dev';
+let published=false;
+for(let attempt=0;attempt<24;attempt++){
+ try{
+  const [page2,bridge]=await Promise.all([
+   fetch(cloud+'/staging/boards/page2_nfl',{headers:{'Cache-Control':'no-cache'}}),
+   fetch(cloud+'/staging/board-runtime-ancestor.js',{headers:{'Cache-Control':'no-cache'}})
+  ]);
+  const [html,source]=await Promise.all([page2.text(),bridge.text()]);
+  if(page2.ok&&bridge.ok&&html.includes('/staging/board-runtime-ancestor.js')&&
+     source.includes('parent.__MC_PRODUCTION')&&source.includes('const host=(()=>{')){
+   published=true;console.log('PASS_CLOUDFLARE_WING_SAFE_RUNTIME_DEPLOYED');break;
+  }
+  console.log('WING_RUNTIME_DEPLOY_PENDING',attempt+1,page2.status,bridge.status);
+ }catch(error){console.log('WING_RUNTIME_DEPLOY_RETRY',attempt+1,String(error).slice(0,150));}
+ await new Promise(resolve=>setTimeout(resolve,8000));
+}
+if(!published)throw Error('Cloudflare nested-window safe runtime not yet deployed');
 const browser=await chromium.launch({headless:true});
 const findings=[],errors=[],responses=[];
 const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1});
@@ -63,8 +81,25 @@ try{
   if(!second.current||second.visible!==second.current)throw Error('Embedded rotation did not advance visibly');
   console.log('PASS_CLOUDFLARE_28_BOARD_PLAYER_INSIDE_FIRE_TV',JSON.stringify(findings));
  }catch(e){
+  const parentState=targetFrame?await targetFrame.evaluate(()=>({
+    current:window.__MC_PRODUCTION?.current,index:window.__MC_PRODUCTION?.index,
+    events:window.__MC_PRODUCTION_EVENTS?.slice(-20),
+    stageFrames:[...document.querySelectorAll('#stage iframe')].map(f=>({
+     id:f.dataset.board,src:f.src.slice(0,220),shown:f.classList.contains('current'),
+     ready:f.contentWindow?.MCBoard?.ready,active:f.contentWindow?.MCBoard?.active
+    }))
+   })).catch(err=>({error:String(err)})):null;
+  const children=await Promise.all(page.frames().filter(f=>f.url().includes('/staging/boards/')).map(async f=>({
+    url:f.url(),state:await f.evaluate(()=>({
+      runtimeReady:window.MCBoard?.ready,
+      originalModuleLoaded:!!window.MCBoard,
+      documentReady:document.readyState,
+      inheritedParent:!!window.parent?.__MC_PRODUCTION,
+      events:window.__MC_PRODUCTION_EVENTS?.slice(-3)
+    })).catch(err=>({error:String(err)}))
+  })));
   const details={message:e.message,frames:page.frames().map(f=>({url:f.url().slice(0,220)})),
-   responses:responses.slice(-30),errors:errors.slice(-12)};
+   parentState,children,responses:responses.slice(-30),errors:errors.slice(-12)};
   console.error('WING_ROTATION_FAILURE',JSON.stringify(details));
   throw e;
  }
