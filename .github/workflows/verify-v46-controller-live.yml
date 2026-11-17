@@ -1,0 +1,54 @@
+name: Verify uncached V46 iPhone Board Library on published GitHub Pages (Firebase mocked)
+on:
+  push:
+    branches: [main]
+    paths:
+      - game-wall-v46-home-screen.html
+      - tests/board-library-cross-screen.mjs
+      - .github/workflows/verify-v46-controller-live.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  published-v46:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm the new URL is publicly served and no longer has preview-only branch
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          const url='https://broncos5523.github.io/left-right-/game-wall-v46-home-screen.html';
+          let ready=false;
+          for(let i=0;i<25;i++){
+            try{
+              const r=await fetch(url,{headers:{'Cache-Control':'no-cache'}});
+              const html=await r.text();
+              if(r.ok&&html.includes('game-wall-v41-remote.js?v=v46-20261117')&&
+                html.includes('Tap any banner to select Left Wing, Right Wing, 32″ Portrait')&&
+                !html.includes("toast('League Deep Dive · 32″ preview only, not sent')")){
+                  console.log('PASS_PUBLISHED_V46_NO_PREVIEW_ONLY_BRANCH',r.status);
+                  ready=true;break;
+              }
+              console.log('V46_PAGES_PENDING',i+1,r.status,html.length);
+            }catch(err){console.log('V46_PAGES_RETRY',i+1,String(err).slice(0,160));}
+            await new Promise(r=>setTimeout(r,9000));
+          }
+          if(!ready)throw Error('New iPhone V46 controller URL not yet published');
+          JS
+      - name: Install Chromium browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Tap actual V46 Board Library cards and mock-send to all three TVs
+        env:
+          CONTROLLER_URL: https://broncos5523.github.io/left-right-/game-wall-v46-home-screen.html
+        run: node tests/board-library-cross-screen.mjs
+      - name: Preserve proof of real published UI without Firebase writes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uncached-v46-controller-board-library-proof
+          retention-days: 14
+          path: board-library-cross-screen-result.json
