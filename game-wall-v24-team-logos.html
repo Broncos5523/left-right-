@@ -486,12 +486,8 @@ document.querySelectorAll('[data-screen]').forEach(n=>n.addEventListener('click'
 // plus alternate sources before falling back to the team's official abbreviation.
 function approvedTeamLogo(value){
  if(typeof value!=='string'||value.length>1000)return '';
- try{
-  const u=new URL(value);
-  if(u.protocol!=='https:'||!['a.espncdn.com','a.espn.com'].includes(u.hostname))return '';
-  if(!/^\/(?:i|combiner)\//.test(u.pathname))return '';
-  return u.href;
- }catch{return '';}
+ const url=value.trim();
+ return /^https:\/\/(?:a\.espncdn\.com|a\.espn\.com)\/(?:i|combiner)\/[^\s<>"'\x60]{1,980}$/i.test(url)?url:'';
 }
 window.ManCaveLogoFallback=img=>{
  let remaining=[];
