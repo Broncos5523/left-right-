@@ -196,7 +196,8 @@ function isSundayAfternoonNFL(game){
  return knownRegular;
 }
 async function loadNflCoverage(date){
- if(nflCoverage.has(date))return nflCoverage.get(date);
+ const cached=nflCoverage.get(date);
+ if(cached&&Date.now()-(cached.loadedAt||0)<15*60*1000)return cached;
  if(nflCoverageInflight.has(date))return nflCoverageInflight.get(date);
  const task=(async()=>{
   let record={status:'unverified',date,games:[],error:'The exact Providence Sunday CBS/FOX schedule has not been verified.'};
@@ -219,6 +220,7 @@ async function loadNflCoverage(date){
   }catch(_e){
    record={status:'unavailable',date,games:[],error:'Could not verify the Providence CBS/FOX schedule.'};
   }
+  record.loadedAt=Date.now();
   nflCoverage.set(date,record);
   nflCoverageInflight.delete(date);
   return record;
