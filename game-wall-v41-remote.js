@@ -4,17 +4,19 @@ const state={user:null,busy:false,message:'Checking Firebase session...',left:nu
  leftMode:'keep',rightMode:'keep',games:[],gameId:'',swap:false,gamesStatus:'Use Refresh to load actual ESPN games.'};
 const el=()=>document.getElementById('liveBridge');
 const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const descriptions={upcoming:'Upcoming Games',live:'Live Games / Results',team:'Team player board'};
-const thirdBoards=[["rotation","ALL 28 SPORTS BOARDS · AUTO ROTATION"],["wrestling","INSIDE THE SQUARED CIRCLE · WRESTLING"],["page1_nfl","Broncos · Page 1"],["page2_nfl","Broncos · Page 2"],["page3_broncos","Broncos · Page 3"],["page4_broncos","Broncos · Page 4"],["page1_nba","Celtics · Page 1"],["page2_nba","Celtics · Page 2"],["page3_celtics","Celtics · Page 3"],["page4_celtics","Celtics · Page 4"],["page1_nhl","Bruins · Page 1"],["page2_nhl","Bruins · Page 2"],["page3_bruins","Bruins · Page 3"],["page4_bruins","Bruins · Page 4"],["page1_mlb","Red Sox · Page 1"],["page2_mlb","Red Sox · Page 2"],["page3_redsox","Red Sox · Page 3"],["page4_redsox","Red Sox · Page 4"],["page1_wnba","Fever · Page 1"],["page2_wnba","Fever · Page 2"],["page3_fever","Fever · Page 3"],["page4_fever","Fever · Page 4"],["page1_cfb","Arizona Football · Page 1"],["page2_cfb","Arizona Football · Page 2"],["page3_arizona_cfb","Arizona Football · Page 3"],["page4_arizona_cfb","Arizona Football · Page 4"],["page1_cbb","Arizona Basketball · Page 1"],["page2_cbb","Arizona Basketball · Page 2"],["page3_arizona_cbb","Arizona Basketball · Page 3"],["page4_arizona_cbb","Arizona Basketball · Page 4"]];
+const descriptions={upcoming:'Upcoming Games',live:'Live Lookin · Live Games / Results',wrestling:'Inside the Squared Circle',rotation:'League Deep Dive · 28-page rotation',team:'Team player board'};
+const thirdBoards=[["rotation","LEAGUE DEEP DIVE · ALL 28 AUTO ROTATION"],["wrestling","INSIDE THE SQUARED CIRCLE · WRESTLING"],["upcoming","UPCOMING GAMES"],["live","LIVE LOOKIN · LIVE / RESULTS"],["page1_nfl","Broncos · Page 1"],["page2_nfl","Broncos · Page 2"],["page3_broncos","Broncos · Page 3"],["page4_broncos","Broncos · Page 4"],["page1_nba","Celtics · Page 1"],["page2_nba","Celtics · Page 2"],["page3_celtics","Celtics · Page 3"],["page4_celtics","Celtics · Page 4"],["page1_nhl","Bruins · Page 1"],["page2_nhl","Bruins · Page 2"],["page3_bruins","Bruins · Page 3"],["page4_bruins","Bruins · Page 4"],["page1_mlb","Red Sox · Page 1"],["page2_mlb","Red Sox · Page 2"],["page3_redsox","Red Sox · Page 3"],["page4_redsox","Red Sox · Page 4"],["page1_wnba","Fever · Page 1"],["page2_wnba","Fever · Page 2"],["page3_fever","Fever · Page 3"],["page4_fever","Fever · Page 4"],["page1_cfb","Arizona Football · Page 1"],["page2_cfb","Arizona Football · Page 2"],["page3_arizona_cfb","Arizona Football · Page 3"],["page4_arizona_cfb","Arizona Football · Page 4"],["page1_cbb","Arizona Basketball · Page 1"],["page2_cbb","Arizona Basketball · Page 2"],["page3_arizona_cbb","Arizona Basketball · Page 3"],["page4_arizona_cbb","Arizona Basketball · Page 4"]];
 const thirdOptions=(choice)=>[['keep','Keep current display'],...thirdBoards].map(([value,label])=>
  '<option value="'+safe(value)+'"'+(choice===value?' selected':'')+'>'+safe(label)+'</option>').join('');
 const thirdLabel=(v)=>{if(!v)return 'No Firebase assignment yet';
- if(v.type==='rotation')return 'All 28 Sports Boards · Auto Rotation';
+ if(v.type==='rotation')return 'League Deep Dive · All 28 Sports Boards';
+ if(v.type==='upcoming')return 'Upcoming Games';
+ if(v.type==='live')return 'Live Lookin · Live Games / Results';
  if(v.type==='wrestling')return 'Inside the Squared Circle';
  if(v.type==='board')return thirdBoards.find(x=>x[0]===v.board)?.[1]||('Board '+String(v.board||'unknown'));
  return 'Other mode ('+(v.type||'unknown')+')';};
 function label(v){if(!v)return 'No Firebase assignment yet';return (v.type==='team'?(v.team||'Team')+' · player board':(descriptions[v.type]||'Unsupported mode'));}
-function options(mode){return [['keep','Keep current'],['upcoming','Upcoming Games'],['live','Live Games / Results']].map(x=>
+function options(mode){return [['keep','Keep current'],['upcoming','Upcoming Games'],['live','Live Lookin · Live Games / Results'],['wrestling','Inside the Squared Circle'],['rotation','League Deep Dive · All 28 Sports Pages']].map(x=>
  '<option value="'+x[0]+'"'+(mode===x[0]?' selected':'')+'>'+x[1]+'</option>').join('');}
 function render(){
  const node=el();if(!node)return;
@@ -28,7 +30,7 @@ function render(){
  +'<h4>Send boards independently</h4><div class="livePair"><label>Left Wing<select data-live-select="leftMode"'+(blocked?' disabled':'')+'>'+options(state.leftMode)+'</select></label><label>Right Wing<select data-live-select="rightMode"'+(blocked?' disabled':'')+'>'+options(state.rightMode)+'</select></label></div>'
  +'<button type="button" class="btn primary liveWide" data-live-action="sendBoards"'+(blocked||(state.leftMode==='keep'&&state.rightMode==='keep')?' disabled':'')+'>Send board assignments</button>'
  +'<hr><h4>32″ Portrait · Onn board control</h4>'
- +'<p>Cloudflare TV3 receiver: select the 28-board rotation, an individual sports page, or wrestling. Left and Right are unaffected.</p>'
+ +'<p>Cloudflare TV3 receiver: choose any Board Library content or an individual sports page. Left and Right are unaffected.</p>'
  +'<label class="liveGameSelect">32″ board content<select data-live-select="thirdMode"'+(blocked?' disabled':'')+'>'+thirdOptions(state.thirdMode)+'</select></label>'
  +'<button type="button" class="btn primary liveWide" data-live-action="sendThird"'+(blocked||state.thirdMode==='keep'?' disabled':'')+'>Send to 32″ Onn TV</button>'
  +'<div class="liveSmall">Cloudflare TV receiver: <a href="https://man-cave-28-page.broncos5523.workers.dev/staging/tv3.html?rotate=ccw" target="_blank" rel="noopener noreferrer">32″ Onn · CCW portrait receiver</a>. For connection troubleshooting: <a href="https://man-cave-28-page.broncos5523.workers.dev/staging/tv3.html?rotate=ccw&amp;debug=1" target="_blank" rel="noopener noreferrer">read-only receiver status</a>. Commands use the existing Firebase screens/third assignment.</div>'
@@ -198,7 +200,7 @@ function renderBoardExtras(){
   +'<div class="liveLibraryTop"><div><span class="liveEyebrow">32″ ONN · LIVE BOARD CONTROL</span><h3>28 Sports Team Pages</h3><p>Choose a league, then send any of its four approved pages to the 32″ screen.</p></div></div>'
   +'<div class="liveLibraryFilters">'+favoritePageLeagues.map(g=>'<button type="button" data-board-league="'+safe(g.id)+'" class="'+(g.id===group.id?'active':'')+'">'+safe(g.label)+'</button>').join('')+'</div>'
   +'<div class="liveLibraryPages">'+group.pages.map((id,i)=>'<button type="button" data-board-page="'+safe(id)+'"><small>'+safe(group.label)+'</small><b>Page '+(i+1)+'</b><span>Send to Onn ›</span></button>').join('')+'</div>'
-  +'<p class="liveLibraryHint">Commands need your Firebase sign-in and the existing Onn receiver running. The approved board artwork is unchanged.</p>'
+  +'<p class="liveLibraryHint">Each sports page is available on the 32″ Onn. All four named Board Library banners can also be assigned to Left, Right or Onn independently.</p>'
   +'</div>';
  holder.querySelectorAll('[data-board-league]').forEach(btn=>btn.addEventListener('click',()=>{
    pageLeague=btn.dataset.boardLeague;renderBoardExtras();
@@ -229,13 +231,13 @@ function liveModalBase(title,desc,inner,buttonText){
 }
 function buildThirdCommand(choice,now){
  if(choice==='rotation')return {type:'rotation',updatedAt:now};
- if(choice==='wrestling')return {type:'wrestling',updatedAt:now};
+ if(['wrestling','upcoming','live'].includes(choice))return {type:choice,updatedAt:now};
  if(thirdBoards.some(([id])=>id===choice))return {type:'board',board:choice,updatedAt:now};
  return null;
 }
 function choiceFor(side,choice,now){
  if(side==='third')return buildThirdCommand(choice,now);
- if((side==='left'||side==='right')&&(choice==='live'||choice==='upcoming'))
+ if((side==='left'||side==='right')&&['live','upcoming','wrestling','rotation'].includes(choice))
    return {type:choice,updatedAt:now};
  return null;
 }
@@ -278,17 +280,20 @@ function openScreenAssignment(screenIds){
 }
 function openLibraryBoard(boardId,pageId){
  let title,desc,targets;
- if(boardId==='live-lookin'){
-  title='Man Cave Sports Book Live Lookin';desc='Send the existing Live Games / Results feed to either or both portrait wing TVs.';
-  targets=[['left','Left Wing'],['right','Right Wing']];
- }else if(boardId==='upcoming'){
-  title='Upcoming Games';desc='Send Upcoming Games to either or both portrait wing TVs.';
-  targets=[['left','Left Wing'],['right','Right Wing']];
- }else if(boardId==='wrestling'){
-  title='Inside the Squared Circle';desc='Send the existing wrestling board to the 32″ Onn display.';
-  targets=[['third','32″ Portrait · Onn']];
+ // Board Library cards are real cross-screen assignments. Select one, two
+ // or all three displays; any unchecked display retains its current game/board.
+ const namedBoards={
+  'live-lookin':['Man Cave Sports Book Live Lookin','Live and final game results'],
+  upcoming:['Upcoming Games','Your next games'],
+  wrestling:['Inside the Squared Circle','The approved wrestling board'],
+  'deep-dive':['League Deep Dive','The approved 28-page sports-board rotation']
+ };
+ if(namedBoards[boardId]){
+  title=namedBoards[boardId][0];desc='Send '+namedBoards[boardId][1]+' to the selected portrait TVs. Other displays are unchanged.';
+  targets=[['left','Left Wing'],['right','Right Wing'],['third','32″ Portrait · Onn']];
  }else if(boardId==='team-page'&&thirdBoards.some(([id])=>id===pageId)){
-  title=thirdBoards.find(([id])=>id===pageId)[1];desc='Send this existing approved sports page to the 32″ Onn display.';
+  title=thirdBoards.find(([id])=>id===pageId)[1];
+  desc='Send this approved individual sports page to the 32″ Onn display.';
   targets=[['third','32″ Portrait · Onn']];
  }else return false;
  const html='<div class="liveModalChecks">'+targets.map(([side,name])=>'<label><input type="checkbox" data-board-target="'+safe(side)+'"> '+safe(name)+'</label>').join('')+'</div>';
@@ -298,7 +303,7 @@ function openLibraryBoard(boardId,pageId){
    if(!selected.length){document.getElementById('liveModalStatus').textContent='Select a destination first.';return;}
    const patch={},now=Date.now();
    selected.forEach(side=>{
-     const choice=boardId==='live-lookin'?'live':boardId==='upcoming'?'upcoming':boardId==='wrestling'?'wrestling':pageId;
+     const choice=boardId==='live-lookin'?'live':boardId==='upcoming'?'upcoming':boardId==='wrestling'?'wrestling':boardId==='deep-dive'?'rotation':pageId;
      const command=choiceFor(side,choice,now);
      if(command)patch[side]=command;
    });
