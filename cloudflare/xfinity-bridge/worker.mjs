@@ -196,6 +196,9 @@ async function xfinity(path,body,token){
 async function withBoxLock(cfg,box,task,{cooldown=false}={}){
  const path=lockPath(box);
  const current=await db(cfg,path,'GET',undefined,{etag:true});
+ // Concurrency safety is mandatory. If Firebase does not supply an ETag,
+ // fail closed rather than silently making the compare-and-set unconditional.
+ if(!current.etag)throw new BridgeError('FIREBASE_DATABASE_UNAVAILABLE');
  const now=Date.now(),v=current.data||{};
  if(Number(v.leaseUntil||0)>now)throw new BridgeError('BUSY',429);
  if(cooldown&&now-Number(v.lastCommandAt||0)<2500)
