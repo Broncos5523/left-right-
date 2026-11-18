@@ -15,7 +15,7 @@ jobs:
       - name: Check Worker health only - no secret values or Firebase commands
         run: |
           node --input-type=module <<'JS'
-          const uri='https://man-cave-xfinity-bridge.broncos5523.workers.dev/health';
+          const uri='https://man-cave-xfinity-bridge.broncos5523.workers.dev/health?check=signing-keys';
           let last='';
           for(let i=0;i<12;i++){
             try{
@@ -25,10 +25,11 @@ jobs:
               if(contentType.includes('application/json'))body=await res.json();
               // Report only public health flags. Never dump returned HTML, authorization or secrets.
               const status={attempt:i+1,http:res.status,runtime:body.runtime||null,
-                 service:body.service||null,configured:body.configured??null};
+                 service:body.service||null,configured:body.configured??null,
+                 signingKeys:body.signingKeys||null};
               console.log('XFINITY_WORKER_HEALTH',JSON.stringify(status));
               last=JSON.stringify(status);
-              if(res.ok&&body.configured===true&&body.service==='man-cave-xfinity-bridge'&&body.runtime==='cloudflare-workers'){
+              if(res.ok&&body.configured===true&&body.signingKeys?.reachable===true&&body.service==='man-cave-xfinity-bridge'&&body.runtime==='cloudflare-workers'){
                 console.log('PASS_CLOUDFLARE_XFINITY_WORKER_PUBLIC_HEALTH_CONFIGURED');
                 process.exit(0);
               }
