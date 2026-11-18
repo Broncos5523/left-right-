@@ -72,7 +72,7 @@ test('live scoring engine flashes each new basket in order, not historical or du
  assert.equal(m.displayed.length,0,'must not autoplay past score on initialization');
  m.process(frame([b1,b2,b3],[b1,b2,b3]));
  assert.deepEqual([...m.displayed],['new-2']);
- assert.deepEqual(m.pending.map(p=>p.entry.key),['new-3']);
+ assert.deepEqual([...m.pending].map(p=>p.entry.key),['new-3']);
  m.process(frame([b1,b2,b3],[b1,b2,b3]));
- assert.deepEqual(m.pending.map(p=>p.entry.key),['new-3'],'duplicate polling cannot requeue scores');
+ assert.deepEqual([...m.pending].map(p=>p.entry.key),['new-3'],'duplicate polling cannot requeue scores');
 });
