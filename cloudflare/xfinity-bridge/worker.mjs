@@ -179,15 +179,25 @@ async function publicKeyProbe(){
 }
 async function getKeys(){
  if(publicKeys&&Date.now()<keysUntil)return publicKeys;
- const response=await safeFetch(JWKS,{},12000);
- if(!response.ok)throw new BridgeError('FIREBASE_SIGNING_KEYS_UNAVAILABLE',503);
- const data=await response.json();
- if(!Array.isArray(data.keys)||!data.keys.length)
-  throw new BridgeError('FIREBASE_SIGNING_KEYS_UNAVAILABLE',503);
- const match=/max-age=(\d+)/i.exec(response.headers.get('Cache-Control')||'');
- keysUntil=Date.now()+Math.max(60,Math.min(18000,Number(match?.[1]||300)))*1000;
- publicKeys=data.keys;
- return publicKeys;
+ // A transient failure retrieving Google's public signing keys must not cause
+ // a permanent login failure. Retry once, while NEVER weakening signature,
+ // issuer, expiration, or UID verification.
+ for(let attempt=0;attempt<2;attempt++){
+  if(attempt)await new Promise(r=>setTimeout(r,250));
+  try{
+   const response=await safeFetch(JWKS,{},12000);
+   if(!response.ok)continue;
+   const data=await response.json();
+   const keys=Array.isArray(data.keys)?data.keys.filter(
+    k=>k.kid&&k.kty==='RSA'&&k.n&&k.e):[];
+   if(!keys.length)continue;
+   const match=/max-age=(\d+)/i.exec(response.headers.get('Cache-Control')||'');
+   keysUntil=Date.now()+Math.max(60,Math.min(18000,Number(match?.[1]||300)))*1000;
+   publicKeys=keys;
+   return publicKeys;
+  }catch{/* Transient Google network/JSON errors; retry once then fail closed. */}
+ }
+ throw new BridgeError('FIREBASE_SIGNING_KEYS_UNAVAILABLE',503);
 }
 async function verifyFirebaseIdToken(token,cfg){
  const parts=token.split('.');
