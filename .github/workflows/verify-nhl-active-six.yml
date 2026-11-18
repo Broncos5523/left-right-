@@ -32,10 +32,10 @@ jobs:
               };
               const [board,engine,preview]=await Promise.all([
                 read('team-board.html'),read('nhl-on-ice-engine.js'),read('team-board-nba-flash-preview-v4.html')]);
-              if(board.includes('nhl-on-ice-engine.js?v=20261117-active-six-10s-v3')&&
+              if(board.includes('nhl-on-ice-engine.js?v=20261117-active-six-broadcast-sync-v4')&&
                 board.includes('nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4')&&
                 engine.includes('summary.onIce')&&engine.includes('setInterval(refresh,10000)')&&
-                preview.includes('nhl-on-ice-engine.js?v=20261117-active-six-10s-v3')){
+                preview.includes('nhl-on-ice-engine.js?v=20261117-active-six-broadcast-sync-v4')){
                 console.log('PASS_PUBLISHED_NHL_ON_ICE_LIVE_AND_APPROVED_NBA_FLASH');process.exit(0);
               }
             }catch(e){console.log('PAGES_NOT_YET_PUBLISHED',attempt+1,String(e));}
