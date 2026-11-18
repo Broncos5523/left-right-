@@ -162,5 +162,5 @@ window.ManCaveNhlOnIce=Object.freeze({
  refresh
 });
 refresh();
-setInterval(refresh,12000);
+setInterval(refresh,10000);
 })();
