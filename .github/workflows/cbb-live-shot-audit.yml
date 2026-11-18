@@ -44,7 +44,7 @@ jobs:
             eligibleGames=all.length;
             const match=g=>g.teams.some(s=>desired.some(n=>s.toLowerCase().includes(n.toLowerCase())));
             const priority=all.filter(match),other=all.filter(g=>!match(g));
-            const targets=[...priority.slice(0,10),...other.slice(0,Math.max(0,18-Math.min(priority.length,10)))].slice(0,18);
+            const targets=all;
             console.log('SCHEDULE',JSON.stringify({total:schedule.events?.length,played:all.length,selected:targets.length,priority:priority.length}));
             const one=async g=>{
               try{
@@ -70,13 +70,13 @@ jobs:
                   error:null};
               }catch(e){return {...g,error:String(e?.message||e),shotCount:0,locatedCount:0,playCount:0,playerIds:0,teamIds:0};}
             };
-            let next=0;const workers=Array.from({length:3},async()=>{while(next<targets.length){const t=targets[next++];games.push(await one(t));}});
+            let next=0;const workers=Array.from({length:5},async()=>{while(next<targets.length){const t=targets[next++];games.push(await one(t));}});
             await Promise.all(workers);
             games.sort((a,b)=>a.teams.join(' ').localeCompare(b.teams.join(' ')));
           }catch(e){status='error';error=String(e?.message||e);}
           const data={checkedAt,day,league,status,error,scheduleEvents,eligibleGames,games};
           fs.mkdirSync('research',{recursive:true});
-          fs.writeFileSync('research/CBB_LIVE_AUDIT_ALL_DI_2026-11-17.json',JSON.stringify(data,null,2)+'\n');
+          fs.writeFileSync('research/CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.json',JSON.stringify(data,null,2)+'\n');
           const headline=['# Real NCAA College Shot-Coordinate Audit — November 17, 2026','',
             'Run UTC: '+checkedAt,'Status: '+status+(error?' — '+error:''),'ESPN schedule games: '+scheduleEvents+'; already started: '+eligibleGames,'',
             'This report measures ESPN play-by-play field-goal attempts, player identifiers and actual X/Y coordinates. It is NOT a complete box-score reconciliation.','',
@@ -84,13 +84,13 @@ jobs:
             '|---|---|---:|---:|---:|---:|',
             ...games.map(g=>'| '+g.teams.join(' vs ').replaceAll('|','/')+' | '+(g.error?'ERROR '+g.error:g.status)+' | '+g.playCount+' | '+g.shotCount+' | '+g.locatedCount+' | '+g.playerIds+' |'),
             '', '## JSON detail','',
-            'Raw samples, coordinates, source payload shape and errors: [CBB_LIVE_AUDIT_ALL_DI_2026-11-17.json](CBB_LIVE_AUDIT_ALL_DI_2026-11-17.json)'];
-          fs.writeFileSync('research/CBB_LIVE_AUDIT_ALL_DI_2026-11-17.md',headline.join('\n')+'\n');
+            'Raw samples, coordinates, source payload shape and errors: [CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.json](CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.json)'];
+          fs.writeFileSync('research/CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.md',headline.join('\n')+'\n');
           console.log('AUDIT_REPORT',JSON.stringify({checkedAt,status,error,checked:games.length,shots:games.reduce((a,g)=>a+(g.shotCount||0),0),located:games.reduce((a,g)=>a+(g.locatedCount||0),0)}));
           JS
       - name: Commit audit report only (do not modify production)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research/CBB_LIVE_AUDIT_ALL_DI_2026-11-17.json research/CBB_LIVE_AUDIT_ALL_DI_2026-11-17.md
+          git add research/CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.json research/CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.md
           git diff --cached --quiet || (git commit -m "Record November 17 college shot-location audit from ESPN" && git push)
