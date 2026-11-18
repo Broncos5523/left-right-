@@ -25,7 +25,7 @@ test('preview wing receivers use V4, approved live receivers are preserved',()=>
   const live=read(side+'.html');
   assert.match(preview,/team-board-nba-flash-preview-v4\.html/);
   assert.match(preview,/screens\/(left|right)/);
-  assert.match(live,/team-board-nba-flash-preview\.html/);
+  assert.match(live,/team-board\.html/);
   assert.doesNotMatch(live,/team-board-nba-flash-preview-v4\.html/);
  }
  const board=read('team-board-nba-flash-preview-v4.html');
