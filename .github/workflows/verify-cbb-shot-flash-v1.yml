@@ -1,0 +1,88 @@
+name: Verify college basketball NBA-matched shot flash
+on:
+  push:
+    branches: [main]
+    paths:
+      - cbb-scoring-flash-preview-v1.js
+      - team-board.html
+      - team-board-nba-flash-preview-v4.html
+      - team-board-cbb-flash-preview-v1.html
+      - index.html
+      - tests/cbb-scoring-flash-v1.mjs
+      - .github/workflows/verify-cbb-shot-flash-v1.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run college, NBA Gold Master, and NHL regressions
+        id: tests
+        shell: bash
+        run: |
+          set +e
+          node --test tests/cbb-scoring-flash-v1.mjs tests/nba-scoring-flash-v4.mjs tests/nba-scoring-flash-live.mjs tests/nhl-active-six-live.mjs > /tmp/cbb-test-results.txt 2>&1
+          result=$?
+          cat /tmp/cbb-test-results.txt
+          echo "status=$result" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Check actual college event play-by-play and shot identity coverage
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const url='https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/summary?event=401909566';
+          let result={checkedAt:new Date().toISOString(),game:'Duke Blue Devils vs Illinois Fighting Illini',
+            eventId:'401909566',source:'ESPN Site v2 men's basketball',status:'pending'};
+          try{
+            const res=await fetch(url,{signal:AbortSignal.timeout(20000)});
+            if(!res.ok)throw Error('ESPN HTTP '+res.status);
+            const data=await res.json();
+            const shots=(data.plays||[]).filter(p=>p.shootingPlay===true&&!/free\s*throw/i.test(p.text||''));
+            const ids=shots.filter(p=>p?.participants?.[0]?.athlete?.id).length;
+            const coords=shots.filter(p=>p.coordinate?.x!=null&&p.coordinate?.y!=null).length;
+            const teams=shots.filter(p=>p.team?.id).length;
+            result={...result,status:'ok',totalPlays:data.plays?.length||0,
+              fieldGoalAttempts:shots.length,withCoordinates:coords,withPlayerIds:ids,withTeamIds:teams,
+              hasCompetitors:!!data.header?.competitions?.[0]?.competitors?.length,
+              hasBoxscore:!!data.boxscore?.players?.length};
+            if(shots.length<40||coords<shots.length||teams<shots.length)result.status='incomplete';
+          }catch(e){result.status='error';result.error=String(e.message||e);}
+          fs.mkdirSync('research',{recursive:true});
+          fs.writeFileSync('research/CBB_FLASH_LIVE_SOURCE_CHECK.json',JSON.stringify(result,null,2)+'\n');
+          console.log('CBB_LIVE_SOURCE_CHECK',JSON.stringify(result));
+          JS
+      - name: Record test results for remote iPhone review
+        shell: bash
+        env:
+          TEST_EXIT: ${{ steps.tests.outputs.status }}
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const log=fs.readFileSync('/tmp/cbb-test-results.txt','utf8');
+          const sample=JSON.parse(fs.readFileSync('research/CBB_FLASH_LIVE_SOURCE_CHECK.json','utf8'));
+          const pass=log.match(/# pass (\d+)/)?.[1]||'unknown';
+          const fail=log.match(/# fail (\d+)/)?.[1]||'unknown';
+          const status=process.env.TEST_EXIT==='0'?'PASS':'FAIL';
+          const body=['# CBB Scoring Flash — Regression Results','',
+            'Run UTC: '+new Date().toISOString(),'Test status: **'+status+'**',
+            'Node tests passed: '+pass,'Node tests failed: '+fail,'',
+            'Live ESPN summary check: '+sample.status,
+            'Real-event PBP shot attempts: '+(sample.fieldGoalAttempts??'not returned'),
+            'Real-event shots with X/Y: '+(sample.withCoordinates??'not returned'),
+            'Real-event shots with shooter IDs: '+(sample.withPlayerIds??'not returned'), '',
+            'The code tests cover: locked NBA SVG parity, CBB live team matching, three-pointers (8 seconds), twos (6 seconds), first-load baseline, no duplicate flash, 30-second broadcast delay, unassigned-player skipping, missing coordinates, and NHL regressions.',
+            'Live output uses the college ESPN game summary. This is not a physical Fire TV acceptance test.',
+            '','## Test log excerpt','```',log.slice(-9000),'```',''];
+          fs.writeFileSync('research/CBB_FLASH_TEST_STATUS.md',body.join('\n'));
+          JS
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/CBB_FLASH_TEST_STATUS.md research/CBB_FLASH_LIVE_SOURCE_CHECK.json
+          git diff --cached --quiet || (git commit -m "Record college flash validation and real ESPN shot sample" && git push)
+      - name: Fail on regression errors
+        if: steps.tests.outputs.status != '0'
+        run: exit 1
