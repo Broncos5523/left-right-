@@ -1,0 +1,2622 @@
+{
+  "checkedAt": "2026-11-18T02:43:55.642Z",
+  "day": "20261117",
+  "league": "mens-college-basketball",
+  "status": "ok",
+  "error": null,
+  "scheduleEvents": 68,
+  "eligibleGames": 61,
+  "games": [
+    {
+      "id": "401906761",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T00:30Z",
+      "teams": [
+        "Alabama Crimson Tide",
+        "Kennesaw State Owls"
+      ],
+      "playCount": 609,
+      "shotCount": 114,
+      "locatedCount": 114,
+      "playerIds": 114,
+      "teamIds": 114,
+      "misses": 60,
+      "makes": 54,
+      "coordinates": [
+        {
+          "x": 36,
+          "y": 23,
+          "playerId": "5082704",
+          "teamId": "333",
+          "text": "Drew Fielder makes 25-foot three point jumper"
+        },
+        {
+          "x": 20,
+          "y": 6,
+          "playerId": "5312348",
+          "teamId": "338",
+          "text": "Amir Taylor makes 8-foot turnaround jump shot (Jacoby Hill assists)"
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "playerId": "4711306",
+          "teamId": "333",
+          "text": "Brandon Garrison misses 23-foot three point jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Kennesaw State Owls",
+          "teamId": "338",
+          "fgAttemptsFromPlayerBoxscore": 57,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "25",
+                "9",
+                "3-6",
+                "1-1",
+                "2-3",
+                "10",
+                "1",
+                "1",
+                "1",
+                "0",
+                "2",
+                "8",
+                "6"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Alabama Crimson Tide",
+          "teamId": "333",
+          "fgAttemptsFromPlayerBoxscore": 57,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "17",
+                "3",
+                "1-2",
+                "1-2",
+                "0-0",
+                "4",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "4",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "333": 57,
+        "338": 57
+      },
+      "rawShotLocationCount": 114,
+      "error": null
+    },
+    {
+      "id": "401909566",
+      "state": "post",
+      "status": "Final",
+      "start": "2026-11-18T00:00Z",
+      "teams": [
+        "Duke Blue Devils",
+        "Illinois Fighting Illini"
+      ],
+      "playCount": 594,
+      "shotCount": 136,
+      "locatedCount": 136,
+      "playerIds": 136,
+      "teamIds": 136,
+      "misses": 81,
+      "makes": 55,
+      "coordinates": [
+        {
+          "x": 27,
+          "y": 2,
+          "playerId": "5287474",
+          "teamId": "150",
+          "text": "Dame Sarr makes layup (Cayden Boozer assists)"
+        },
+        {
+          "x": 40,
+          "y": 19,
+          "playerId": "5307569",
+          "teamId": "356",
+          "text": "Quentin Coleman misses 24-foot three point jumper"
+        },
+        {
+          "x": 25,
+          "y": 1,
+          "playerId": "5325990",
+          "teamId": "356",
+          "text": "Ethan Brown makes 0-foot tip in layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Illinois Fighting Illini",
+          "teamId": "356",
+          "fgAttemptsFromPlayerBoxscore": 72,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "14",
+                "2",
+                "1-4",
+                "0-2",
+                "0-0",
+                "1",
+                "0",
+                "1",
+                "0",
+                "1",
+                "1",
+                "0",
+                "4"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Duke Blue Devils",
+          "teamId": "150",
+          "fgAttemptsFromPlayerBoxscore": 64,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "19",
+                "4",
+                "2-4",
+                "0-2",
+                "0-0",
+                "1",
+                "1",
+                "3",
+                "1",
+                "1",
+                "0",
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "150": 64,
+        "356": 72
+      },
+      "rawShotLocationCount": 136,
+      "error": null
+    },
+    {
+      "id": "401921027",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Georgia Southern Eagles",
+        "Middle Tennessee Blue Raiders"
+      ],
+      "playCount": 340,
+      "shotCount": 103,
+      "locatedCount": 103,
+      "playerIds": 103,
+      "teamIds": 103,
+      "misses": 58,
+      "makes": 45,
+      "coordinates": [
+        {
+          "x": 26,
+          "y": 11,
+          "playerId": "5175352",
+          "teamId": "2393",
+          "text": "Ofri Naveh misses dunk"
+        },
+        {
+          "x": 40,
+          "y": 24,
+          "playerId": "5460889",
+          "teamId": "290",
+          "text": "Cole Crissman misses 29-foot three point jumper"
+        },
+        {
+          "x": 2,
+          "y": 4,
+          "playerId": "5460082",
+          "teamId": "2393",
+          "text": "Quintero Barnett makes 24-foot three point jumper (Jahvin Carter assists)"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Middle Tennessee Blue Raiders",
+          "teamId": "2393",
+          "fgAttemptsFromPlayerBoxscore": 57,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "31",
+                "0",
+                "0-3",
+                "0-0",
+                "0-0",
+                "4",
+                "3",
+                "0",
+                "0",
+                "0",
+                "2",
+                "2",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Georgia Southern Eagles",
+          "teamId": "290",
+          "fgAttemptsFromPlayerBoxscore": 46,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "10",
+                "3",
+                "1-2",
+                "1-2",
+                "0-0",
+                "3",
+                "1",
+                "0",
+                "0",
+                "0",
+                "1",
+                "2",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "290": 46,
+        "2393": 57
+      },
+      "rawShotLocationCount": 103,
+      "error": null
+    },
+    {
+      "id": "401921106",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Illinois State Redbirds",
+        "Bellarmine Knights"
+      ],
+      "playCount": 359,
+      "shotCount": 87,
+      "locatedCount": 87,
+      "playerIds": 87,
+      "teamIds": 87,
+      "misses": 49,
+      "makes": 38,
+      "coordinates": [
+        {
+          "x": 7,
+          "y": 16,
+          "playerId": "5313852",
+          "teamId": "2287",
+          "text": "Mason Klabo makes 24-foot three point jumper (Johnny Kinziger assists)"
+        },
+        {
+          "x": 49,
+          "y": 3,
+          "playerId": "5312902",
+          "teamId": "91",
+          "text": "Sam Donald misses 24-foot three point jumper"
+        },
+        {
+          "x": 4,
+          "y": 11,
+          "playerId": "5313852",
+          "teamId": "2287",
+          "text": "Mason Klabo misses 24-foot three point jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Bellarmine Knights",
+          "teamId": "91",
+          "fgAttemptsFromPlayerBoxscore": 43,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "7",
+                "0",
+                "0-2",
+                "0-1",
+                "0-0",
+                "1",
+                "0",
+                "0",
+                "0",
+                "0",
+                "1",
+                "0",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Illinois State Redbirds",
+          "teamId": "2287",
+          "fgAttemptsFromPlayerBoxscore": 44,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "21",
+                "9",
+                "4-5",
+                "0-0",
+                "1-3",
+                "6",
+                "1",
+                "2",
+                "0",
+                "3",
+                "3",
+                "3",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "91": 43,
+        "2287": 44
+      },
+      "rawShotLocationCount": 87,
+      "error": null
+    },
+    {
+      "id": "401916289",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T00:30Z",
+      "teams": [
+        "Indiana Hoosiers",
+        "Arkansas Razorbacks"
+      ],
+      "playCount": 456,
+      "shotCount": 106,
+      "locatedCount": 106,
+      "playerIds": 106,
+      "teamIds": 106,
+      "misses": 60,
+      "makes": 46,
+      "coordinates": [
+        {
+          "x": 7,
+          "y": 1,
+          "playerId": "5165276",
+          "teamId": "8",
+          "text": "Jeremiah Wilkinson makes 18-foot jumper (Jordan Smith Jr. assists)"
+        },
+        {
+          "x": 28,
+          "y": 6,
+          "playerId": "4873184",
+          "teamId": "84",
+          "text": "Aiden Sherrell makes 6-foot floating jump shot (Markus Burton assists)"
+        },
+        {
+          "x": 24,
+          "y": 14,
+          "playerId": "5176136",
+          "teamId": "8",
+          "text": "Cooper Bowser misses 13-foot floating jump shot"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Arkansas Razorbacks",
+          "teamId": "8",
+          "fgAttemptsFromPlayerBoxscore": 55,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "20",
+                "10",
+                "2-5",
+                "1-4",
+                "5-7",
+                "3",
+                "1",
+                "2",
+                "0",
+                "0",
+                "1",
+                "2",
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Indiana Hoosiers",
+          "teamId": "84",
+          "fgAttemptsFromPlayerBoxscore": 51,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "25",
+                "17",
+                "7-9",
+                "0-1",
+                "3-3",
+                "6",
+                "1",
+                "1",
+                "1",
+                "0",
+                "2",
+                "4",
+                "5"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "8": 55,
+        "84": 51
+      },
+      "rawShotLocationCount": 106,
+      "error": null
+    },
+    {
+      "id": "401921006",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Kansas City Roos",
+        "Newman Jets"
+      ],
+      "playCount": 370,
+      "shotCount": 93,
+      "locatedCount": 93,
+      "playerIds": 93,
+      "teamIds": 93,
+      "misses": 53,
+      "makes": 40,
+      "coordinates": [
+        {
+          "x": 1,
+          "y": 2,
+          "playerId": "5466833",
+          "teamId": "580",
+          "text": "Mike Quick Jr. misses 24-foot three point jumper"
+        },
+        {
+          "x": 28,
+          "y": 2,
+          "playerId": "4711295",
+          "teamId": "140",
+          "text": "Assane Diop misses layup"
+        },
+        {
+          "x": 49,
+          "y": 0,
+          "playerId": "5106684",
+          "teamId": "140",
+          "text": "Carl Daughtery Jr. makes 24-foot three point jumper (Lincoln Goodwin assists)"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Newman Jets",
+          "teamId": "580",
+          "fgAttemptsFromPlayerBoxscore": 48,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "19",
+                "7",
+                "3-5",
+                "0-0",
+                "1-2",
+                "5",
+                "1",
+                "1",
+                "1",
+                "1",
+                "3",
+                "2",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Kansas City Roos",
+          "teamId": "140",
+          "fgAttemptsFromPlayerBoxscore": 45,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "17",
+                "4",
+                "1-5",
+                "0-2",
+                "2-2",
+                "2",
+                "0",
+                "4",
+                "1",
+                "1",
+                "2",
+                "0",
+                "3"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "140": 45,
+        "580": 48
+      },
+      "rawShotLocationCount": 93,
+      "error": null
+    },
+    {
+      "id": "401911020",
+      "state": "in",
+      "status": "End of Period",
+      "start": "2026-11-18T00:30Z",
+      "teams": [
+        "Massachusetts Minutemen",
+        "Bryant Bulldogs"
+      ],
+      "playCount": 459,
+      "shotCount": 111,
+      "locatedCount": 111,
+      "playerIds": 111,
+      "teamIds": 111,
+      "misses": 63,
+      "makes": 48,
+      "coordinates": [
+        {
+          "x": 36,
+          "y": 22,
+          "playerId": "5176426",
+          "teamId": "113",
+          "text": "Junjie Wang misses 24-foot three point jumper"
+        },
+        {
+          "x": 8,
+          "y": 19,
+          "playerId": "5176426",
+          "teamId": "113",
+          "text": "Junjie Wang misses 26-foot three point jumper"
+        },
+        {
+          "x": 26,
+          "y": 4,
+          "playerId": "5196957",
+          "teamId": "2803",
+          "text": "Onyx Nnani misses 4-foot hook shot"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Bryant Bulldogs",
+          "teamId": "2803",
+          "fgAttemptsFromPlayerBoxscore": 59,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "21",
+                "0",
+                "0-3",
+                "0-3",
+                "0-0",
+                "1",
+                "0",
+                "0",
+                "1",
+                "0",
+                "0",
+                "1",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Massachusetts Minutemen",
+          "teamId": "113",
+          "fgAttemptsFromPlayerBoxscore": 52,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "11",
+                "2",
+                "1-3",
+                "0-0",
+                "0-1",
+                "4",
+                "0",
+                "3",
+                "0",
+                "0",
+                "1",
+                "3",
+                "2"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "113": 52,
+        "2803": 59
+      },
+      "rawShotLocationCount": 111,
+      "error": null
+    },
+    {
+      "id": "401921722",
+      "state": "post",
+      "status": "Final",
+      "start": "2026-11-18T00:00Z",
+      "teams": [
+        "Miami Hurricanes",
+        "Rider Broncs"
+      ],
+      "playCount": 537,
+      "shotCount": 131,
+      "locatedCount": 131,
+      "playerIds": 131,
+      "teamIds": 131,
+      "misses": 79,
+      "makes": 52,
+      "coordinates": [
+        {
+          "x": 30,
+          "y": 4,
+          "playerId": "5142723",
+          "teamId": "2390",
+          "text": "Caleb Gaskins misses layup"
+        },
+        {
+          "x": 26,
+          "y": 4,
+          "playerId": "5238203",
+          "teamId": "2390",
+          "text": "Somto Cyril misses layup"
+        },
+        {
+          "x": 26,
+          "y": 1,
+          "playerId": "5101809",
+          "teamId": "2390",
+          "text": "Shelton Henderson makes layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Rider Broncs",
+          "teamId": "2520",
+          "fgAttemptsFromPlayerBoxscore": 65,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "15",
+                "4",
+                "2-2",
+                "0-0",
+                "0-1",
+                "3",
+                "0",
+                "0",
+                "0",
+                "0",
+                "1",
+                "2",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Miami Hurricanes",
+          "teamId": "2390",
+          "fgAttemptsFromPlayerBoxscore": 66,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "29",
+                "14",
+                "5-10",
+                "2-4",
+                "2-4",
+                "8",
+                "0",
+                "1",
+                "1",
+                "0",
+                "4",
+                "4",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "2390": 66,
+        "2520": 65
+      },
+      "rawShotLocationCount": 131,
+      "error": null
+    },
+    {
+      "id": "401926143",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "North Dakota Fighting Hawks",
+        "SIU Edwardsville Cougars"
+      ],
+      "playCount": 395,
+      "shotCount": 82,
+      "locatedCount": 82,
+      "playerIds": 82,
+      "teamIds": 82,
+      "misses": 46,
+      "makes": 36,
+      "coordinates": [
+        {
+          "x": 22,
+          "y": 4,
+          "playerId": "5461666",
+          "teamId": "155",
+          "text": "Carter Evanson misses 5-foot jumper"
+        },
+        {
+          "x": 6,
+          "y": 13,
+          "playerId": "5461669",
+          "teamId": "155",
+          "text": "Luke Winkel makes 23-foot three point jumper"
+        },
+        {
+          "x": 38,
+          "y": 21,
+          "playerId": "5176137",
+          "teamId": "2565",
+          "text": "Darrion Baker makes 25-foot three point jumper (Gianni Cobb assists)"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "team",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "SIU Edwardsville Cougars",
+          "teamId": "2565",
+          "fgAttemptsFromPlayerBoxscore": 39,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "26",
+                "11",
+                "3-5",
+                "0-0",
+                "5-6",
+                "4",
+                "1",
+                "0",
+                "0",
+                "2",
+                "1",
+                "3",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "North Dakota Fighting Hawks",
+          "teamId": "155",
+          "fgAttemptsFromPlayerBoxscore": 43,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "16",
+                "0",
+                "0-2",
+                "0-0",
+                "0-0",
+                "2",
+                "1",
+                "0",
+                "0",
+                "0",
+                "0",
+                "2",
+                "3"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "155": 43,
+        "2565": 39
+      },
+      "rawShotLocationCount": 82,
+      "error": null
+    },
+    {
+      "id": "401927867",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Northern Arizona Lumberjacks",
+        "Embry Riddle (AZ) Eagles"
+      ],
+      "playCount": 416,
+      "shotCount": 98,
+      "locatedCount": 98,
+      "playerIds": 98,
+      "teamIds": 98,
+      "misses": 53,
+      "makes": 45,
+      "coordinates": [
+        {
+          "x": 27,
+          "y": 2,
+          "playerId": "5319803",
+          "teamId": "111226",
+          "text": "Ethan Macken makes layup"
+        },
+        {
+          "x": 25,
+          "y": 6,
+          "playerId": "4432739",
+          "teamId": "2464",
+          "text": "Dylan Anderson misses 6-foot jumper"
+        },
+        {
+          "x": 33,
+          "y": 9,
+          "playerId": "5255084",
+          "teamId": "111226",
+          "text": "Peter Dress misses 12-foot jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Embry Riddle (AZ) Eagles",
+          "teamId": "111226",
+          "fgAttemptsFromPlayerBoxscore": 47,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "17",
+                "10",
+                "4-7",
+                "0-0",
+                "2-3",
+                "5",
+                "1",
+                "0",
+                "0",
+                "0",
+                "1",
+                "4",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Northern Arizona Lumberjacks",
+          "teamId": "2464",
+          "fgAttemptsFromPlayerBoxscore": 51,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "31",
+                "24",
+                "10-16",
+                "0-3",
+                "4-5",
+                "9",
+                "1",
+                "2",
+                "2",
+                "1",
+                "3",
+                "6",
+                "2"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "2464": 51,
+        "111226": 47
+      },
+      "rawShotLocationCount": 98,
+      "error": null
+    },
+    {
+      "id": "401927388",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Northern Iowa Panthers",
+        "Lindenwood Lions"
+      ],
+      "playCount": 436,
+      "shotCount": 87,
+      "locatedCount": 87,
+      "playerIds": 87,
+      "teamIds": 87,
+      "misses": 47,
+      "makes": 40,
+      "coordinates": [
+        {
+          "x": 21,
+          "y": 25,
+          "playerId": "5314285",
+          "teamId": "2460",
+          "text": "Carson Vis misses 25-foot three point jumper"
+        },
+        {
+          "x": 27,
+          "y": 7,
+          "playerId": "5314285",
+          "teamId": "2460",
+          "text": "Carson Vis misses layup"
+        },
+        {
+          "x": 25,
+          "y": 1,
+          "playerId": "5101691",
+          "teamId": "2460",
+          "text": "Ian Smikle makes 0-foot tip in layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Lindenwood Lions",
+          "teamId": "2815",
+          "fgAttemptsFromPlayerBoxscore": 42,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "3",
+                "0",
+                "0-1",
+                "0-0",
+                "0-0",
+                "1",
+                "0",
+                "1",
+                "0",
+                "0",
+                "1",
+                "0",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Northern Iowa Panthers",
+          "teamId": "2460",
+          "fgAttemptsFromPlayerBoxscore": 45,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "19",
+                "8",
+                "3-6",
+                "1-3",
+                "1-1",
+                "4",
+                "0",
+                "0",
+                "1",
+                "0",
+                "2",
+                "2",
+                "2"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "2460": 45,
+        "2815": 42
+      },
+      "rawShotLocationCount": 87,
+      "error": null
+    },
+    {
+      "id": "401925012",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Omaha Mavericks",
+        "Lamar Cardinals"
+      ],
+      "playCount": 409,
+      "shotCount": 94,
+      "locatedCount": 94,
+      "playerIds": 94,
+      "teamIds": 94,
+      "misses": 45,
+      "makes": 49,
+      "coordinates": [
+        {
+          "x": 3,
+          "y": 2,
+          "playerId": "5460776",
+          "teamId": "2320",
+          "text": "Jeremiah Jones makes 22-foot three point jumper (Niccolo Moretti assists)"
+        },
+        {
+          "x": 20,
+          "y": 4,
+          "playerId": "5177349",
+          "teamId": "2437",
+          "text": "Isaac Ondekane misses layup"
+        },
+        {
+          "x": 25,
+          "y": 6,
+          "playerId": "5313362",
+          "teamId": "2437",
+          "text": "Deke Thompson makes 6-foot jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Lamar Cardinals",
+          "teamId": "2320",
+          "fgAttemptsFromPlayerBoxscore": 49,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "8",
+                "2",
+                "1-2",
+                "0-1",
+                "0-0",
+                "2",
+                "1",
+                "1",
+                "0",
+                "0",
+                "0",
+                "2",
+                "4"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Omaha Mavericks",
+          "teamId": "2437",
+          "fgAttemptsFromPlayerBoxscore": 45,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "21",
+                "12",
+                "3-6",
+                "0-0",
+                "6-8",
+                "3",
+                "1",
+                "2",
+                "0",
+                "0",
+                "2",
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "2320": 49,
+        "2437": 45
+      },
+      "rawShotLocationCount": 94,
+      "error": null
+    },
+    {
+      "id": "401921097",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Rice Owls",
+        "Texas A&M-Corpus Christi Islanders"
+      ],
+      "playCount": 403,
+      "shotCount": 84,
+      "locatedCount": 84,
+      "playerIds": 84,
+      "teamIds": 84,
+      "misses": 49,
+      "makes": 35,
+      "coordinates": [
+        {
+          "x": 29,
+          "y": 5,
+          "playerId": "5111629",
+          "teamId": "242",
+          "text": "Jacob Dar misses 6-foot jumper"
+        },
+        {
+          "x": 41,
+          "y": 1,
+          "playerId": "5183294",
+          "teamId": "242",
+          "text": "Carmelo Adkins misses 16-foot jumper"
+        },
+        {
+          "x": 23,
+          "y": 22,
+          "playerId": "5314705",
+          "teamId": "357",
+          "text": "Daniel Michelini-Jackson misses 22-foot jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Texas A&M-Corpus Christi Islanders",
+          "teamId": "357",
+          "fgAttemptsFromPlayerBoxscore": 37,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "14",
+                "0",
+                "0-1",
+                "0-0",
+                "0-0",
+                "1",
+                "1",
+                "1",
+                "1",
+                "0",
+                "1",
+                "0",
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Rice Owls",
+          "teamId": "242",
+          "fgAttemptsFromPlayerBoxscore": 47,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "17",
+                "7",
+                "3-6",
+                "1-3",
+                "0-1",
+                "1",
+                "2",
+                "2",
+                "0",
+                "0",
+                "1",
+                "0",
+                "2"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "242": 47,
+        "357": 37
+      },
+      "rawShotLocationCount": 84,
+      "error": null
+    },
+    {
+      "id": "401920953",
+      "state": "post",
+      "status": "Final",
+      "start": "2026-11-17T23:00Z",
+      "teams": [
+        "Southern Illinois Salukis",
+        "Liberty Flames"
+      ],
+      "playCount": 514,
+      "shotCount": 122,
+      "locatedCount": 122,
+      "playerIds": 122,
+      "teamIds": 122,
+      "misses": 68,
+      "makes": 54,
+      "coordinates": [
+        {
+          "x": 20,
+          "y": 7,
+          "playerId": "5061607",
+          "teamId": "79",
+          "text": "Jaheem Webber misses layup"
+        },
+        {
+          "x": 18,
+          "y": 3,
+          "playerId": "5254332",
+          "teamId": "2335",
+          "text": "Zander Carter misses 8-foot hook shot"
+        },
+        {
+          "x": 29,
+          "y": 4,
+          "playerId": "5107899",
+          "teamId": "79",
+          "text": "Damien Mayo Jr. makes layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Liberty Flames",
+          "teamId": "2335",
+          "fgAttemptsFromPlayerBoxscore": 63,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "16",
+                "2",
+                "1-3",
+                "0-0",
+                "0-2",
+                "5",
+                "3",
+                "1",
+                "0",
+                "0",
+                "0",
+                "5",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Southern Illinois Salukis",
+          "teamId": "79",
+          "fgAttemptsFromPlayerBoxscore": 59,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "24",
+                "3",
+                "1-4",
+                "0-3",
+                "1-2",
+                "8",
+                "0",
+                "1",
+                "0",
+                "0",
+                "2",
+                "6",
+                "3"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "79": 59,
+        "2335": 63
+      },
+      "rawShotLocationCount": 122,
+      "error": null
+    },
+    {
+      "id": "401929358",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Southern Miss Golden Eagles",
+        "UT Arlington Mavericks"
+      ],
+      "playCount": 331,
+      "shotCount": 79,
+      "locatedCount": 79,
+      "playerIds": 79,
+      "teamIds": 79,
+      "misses": 38,
+      "makes": 41,
+      "coordinates": [
+        {
+          "x": 2,
+          "y": 0,
+          "playerId": "5175711",
+          "teamId": "250",
+          "text": "Mier Panoam makes 23-foot three point jumper (Noah Shelby assists)"
+        },
+        {
+          "x": 27,
+          "y": 3,
+          "playerId": "5176218",
+          "teamId": "2572",
+          "text": "Isaac Taveras makes layup (Jalyke Gaines-Wyatt assists)"
+        },
+        {
+          "x": 6,
+          "y": 16,
+          "playerId": "5175711",
+          "teamId": "250",
+          "text": "Mier Panoam makes 25-foot three point jumper (Noah Shelby assists)"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "UT Arlington Mavericks",
+          "teamId": "250",
+          "fgAttemptsFromPlayerBoxscore": 42,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "16",
+                "8",
+                "3-4",
+                "0-0",
+                "2-2",
+                "2",
+                "0",
+                "1",
+                "0",
+                "1",
+                "0",
+                "2",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Southern Miss Golden Eagles",
+          "teamId": "2572",
+          "fgAttemptsFromPlayerBoxscore": 38,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "9",
+                "0",
+                "0-1",
+                "0-0",
+                "0-2",
+                "2",
+                "0",
+                "0",
+                "0",
+                "0",
+                "1",
+                "1",
+                "0"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "250": 41,
+        "2572": 38
+      },
+      "rawShotLocationCount": 79,
+      "error": null
+    },
+    {
+      "id": "401906851",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T02:00Z",
+      "teams": [
+        "Tennessee Volunteers",
+        "Michigan State Spartans"
+      ],
+      "playCount": 145,
+      "shotCount": 31,
+      "locatedCount": 31,
+      "playerIds": 31,
+      "teamIds": 31,
+      "misses": 20,
+      "makes": 11,
+      "coordinates": [
+        {
+          "x": 22,
+          "y": 3,
+          "playerId": "5142710",
+          "teamId": "2633",
+          "text": "DeWayne Brown II makes layup (Jalen Haralson assists)"
+        },
+        {
+          "x": 39,
+          "y": 21,
+          "playerId": "5196931",
+          "teamId": "127",
+          "text": "Jordan Scott misses 25-foot three point jumper"
+        },
+        {
+          "x": 8,
+          "y": 21,
+          "playerId": "4872740",
+          "teamId": "127",
+          "text": "Coen Carr misses 27-foot three point jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Michigan State Spartans",
+          "teamId": "127",
+          "fgAttemptsFromPlayerBoxscore": 15,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "10",
+                "0",
+                "0-2",
+                "0-1",
+                "0-0",
+                "2",
+                "0",
+                "0",
+                "0",
+                "0",
+                "1",
+                "1",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Tennessee Volunteers",
+          "teamId": "2633",
+          "fgAttemptsFromPlayerBoxscore": 16,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "7",
+                "4",
+                "2-2",
+                "0-0",
+                "0-0",
+                "2",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "2",
+                "2"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "127": 15,
+        "2633": 16
+      },
+      "rawShotLocationCount": 31,
+      "error": null
+    },
+    {
+      "id": "401921826",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Vanderbilt Commodores",
+        "Eastern Illinois Panthers"
+      ],
+      "playCount": 395,
+      "shotCount": 101,
+      "locatedCount": 101,
+      "playerIds": 101,
+      "teamIds": 101,
+      "misses": 49,
+      "makes": 52,
+      "coordinates": [
+        {
+          "x": 31,
+          "y": 28,
+          "playerId": "5311759",
+          "teamId": "238",
+          "text": "Chandler Bing misses 29-foot three point jumper"
+        },
+        {
+          "x": 32,
+          "y": 26,
+          "playerId": "5187600",
+          "teamId": "238",
+          "text": "Tyler Tanner makes 27-foot three point jumper (Chandler Bing assists)"
+        },
+        {
+          "x": 32,
+          "y": 32,
+          "playerId": "5184415",
+          "teamId": "2197",
+          "text": "Tanner Vogel makes 32-foot three point jumper (Jaden Miller assists)"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Eastern Illinois Panthers",
+          "teamId": "2197",
+          "fgAttemptsFromPlayerBoxscore": 46,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "32",
+                "9",
+                "3-7",
+                "3-5",
+                "0-0",
+                "3",
+                "1",
+                "1",
+                "0",
+                "0",
+                "0",
+                "3",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Vanderbilt Commodores",
+          "teamId": "238",
+          "fgAttemptsFromPlayerBoxscore": 55,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "22",
+                "8",
+                "3-6",
+                "2-4",
+                "0-0",
+                "6",
+                "6",
+                "3",
+                "1",
+                "0",
+                "1",
+                "5",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "238": 55,
+        "2197": 46
+      },
+      "rawShotLocationCount": 101,
+      "error": null
+    },
+    {
+      "id": "401920426",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T02:00Z",
+      "teams": [
+        "Virginia Cavaliers",
+        "Old Dominion Monarchs"
+      ],
+      "playCount": 173,
+      "shotCount": 48,
+      "locatedCount": 48,
+      "playerIds": 48,
+      "teamIds": 48,
+      "misses": 31,
+      "makes": 17,
+      "coordinates": [
+        {
+          "x": 25,
+          "y": 26,
+          "playerId": "5150404",
+          "teamId": "258",
+          "text": "Chance Mallory misses 26-foot three point jumper"
+        },
+        {
+          "x": 48,
+          "y": 1,
+          "playerId": "5457336",
+          "teamId": "258",
+          "text": "Nolan Adekunle misses 23-foot three point jumper"
+        },
+        {
+          "x": 23,
+          "y": 3,
+          "playerId": "5311844",
+          "teamId": "258",
+          "text": "Johann Grunloh misses driving layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Old Dominion Monarchs",
+          "teamId": "295",
+          "fgAttemptsFromPlayerBoxscore": 24,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "6",
+                "0",
+                "0-1",
+                "0-0",
+                "0-0",
+                "2",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "2",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "Virginia Cavaliers",
+          "teamId": "258",
+          "fgAttemptsFromPlayerBoxscore": 24,
+          "statGroups": [
+            {
+              "name": "",
+              "keys": [
+                "minutes",
+                "points",
+                "fieldGoalsMade-fieldGoalsAttempted",
+                "threePointFieldGoalsMade-threePointFieldGoalsAttempted",
+                "freeThrowsMade-freeThrowsAttempted",
+                "rebounds",
+                "assists",
+                "turnovers",
+                "steals",
+                "blocks",
+                "offensiveRebounds",
+                "defensiveRebounds",
+                "fouls"
+              ],
+              "example": [
+                "10",
+                "0",
+                "0-3",
+                "0-2",
+                "0-0",
+                "2",
+                "0",
+                "0",
+                "0",
+                "0",
+                "1",
+                "1",
+                "1"
+              ]
+            }
+          ]
+        }
+      ],
+      "pbpShotsPerTeam": {
+        "258": 24,
+        "295": 24
+      },
+      "rawShotLocationCount": 48,
+      "error": null
+    }
+  ]
+}
