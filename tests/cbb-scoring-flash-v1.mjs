@@ -173,8 +173,8 @@ test('a shot with no athlete ID does not trigger an invented player spotlight',a
 test('missing coordinates remain unplotted, and missing headshots use genuine college team logo',async()=>{
  const h=wing(teamNames[0]);
  const unlocated=shot('a6',6,'333','4711306','Brandon Garrison makes layup',2,null);
- await h.tick(game(baseline));
- await h.tick(game([...baseline,unlocated],'in',19,16));
+ await h.tick(game(baseline.slice(0,1)));
+ await h.tick(game([...baseline.slice(0,1),unlocated],'in',19,16));
  assert.equal(h.active(),true);
  assert.match(h.overlay.innerHTML,/BRANDON GARRISON/i);
  assert.match(h.overlay.innerHTML,/SHOT LOCATIONS UNAVAILABLE/);
