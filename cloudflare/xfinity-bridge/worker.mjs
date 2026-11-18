@@ -72,8 +72,16 @@ function config(env){
 async function safeFetch(url,init,timeout=10000){
  const controller=new AbortController();
  const timer=setTimeout(()=>controller.abort(),timeout);
- try{return await fetch(url,{...init,signal:controller.signal,redirect:'error'});}
- catch{
+ try{
+  // Cloudflare Workers only supports "manual" or "follow" redirects.
+  // Use manual and explicitly reject 3xx, so no credentials are forwarded
+  // to another host and Google/Firebase/Xfinity requests can actually run.
+  const response=await fetch(url,{...init,signal:controller.signal,redirect:'manual'});
+  if(response.status>=300&&response.status<400)throw new BridgeError('UPSTREAM_REDIRECT_BLOCKED',502);
+  return response;
+ }
+ catch(error){
+  if(error instanceof BridgeError)throw error;
   const host=new URL(url).hostname;
   const code=host==='remote.xfinity.com'?'XFINITY_NETWORK_UNAVAILABLE':
     host==='oauth2.googleapis.com'?'FIREBASE_AUTH_UNAVAILABLE':
@@ -438,6 +446,7 @@ export default{
     FIREBASE_AUTH_UNAVAILABLE:'Firebase service authentication is unavailable. Check that the new service account belongs to man-cave-left-right.',
     FIREBASE_SERVICE_KEY_INVALID:'Firebase Admin service-account private key cannot be used. Generate a new JSON key for man-cave-left-right.',
     XFINITY_NETWORK_UNAVAILABLE:'Cloudflare could not reach Xfinity remote pairing service. Xfinity may be blocking Cloudflare network requests.',
+    UPSTREAM_REDIRECT_BLOCKED:'An upstream service redirected the bridge request. The redirect was blocked to protect credentials.',
     INVALID_SAVED_PAIRING:'Saved Xfinity pairing record is unreadable.',
     PAIRING_KEY_MISMATCH:'Original Xfinity encryption key does not match. Preserve or restore the original key.',
     BUSY:'Box is processing a command.',
