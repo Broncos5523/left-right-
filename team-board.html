@@ -219,7 +219,7 @@ if(['nba','wnba','cbb'].includes(sport)){
    app.querySelector('.note').textContent='Players shown are current-game box-score participants, not confirmed five players presently on court. Live stats may be delayed.';
   }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
  }
- update();setInterval(update,45000);
+ update();setInterval(update,10000);
 }
 </script>
 <script src="./football-personnel.js?v=cfb-edge-stats-v1"></script><script src="./football-personnel-nfl-engine.js?v=nfl-edge-stats-v1"></script><script src="./football-board.js?v=cfb-possession-v5"></script><script src="./mlb-board.js?v=phase-headings-v1"></script><script src="./nfl-status-indicators.js?v=nfl-status-v1"></script><script src="./nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4"></script></body></html>
