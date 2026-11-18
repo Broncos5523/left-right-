@@ -149,7 +149,12 @@ function stopPolling(){if(pairTimer){clearInterval(pairTimer);pairTimer=null;}}
 async function refreshBoxes(){
  try{
   const result=await api('/api/boxes');
-  paired=new Set((result.boxes||[]).filter(x=>x.paired).map(x=>x.name));
+  if(result?.ok!==true||!Array.isArray(result.boxes))
+   throw Error('Bridge returned an invalid box list.');
+  paired=new Set(result.boxes.filter(x=>x.paired).map(x=>x.name));
+  // A successful, authenticated status request proves this private bridge is
+  // working. Unlock EasyPair without requiring a redundant Check bridge tap.
+  bridgeReady=true;
   renderBoxes();
   status('serverStatus','Bridge connected. '+paired.size+' of 4 Xfinity boxes paired.','good');
  }catch(error){status('serverStatus','Cannot fetch box status: '+error.message,'warn');}
