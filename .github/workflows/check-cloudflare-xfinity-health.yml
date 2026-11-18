@@ -28,8 +28,8 @@ jobs:
                  service:body.service||null,configured:body.configured??null};
               console.log('XFINITY_WORKER_HEALTH',JSON.stringify(status));
               last=JSON.stringify(status);
-              if(res.ok&&body.service==='man-cave-xfinity-bridge'&&body.runtime==='cloudflare-workers'){
-                console.log('PASS_CLOUDFLARE_XFINITY_WORKER_PUBLIC_HEALTH',body.configured?'CONFIGURED':'SECRETS_NEEDED');
+              if(res.ok&&body.configured===true&&body.service==='man-cave-xfinity-bridge'&&body.runtime==='cloudflare-workers'){
+                console.log('PASS_CLOUDFLARE_XFINITY_WORKER_PUBLIC_HEALTH_CONFIGURED');
                 process.exit(0);
               }
             }catch(e){
@@ -38,6 +38,6 @@ jobs:
             }
             await new Promise(r=>setTimeout(r,10000));
           }
-          console.log('CLOUDFLARE_WORKER_NOT_VERIFIED',last);
+          console.log('CLOUDFLARE_WORKER_NOT_YET_FULLY_CONFIGURED',last);
           process.exitCode=1;
           JS
