@@ -12,7 +12,8 @@ test('exact approved V4 black/red/green shot-chart and frameless headshot kept',
  assert.match(code,/'#37ff8e'/);
  assert.match(code,/'#ff405c'/);
  assert.match(code,/border:0;border-radius:0;background:transparent/);
- assert.match(code,/transform:translateY\(-18%\) scale\(1\.55\)/);
+ assert.match(code,/#nbaFlash \.f-head\{width:28%/);
+ assert.match(code,/transform:translateY\(-8%\) scale\(1\.22\)/);
  assert.match(code,/timer=setTimeout\(/);
  assert.match(code,/isThree\?8000:6000/);
  assert.match(code,/if\(!p\)return '';/);
