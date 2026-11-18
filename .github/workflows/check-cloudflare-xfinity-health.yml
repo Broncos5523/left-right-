@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/check-cloudflare-xfinity-health.yml
+      - cloudflare/xfinity-bridge/worker.mjs
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,7 +30,7 @@ jobs:
                  signingKeys:body.signingKeys||null};
               console.log('XFINITY_WORKER_HEALTH',JSON.stringify(status));
               last=JSON.stringify(status);
-              if(res.ok&&body.configured===true&&body.signingKeys?.reachable===true&&body.service==='man-cave-xfinity-bridge'&&body.runtime==='cloudflare-workers'){
+              if(res.ok&&body.configured===true&&body.signingKeys?.reachable===true&&body.signingKeys?.verifierPath===true&&body.service==='man-cave-xfinity-bridge'&&body.runtime==='cloudflare-workers'){
                 console.log('PASS_CLOUDFLARE_XFINITY_WORKER_PUBLIC_HEALTH_CONFIGURED');
                 process.exit(0);
               }
