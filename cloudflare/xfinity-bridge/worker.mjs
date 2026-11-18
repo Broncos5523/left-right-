@@ -66,10 +66,20 @@ function config(env){
    throw new BridgeError('UNCONFIGURED',503);
  return {account,uids,url:url.replace(/\/$/,''),origin,key};
 }
+// Convert network failures into actionable, non-sensitive diagnostics.  Never
+// include request URLs, headers, credentials, tokens, or upstream response bodies.
 async function safeFetch(url,init,timeout=10000){
  const controller=new AbortController();
  const timer=setTimeout(()=>controller.abort(),timeout);
  try{return await fetch(url,{...init,signal:controller.signal,redirect:'error'});}
+ catch{
+  const host=new URL(url).hostname;
+  const code=host==='remote.xfinity.com'?'XFINITY_NETWORK_UNAVAILABLE':
+    host==='oauth2.googleapis.com'?'FIREBASE_AUTH_UNAVAILABLE':
+    host==='www.googleapis.com'?'FIREBASE_SIGNING_KEYS_UNAVAILABLE':
+    'FIREBASE_DATABASE_UNAVAILABLE';
+  throw new BridgeError(code,502);
+ }
  finally{clearTimeout(timer);}
 }
 async function aesKey(cfg){
@@ -106,8 +116,11 @@ async function googleAccess(cfg){
  const claims=b64url(bytes(JSON.stringify({iss:cfg.account.client_email,
   aud:OAUTH,scope:SCOPES,iat:now,exp:now+3300})));
  const input=header+'.'+claims;
- const signature=b64url(new Uint8Array(await crypto.subtle.sign(
-  'RSASSA-PKCS1-v1_5',await importRsa(cfg.account.private_key),bytes(input))));
+ let signature;
+ try{
+  signature=b64url(new Uint8Array(await crypto.subtle.sign(
+   'RSASSA-PKCS1-v1_5',await importRsa(cfg.account.private_key),bytes(input))));
+ }catch{throw new BridgeError('FIREBASE_SERVICE_KEY_INVALID',503);}
  const response=await safeFetch(OAUTH,{method:'POST',
   headers:{'Content-Type':'application/x-www-form-urlencoded'},
   body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -389,7 +402,9 @@ export default{
     NOT_AUTHORIZED:'This Firebase user cannot control Xfinity devices.',
     FIREBASE_SIGNING_KEYS_UNAVAILABLE:'Firebase identity verification is unavailable.',
     FIREBASE_DATABASE_UNAVAILABLE:'Firebase pairing records are temporarily unavailable.',
-    FIREBASE_AUTH_UNAVAILABLE:'Firebase service authentication is unavailable.',
+    FIREBASE_AUTH_UNAVAILABLE:'Firebase service authentication is unavailable. Check that the new service account belongs to man-cave-left-right.',
+    FIREBASE_SERVICE_KEY_INVALID:'Firebase Admin service-account private key cannot be used. Generate a new JSON key for man-cave-left-right.',
+    XFINITY_NETWORK_UNAVAILABLE:'Cloudflare could not reach Xfinity remote pairing service. Xfinity may be blocking Cloudflare network requests.',
     INVALID_SAVED_PAIRING:'Saved Xfinity pairing record is unreadable.',
     PAIRING_KEY_MISMATCH:'Original Xfinity encryption key does not match. Preserve or restore the original key.',
     BUSY:'Box is processing a command.',
