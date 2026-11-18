@@ -8,7 +8,7 @@ const live=read('team-board.html');
 const preview=read('team-board-nba-flash-preview-v4.html');
 const overlayCode=read('nba-scoring-flash-preview-v4.js');
 const archive=JSON.parse(read('nba-scoring-archive-401585607.json'));
-const sharedTag='<script src="./nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4&score-sync=10s-v1"></script>';
+const sharedTag='<script src="./nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4&score-sync=10s-broadcast-delay-v2"></script>';
 
 test('production team board differs from Gold Master preview only in title',()=>{
  assert.ok(live.includes(sharedTag),'production board must load exact Gold Master');
