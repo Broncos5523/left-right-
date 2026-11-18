@@ -1,0 +1,49 @@
+name: Verify NBA V4 shot chart and isolated wing preview receivers
+on:
+  push:
+    branches: [main]
+    paths:
+      - nba-scoring-flash-preview-v4.js
+      - nba-scoring-flash-lab-v1.html
+      - left-nba-flash-preview.html
+      - right-nba-flash-preview.html
+      - team-board-nba-flash-preview-v4.html
+      - nba-scoring-archive-401585607.json
+      - tests/nba-scoring-flash-v4.mjs
+      - .github/workflows/verify-nba-flash-v4-wing-staging.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check ESPN archived data, queue-all scoring alerts, and protected approved design
+        run: node --test tests/nba-scoring-flash-v4.mjs
+      - name: Confirm both isolated wing previews are published without replacing live receivers
+        run: |
+          node --input-type=module <<'JS'
+          const root='https://broncos5523.github.io/left-right-/';
+          const wanted=['left-nba-flash-preview.html','right-nba-flash-preview.html',
+            'team-board-nba-flash-preview-v4.html','nba-scoring-flash-preview-v4.js'];
+          for(let attempt=0;attempt<18;attempt++){
+            try{
+              const files=await Promise.all(wanted.map(async file=>{
+                const r=await fetch(root+file+'?verify='+Date.now(),{cache:'no-store'});
+                return {file,ok:r.ok,text:r.ok?await r.text():''};
+              }));
+              if(files.every(f=>f.ok)&&
+                files.filter(f=>f.file.includes('nba-flash-preview.html')).every(f=>f.text.includes('team-board-nba-flash-preview-v4.html'))&&
+                files.find(f=>f.file==='team-board-nba-flash-preview-v4.html').text.includes('nba-scoring-flash-preview-v4.js')&&
+                files.find(f=>f.file==='nba-scoring-flash-preview-v4.js').text.includes('for(const entry of fresh)')){
+                console.log('PASS_PUBLISHED_NBA_V4_WING_RECEIVERS_BLACK_SHOT_CHART_SCORING_QUEUE');
+                process.exit(0);
+              }
+            }catch{}
+            console.log('PAGES_PUBLISH_NOT_YET_CONFIRMED',attempt+1);
+            await new Promise(r=>setTimeout(r,7000));
+          }
+          throw Error('Unable to confirm new isolated NBA V4 wing preview is published.');
+          JS
