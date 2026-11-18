@@ -1,4 +1,4 @@
-// V4 NBA scoring spotlight; preview-only. Seamless black background. No Firebase writes, no changes to approved boards.
+// V4 NBA scoring spotlight; preview-only. Seamless black background. Live queue fix. No Firebase writes or approved-board design changes.
 (()=>{
 'use strict';
 const qs=new URLSearchParams(location.search);
@@ -148,15 +148,30 @@ function process(data){
  if(!c.selectedId)return;
  last=c.shotMakes[c.shotMakes.length-1]||last;
  if(!loaded){
-  loaded=true;seen=new Set(c.all.map(e=>e.key));maxOrder=Math.max(-1,...c.all.map(e=>e.order));
-  return; // Never display past baskets automatically on startup.
+  loaded=true;
+  // Baseline all already-scored baskets: never flash historical plays on load.
+  // Do not mark *unscored* plays as seen; a late ESPN scoring correction
+  // must remain eligible for a genuine new-basket flash.
+  seen=new Set(c.shotMakes.map(e=>e.key));
+  maxOrder=Math.max(-1,...c.all.map(e=>e.order));
+  return;
  }
- const fresh=c.shotMakes.filter(e=>!seen.has(e.key)&&e.order>maxOrder);
- c.all.forEach(e=>seen.add(e.key));maxOrder=Math.max(maxOrder,...c.all.map(e=>e.order));
+ const fresh=c.shotMakes.filter(e=>!seen.has(e.key)&&e.order>=maxOrder-3)
+   .sort((a,b)=>a.order-b.order);
+ c.shotMakes.forEach(e=>seen.add(e.key));
+ maxOrder=Math.max(maxOrder,...c.all.map(e=>e.order));
  if(phase!=='in'||!fresh.length)return;
- const newest=fresh[fresh.length-1];
- if(overlay.classList.contains('active')){pending.push({entry:newest,c});if(pending.length>2)pending.shift();}
- else display(newest,c);
+ // Process *every* newly identified scoring play, in game order. The older
+ // implementation silently dropped all but the newest basket per ESPN poll.
+ // Cap the queue only to prevent an old/backfilled feed overwhelming the TV.
+ for(const entry of fresh){
+  pending.push({entry,c});
+  if(pending.length>6)pending.shift();
+ }
+ if(!overlay.classList.contains('active')){
+  const next=pending.shift();
+  if(next)display(next.entry,next.c);
+ }
 }
 async function poll(){
  if(!/^\d{6,15}$/.test(eventId)||busy||document.hidden||(loaded&&phase==='post'))return;
