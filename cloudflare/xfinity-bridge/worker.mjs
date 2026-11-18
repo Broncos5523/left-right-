@@ -156,25 +156,18 @@ async function db(cfg,path,method='GET',value,opts={}){
 // requests from health checks.
 async function publicKeyProbe(){
  if(publicProbe&&Date.now()<publicProbeUntil)return publicProbe;
+ // Use the SAME strict retrieval/validation as real Firebase ID-token auth.
+ // No signing-key bytes, tokens, secret names or private records are returned.
  let result;
  try{
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),8500);
-  let response;
-  try{response=await fetch(JWKS,{redirect:'manual',signal:controller.signal});}
-  finally{clearTimeout(timer);}
-  if(!response.ok){
-   result={reachable:false,http:response.status,reason:'HTTP_NOT_OK'};
-  }else{
-   try{
-    const body=await response.json();
-    const keys=Array.isArray(body?.keys)?body.keys.filter(k=>k.kid&&k.kty==='RSA'&&k.n&&k.e):[];
-    result={reachable:keys.length>0,http:response.status,
-     reason:keys.length?'OK':'NO_RSA_SIGNING_KEYS'};
-   }catch{result={reachable:false,http:response.status,reason:'INVALID_JSON'};}
-  }
- }catch{result={reachable:false,http:null,reason:'NETWORK_OR_REDIRECT'};}
- publicProbe=result;publicProbeUntil=Date.now()+60000;
+  const keys=await getKeys();
+  result={reachable:keys.length>0,reason:keys.length?'OK':'NO_KEYS',
+   verifierPath:true};
+ }catch(error){
+  result={reachable:false,reason:error instanceof BridgeError?
+   error.code:'VERIFIER_RUNTIME_FAILURE',verifierPath:true};
+ }
+ publicProbe=result;publicProbeUntil=Date.now()+15000;
  return result;
 }
 async function getKeys(){
