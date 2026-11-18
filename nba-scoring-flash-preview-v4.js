@@ -143,6 +143,10 @@ function display(entry,c,sample=false){
 }
 function process(data){
  const c=build(data);latest=c;
+ // Synchronize the persistent wing scoreboard from the SAME ESPN snapshot
+ // before showing the scoring flash; the 10-second roster poll may race this fetch.
+ const scoredTeam=data?.header?.competitions?.[0]?.competitors?.find(x=>String(x.team?.id||'')===c.selectedId);
+ if(scoredTeam?.score!=null&&typeof setScore==='function')setScore(scoredTeam.score);
  phase=String(data?.header?.competitions?.[0]?.status?.type?.state||data?.header?.status?.type?.state||'').toLowerCase();
  const lab=document.getElementById('nbaFeedStatus');if(lab)lab.textContent=c.selectedId?'NBA '+(phase||'loaded')+' · '+c.shots.length+' shots':'Team not found in game';
  if(!c.selectedId)return;
@@ -228,5 +232,5 @@ window.ManCaveNbaFlash=Object.freeze(api);
 document.getElementById('nbaReplay')?.addEventListener('click',()=>{if(!api.replay())document.getElementById('nbaFeedStatus').textContent='No confirmed made basket loaded yet';});
 document.getElementById('nbaLeader')?.addEventListener('click',()=>{if(!api.leader())document.getElementById('nbaFeedStatus').textContent='No scored shots available for this team';});
 document.getElementById('nbaDemo')?.addEventListener('click',api.demo);
-poll();setInterval(poll,12000);
+poll();setInterval(poll,10000);
 })();
