@@ -41,7 +41,7 @@ const position=data=>{
  return /^G$|GOAL/.test(code)?'G':/^C$|CENTER/.test(code)?'C':/^D$|DEFEN/.test(code)?'D':'F';
 };
 const rank=data=>({C:0,F:1,D:2,G:3})[position(data)]??2;
-const byPosition=(a,b)=>rank(a)-rank(b);
+const byPosition=(a,b)=>rank(a)-rank(b)||String(a?.a?.athlete?.displayName||'').localeCompare(String(b?.a?.athlete?.displayName||''));
 const fallbackIds=roster=>{
  const athletes=[...roster.values()];
  const centers=athletes.filter(a=>position(a)==='C');
