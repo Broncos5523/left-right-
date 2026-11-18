@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090f19"><title>Man Cave — College Shot Coverage Audit</title><style>
+*{box-sizing:border-box}body{margin:0;background:#090f19;color:#f4f6fd;font:15px -apple-system,BlinkMacSystemFont,Arial,sans-serif}main{max-width:900px;margin:auto;padding:20px 13px 80px}h1{font-size:25px;margin:6px 0 10px}h2{font-size:18px;margin:18px 0 10px}p{line-height:1.45;color:#b8c5d7}.eyebrow{font-size:11px;color:#73d3ef;font-weight:900;letter-spacing:2px}.panel{background:#151c2a;border:1px solid #344458;border-radius:15px;padding:14px;margin:15px 0}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}label{display:flex;flex-direction:column;gap:6px;color:#c5d4e5;font-size:12px;font-weight:800}select,input,button{min-width:0;width:100%;padding:11px 10px;background:#202b3c;color:white;border-radius:9px;border:1px solid #49617c;font:inherit}button{border:0;background:#1783d3;color:white;font-weight:900;margin-top:12px}button:disabled{opacity:.45}.muted{font-size:12px;color:#a5b4c9}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{background:#091321;border:1px solid #324357;border-radius:10px;padding:12px 8px;text-align:center}.metric strong{font-size:23px;display:block}.metric small{color:#9eb7ca}.item{border-bottom:1px solid #3b4a60;padding:11px 2px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.name{font-weight:900}.detail{font-size:12px;color:#b9ccdd;margin-top:5px}.tag{border-radius:8px;border:1px solid #748ba3;color:#d3e0f0;font-size:11px;font-weight:900;padding:5px 7px;white-space:nowrap}.exact{color:#6bf6ab;border-color:#27764c}.partial{color:#ffd475;border-color:#8b652b}.none{color:#ff8f9d;border-color:#a0404c}.error{color:#ff9da6}.small{font-size:11px;color:#91a6c2}a{color:#7cd6ff;text-decoration:none}#status{white-space:pre-wrap}details{border-top:1px solid #4a5a6c;margin-top:10px;padding-top:10px}summary{cursor:pointer;font-weight:800}
+</style></head><body><main><div class="eyebrow">MAN CAVE SPORTS BOOK · RESEARCH ONLY</div><h1>College Shot Coverage Audit</h1><p>Read-only ESPN field-goal coordinate audit. Checks a real schedule date and records player IDs and actual shot X/Y supplied by ESPN. No TV controller assignments or graphics are modified.</p>
+<div class="panel"><div class="fields"><label>League<select id="league"><option value="mens-college-basketball">Men's Division I</option><option value="womens-college-basketball">Women's Division I</option></select></label><label>Date (Eastern)<input id="date" type="date"></label><label>Games<select id="scope"><option value="20">First 20 played</option><option value="60">First 60 played</option><option value="all">All returned played games</option></select></label><label>Order<select id="order"><option value="coverage">Lowest coverage first</option><option value="alphabetical">Alphabetical</option></select></label></div><button id="run">Audit ESPN shot positions</button><p id="status" class="muted" role="status">Select a date and run the read-only check.</p></div>
+<div class="summary"><div class="metric"><strong id="gameCount">—</strong><small>Games checked</small></div><div class="metric"><strong id="attemptCount">—</strong><small>PBP shot attempts</small></div><div class="metric"><strong id="coordCount">—</strong><small>Located attempts</small></div></div>
+<div class="panel"><h2>Per-game results</h2><div class="muted">Exact indicates coordinates and shooter IDs for every shot <em>present in the ESPN play-by-play</em>. This does NOT prove that ESPN included every actual field-goal attempt; final box-score reconciliation is a separate task.</div><div id="list"></div></div>
+<div class="panel"><h2>Source limitations</h2><p class="muted">ESPN is an unofficial publicly accessible endpoint, not a guaranteed service. Not all games have complete PBP; some shot coordinates may be placeholders. A missing value is never turned into an invented dot. NCAA/Genius/Sportradar coverage is not measured by this page. This audit is intentionally separate from your production boards.</p><a href="./COLLEGE_BASKETBALL_SHOT_CHART_SOURCE_AUDIT.md" target="_blank" rel="noopener">Read full source audit</a></div>
+</main><script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);const log=(msg)=>$('status').textContent=msg;
+const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).map(p=>[p.type,p.value]));$('date').value=parts.year+'-'+parts.month+'-'+parts.day;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const get=async url=>{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()};
+const athleteId=p=>String(p?.participants?.[0]?.athlete?.id||p?.participants?.[0]?.id||p?.athletes?.[0]?.id||p?.athlete?.id||p?.athleteId||'');
+const isShot=p=>(p.shootingPlay===true||/\b(makes|misses)\b.+\b(shot|jumper|layup|dunk|tip|hook)\b/i.test(p.text||''))&&!/free[ -]?throw/i.test((p.text||'')+' '+(p.type?.text||''));
+const xy=p=>{
+ const x=Number(p.coordinate?.x??p.coordinateX),y=Number(p.coordinate?.y??p.coordinateY);
+ if(!Number.isFinite(x)||!Number.isFinite(y)||p.coordinate?.x==null&&p.coordinateX==null||p.coordinate?.y==null&&p.coordinateY==null)return false;
+ // The raw college coordinate system differs between providers; reject clearly impossible sentinel values.
+ return Math.abs(x)<=150&&Math.abs(y)<=150;
+};
+let entries=[];
+async function scan(game,league){
+ const data=await get('https://site.api.espn.com/apis/site/v2/sports/basketball/'+league+'/summary?event='+encodeURIComponent(game.id));
+ const list=Array.isArray(data.plays)?data.plays:Array.isArray(data?.playByPlay?.plays)?data.playByPlay.plays:[];
+ const shots=list.filter(isShot),located=shots.filter(xy).length,attributed=shots.filter(p=>athleteId(p)).length;
+ const status=shots.length===0?'No attempts in feed':located===shots.length&&attributed===shots.length?'All PBP shots located':located?'Partial':'No shot positions';
+ return {...game,shots:shots.length,located,attributed,status};
+}
+function render(){
+ const arr=[...entries];
+ if($('order').value==='coverage')arr.sort((a,b)=>(a.shots? a.located/a.shots : -1)-(b.shots?b.located/b.shots:-1));
+ else arr.sort((a,b)=>a.name.localeCompare(b.name));
+ $('list').innerHTML=arr.map(g=>{
+  const pct=g.shots?Math.round(100*g.located/g.shots):0;const cls=g.error?'none':g.shots&&g.located===g.shots&&g.attributed===g.shots?'exact':g.located?'partial':'none';
+  return '<div class="item"><div class="row"><span class="name">'+esc(g.name)+'</span><span class="tag '+cls+'">'+(g.error?'ERROR':esc(g.status||'NO DATA'))+'</span></div><div class="detail">'+(g.error?esc(g.error):g.shots+' PBP FGA · '+g.located+' located ('+pct+'%) · '+g.attributed+' with shooter IDs')+'</div><div class="small">'+esc(g.id)+' · '+esc(g.state)+'</div></div>';
+ }).join('')||'<p class="muted">No data yet.</p>';
+ $('gameCount').textContent=entries.length;
+ $('attemptCount').textContent=entries.reduce((sum,g)=>sum+(g.shots||0),0);
+ $('coordCount').textContent=entries.reduce((sum,g)=>sum+(g.located||0),0);
+}
+$('order').addEventListener('change',render);
+$('run').addEventListener('click',async()=>{
+ const btn=$('run');btn.disabled=true;entries=[];render();
+ try{
+  const league=$('league').value,date=$('date').value.replace(/-/g,'');
+  if(!/^\d{8}$/.test(date))throw Error('Choose a valid calendar date');
+  log('Reading ESPN schedule…');
+  const schedule=await get('https://site.api.espn.com/apis/site/v2/sports/basketball/'+league+'/scoreboard?dates='+date+'&limit=500');
+  const games=(schedule.events||[]).filter(e=>['in','post'].includes(e.status?.type?.state)).map(e=>({
+   id:String(e.id),name:(e.competitions?.[0]?.competitors||[]).map(x=>x.team?.shortDisplayName||x.team?.displayName||'Unknown').join(' vs '),state:e.status?.type?.description||e.status?.type?.state||'unknown'
+  }));
+  const max=$('scope').value==='all'?games.length:Number($('scope').value);
+  const targets=games.slice(0,max);
+  log('ESPN returned '+(schedule.events||[]).length+' games; checking '+targets.length+' in-progress/final games (up to 3 parallel requests)…');
+  let next=0,done=0;
+  const worker=async()=>{while(next<targets.length){
+   const j=next++,game=targets[j];
+   try{entries.push(await scan(game,league));}
+   catch(e){entries.push({...game,shots:0,located:0,attributed:0,error:String(e?.message||e)});}
+   done++;render();log('Checked '+done+'/'+targets.length+' games. ESPN returned '+(schedule.events||[]).length+' games on this date.');
+  }};
+  await Promise.all(Array.from({length:Math.min(3,targets.length)},worker));
+  if(!targets.length)log('No played games found for this date. Scheduled games have no shot data yet.');
+  else log('Audit complete: '+done+' games. This tests ESPN only; see the source audit for independent NCAA and paid sources.');
+ }catch(e){log('Unable to complete audit: '+String(e?.message||e)+'. Check ESPN access, browser CORS or the chosen date.');}
+ finally{btn.disabled=false;}
+});
+})();
+</script></body></html>
