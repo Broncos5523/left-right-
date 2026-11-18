@@ -34,6 +34,19 @@ jobs:
             console.log('ESPN_PLAY_SAMPLE_KEYS',JSON.stringify((d.plays||[]).slice(-2).map(x=>({keys:Object.keys(x),onIce:x.onIce,roster:x.roster}))));
             console.log('ESPN_BOXSCORE_GROUPS',JSON.stringify((d.boxscore?.players||[]).map(g=>({team:g.team?.displayName,stats:g.statistics?.map(s=>({name:s.name,labels:s.labels,keys:s.keys,athletes:s.athletes?.length,activeValues:s.athletes?.slice(0,6).map(a=>a.active),positionValues:s.athletes?.slice(0,6).map(a=>a.athlete?.position)}))}))));
             console.log('ESPN_TOP_ONICE',JSON.stringify(d.onIce).slice(0,7000));
+            const describe=(data)=> (data.onIce||[]).map(group=>{
+              const box=(data.boxscore?.players||[]).find(x=>String(x.team?.id)===String(group.teamId));
+              const roster=new Set((box?.statistics||[]).flatMap(s=>s.athletes||[]).map(a=>String(a.athlete?.id||'')));
+              const ids=(group.entries||[]).map(x=>String(x.athleteid||''));
+              return {teamId:group.teamId,onIceCount:ids.length,matched:ids.filter(id=>roster.has(id)).length,unmatched:ids.filter(id=>!roster.has(id))};
+            });
+            console.log('ESPN_ONICE_BOXSCORE_ID_MATCH',JSON.stringify(describe(d)));
+            await new Promise(resolve=>setTimeout(resolve,13000));
+            const laterResponse=await fetch(endpoints.espn);
+            const later=await laterResponse.json();
+            const ids=(data)=>(data.onIce||[]).map(g=>({team:g.teamId,ids:(g.entries||[]).map(x=>String(x.athleteid||'')).sort()}));
+            console.log('ESPN_ONICE_13S_COMPARE',JSON.stringify({before:ids(d),after:ids(later),changed:JSON.stringify(ids(d))!==JSON.stringify(ids(later)),beforeClock:d.header?.competitions?.[0]?.status?.displayClock,afterClock:later.header?.competitions?.[0]?.status?.displayClock}));
+            console.log('ESPN_LATER_ID_MATCH',JSON.stringify(describe(later)));
           }catch(e){console.log('ESPN_ERROR',String(e))}
           try{
             const r=await fetch(endpoints.nhl);const d=await r.json();
