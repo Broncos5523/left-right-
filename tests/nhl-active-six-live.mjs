@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const code=read('nhl-on-ice-engine.js');
-const chosenTag='<script src="./nhl-on-ice-engine.js?v=20261117-active-six-v2"></script>';
+const chosenTag='<script src="./nhl-on-ice-engine.js?v=20261117-active-six-10s-v3"></script>';
 
 test('production and approved preview use identical six-row NHL engine without touching layout',()=>{
  const prod=read('team-board.html'),preview=read('team-board-nba-flash-preview-v4.html');
@@ -17,7 +17,7 @@ test('production and approved preview use identical six-row NHL engine without t
  assert.match(code,/summary\.onIce/);
  assert.match(code,/athleteid/);
  assert.match(code,/whereabouts/);
- assert.match(code,/setInterval\(refresh,12000\)/);
+ assert.match(code,/setInterval\(refresh,10000\)/);
  assert.doesNotMatch(code,/\.slice\(0,6\).*side\?\.statistics/,'must not treat first six boxscore rows as on ice');
 });
 
@@ -77,7 +77,7 @@ function harness(){
 test('six real IDs sort C/F/D/G and update when the live NHL lineup changes',async()=>{
  const h=harness();
  await h.update(summary(['16','15','14','13','12','11']));
- assert.equal(h.clock[0],12000);
+ assert.equal(h.clock[0],10000);
  assert.deepEqual(h.rows.map(r=>r.name.textContent),[
   'BRUINS CENTER','BRUINS WING A','BRUINS WING B','BRUINS DEFENSE A','BRUINS DEFENSE B','BRUINS GOALIE'
  ]);
