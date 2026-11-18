@@ -111,6 +111,16 @@ test('missing onIce never falsely labels arbitrary box score roster as current o
  assert.equal(h.status().mode,'unverified');
  assert.match(h.single['.note'].textContent,/not supplied a complete verified on-ice lineup/);
 });
+test('end-of-period reporting keeps lineup visible without claiming players are currently skating',async()=>{
+ const h=harness();
+ const intermission=summary(['11','12','13','14','15','16']);
+ intermission.header.competitions[0].status.type.name='STATUS_END_PERIOD';
+ await h.update(intermission);
+ assert.equal(h.single['.band'].textContent,'LAST ON ICE');
+ assert.match(h.single['.meta'].textContent,/INTERMISSION/);
+ assert.equal(h.status().mode,'held');
+ assert.equal(h.rows.filter(r=>r.name.textContent.includes('BRUINS')).length,6);
+});
 test('power plays and overtime can show fewer players without inventing active players',async()=>{
  const h=harness();
  await h.update(summary(['11','12','14','16']));
