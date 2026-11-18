@@ -1,0 +1,49 @@
+name: Diagnose NHL active six data (safe shapes only)
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/diagnose-nhl-on-ice.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect current ESPN and NHL live on-ice payload structure
+        run: |
+          node --input-type=module <<'JS'
+          const endpoints={
+            espn:'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/summary?event=401892728',
+            nhl:'https://api-web.nhle.com/v1/score/2026-11-17'
+          };
+          const shape=(v,depth=0)=>{
+            if(depth>3)return '…';
+            if(Array.isArray(v))return {length:v.length,first:v.length?shape(v[0],depth+1):null};
+            if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).slice(0,25).map(([k,x])=>[k,shape(x,depth+1)]));
+            return typeof v;
+          };
+          try{
+            const r=await fetch(endpoints.espn,{headers:{'User-Agent':'ManCaveNhlDiagnostic/1.0'}});
+            const d=await r.json();
+            console.log('ESPN_RESPONSE',r.status,'ROOT_KEYS',Object.keys(d));
+            console.log('ESPN_ON_ICE_SHAPE',JSON.stringify(shape(d.onIce)));
+            console.log('ESPN_ONICE_TYPE',typeof d.onIce);
+            console.log('ESPN_COMP_STATUS',JSON.stringify(d.header?.competitions?.[0]?.status));
+            console.log('ESPN_PLAY_SAMPLE_KEYS',JSON.stringify((d.plays||[]).slice(-2).map(x=>({keys:Object.keys(x),onIce:x.onIce,roster:x.roster}))));
+            console.log('ESPN_BOXSCORE_GROUPS',JSON.stringify((d.boxscore?.players||[]).map(g=>({team:g.team?.displayName,stats:g.statistics?.map(s=>({name:s.name,labels:s.labels,keys:s.keys,athletes:s.athletes?.length,activeValues:s.athletes?.slice(0,6).map(a=>a.active),positionValues:s.athletes?.slice(0,6).map(a=>a.athlete?.position)}))}))));
+            console.log('ESPN_TOP_ONICE',JSON.stringify(d.onIce).slice(0,7000));
+          }catch(e){console.log('ESPN_ERROR',String(e))}
+          try{
+            const r=await fetch(endpoints.nhl);const d=await r.json();
+            console.log('NHL_RESPONSE',r.status,'SCORE_GAMES',JSON.stringify((d.games||[]).map(g=>({id:g.id,away:g.awayTeam?.abbrev,home:g.homeTeam?.abbrev,gameState:g.gameState})).slice(0,15)));
+            const g=(d.games||[]).find(g=>g.awayTeam?.abbrev==='LAK'&&g.homeTeam?.abbrev==='BOS')||(d.games||[])[0];
+            if(g){
+              const url='https://api-web.nhle.com/v1/gamecenter/'+g.id+'/play-by-play'; const r2=await fetch(url);const pbp=await r2.json();
+              console.log('NHL_PBP',r2.status,'KEYS',Object.keys(pbp),'ONICE',JSON.stringify(shape(pbp.onIce)),
+                'PLAYS_SAMPLE',JSON.stringify((pbp.plays||[]).slice(-2).map(p=>({keys:Object.keys(p),details:Object.keys(p.details||{}),situationCode:p.situationCode}))),
+                'ROSTERSPOTS',JSON.stringify(shape(pbp.rosterSpots)));
+            }
+          }catch(e){console.log('NHL_ERROR',String(e))}
+          JS
