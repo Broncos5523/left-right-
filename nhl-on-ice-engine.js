@@ -11,6 +11,8 @@ const nodes=Array.from(app.querySelectorAll('.row'));
 const norm=s=>String(s??'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const list=x=>Array.isArray(x)?x:[];
 const requested=String(p.get('eventId')||'');
+// Hold ESPN snapshots back by the user's TV broadcast delay without slowing the 10-second feed.
+const broadcastDelayMs=Math.min(120,Math.max(0,Number(p.get('broadcastDelay')||0)||0))*1000;
 const url='https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/summary?event='+encodeURIComponent(requested);
 let busy=false,hasRendered=false,lastVerifiedIds=[],lastVerification=0,lastError='',lastMode='pending';
 band.textContent='ON ICE';meta.textContent='LOOKING UP NHL LIVE LINEUP…';
@@ -147,7 +149,8 @@ async function refresh(){
   const summary=await response.json();
   const match=list(summary.header?.competitions?.[0]?.competitors).find(x=>norm(x.team?.displayName)===norm(team)||norm(x.team?.name)===norm(team)||norm(x.team?.abbreviation)===norm(team));
   if(!match)throw Error('Selected NHL team missing from ESPN event');
-  render(summary,match);
+  if(broadcastDelayMs)setTimeout(()=>render(summary,match),broadcastDelayMs);
+  else render(summary,match);
   lastError='';
  }catch(e){
   lastError=String(e?.message||e);
@@ -158,7 +161,7 @@ async function refresh(){
 }
 window.ManCaveNhlOnIce=Object.freeze({
  status:()=>({team,eventId:requested,mode:lastMode,verifiedCount:lastVerifiedIds.length,
-  lastVerifiedAt:lastVerification,error:lastError}),
+  lastVerifiedAt:lastVerification,broadcastDelaySeconds:broadcastDelayMs/1000,error:lastError}),
  refresh
 });
 refresh();
