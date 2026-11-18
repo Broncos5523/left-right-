@@ -8,8 +8,10 @@ on:
       - left-nba-flash-preview.html
       - right-nba-flash-preview.html
       - team-board-nba-flash-preview-v4.html
+      - team-board.html
       - nba-scoring-archive-401585607.json
       - tests/nba-scoring-flash-v4.mjs
+      - tests/nba-scoring-flash-live.mjs
       - .github/workflows/verify-nba-flash-v4-wing-staging.yml
   workflow_dispatch:
 permissions:
@@ -21,13 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check ESPN archived data, queue-all scoring alerts, and protected approved design
-        run: node --test tests/nba-scoring-flash-v4.mjs
+        run: node --test tests/nba-scoring-flash-v4.mjs tests/nba-scoring-flash-live.mjs
       - name: Confirm both isolated wing previews are published without replacing live receivers
         run: |
           node --input-type=module <<'JS'
           const root='https://broncos5523.github.io/left-right-/';
           const wanted=['left-nba-flash-preview.html','right-nba-flash-preview.html',
-            'team-board-nba-flash-preview-v4.html','nba-scoring-flash-preview-v4.js'];
+            'team-board-nba-flash-preview-v4.html','team-board.html','nba-scoring-flash-preview-v4.js'];
           for(let attempt=0;attempt<18;attempt++){
             try{
               const files=await Promise.all(wanted.map(async file=>{
@@ -37,8 +39,9 @@ jobs:
               if(files.every(f=>f.ok)&&
                 files.filter(f=>f.file.includes('nba-flash-preview.html')).every(f=>f.text.includes('team-board-nba-flash-preview-v4.html'))&&
                 files.find(f=>f.file==='team-board-nba-flash-preview-v4.html').text.includes('nba-scoring-flash-preview-v4.js')&&
+                files.find(f=>f.file==='team-board.html').text.includes('nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4')&&
                 files.find(f=>f.file==='nba-scoring-flash-preview-v4.js').text.includes('for(const entry of fresh)')){
-                console.log('PASS_PUBLISHED_NBA_V4_WING_RECEIVERS_BLACK_SHOT_CHART_SCORING_QUEUE');
+                console.log('PASS_PUBLISHED_NBA_V4_LIVE_BOARD_AND_ISOLATED_WING_RECEIVERS_BLACK_SHOT_CHART_SCORING_QUEUE');
                 process.exit(0);
               }
             }catch{}
