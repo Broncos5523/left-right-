@@ -171,14 +171,14 @@ if(sport==='cbb'){
 if(['nba','wnba','cbb'].includes(sport)){
  const path={nba:'basketball/nba',wnba:'basketball/wnba',cbb:'basketball/mens-college-basketball'}[sport];
  const id=p.get('eventId'),meta=app.querySelector('.meta'),band=app.querySelector('.band');
+ const broadcastDelayMs=sport==='nba'?Math.min(120,Math.max(0,Number(p.get('broadcastDelay')||0)||0))*1000:0;
  band.textContent='ON COURT';
  const get=async()=>{const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(id),{cache:'no-store'});if(!r.ok)throw Error('ESPN HTTP '+r.status);return r.json()};
  const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
  const pick=(data,keys,labels)=>{const idx=data.keys.findIndex(x=>keys.includes(norm(x)));const j=idx<0?data.labels.findIndex(x=>labels.includes(norm(x))):idx;return j<0?'—':data.a.stats?.[j]??'—'};
- async function update(){
-  if(!id){meta.textContent='SELECT A LIVE GAME TO LOAD STATS';return}
+ function apply(data){
   try{
-   const data=await get(),competitors=data.header?.competitions?.[0]?.competitors||[];
+   const competitors=data.header?.competitions?.[0]?.competitors||[];
    const match=competitors.find(x=>norm(x.team?.displayName)===norm(team)||norm(x.team?.name)===norm(team));
    if(!match)throw Error('Team not in selected event');setHeader(match);
    const logo=app.querySelector('.logo');
@@ -217,6 +217,14 @@ if(['nba','wnba','cbb'].includes(sport)){
    setGamePhaseHeading(data);
    meta.textContent='ESPN · VERIFIED CURRENT-GAME STATS';
    app.querySelector('.note').textContent='Players shown are current-game box-score participants, not confirmed five players presently on court. Live stats may be delayed.';
+  }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
+ }
+ async function update(){
+  if(!id){meta.textContent='SELECT A LIVE GAME TO LOAD STATS';return}
+  try{
+   const data=await get();
+   if(broadcastDelayMs)setTimeout(()=>apply(data),broadcastDelayMs);
+   else apply(data);
   }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
  }
  update();setInterval(update,10000);
