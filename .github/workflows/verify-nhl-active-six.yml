@@ -1,0 +1,45 @@
+name: Verify NHL active on-ice six and immutable board design
+on:
+  push:
+    branches: [main]
+    paths:
+      - nhl-on-ice-engine.js
+      - team-board.html
+      - team-board-nba-flash-preview-v4.html
+      - tests/nhl-active-six-live.mjs
+      - .github/workflows/verify-nhl-active-six.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate live on-ice substitutions, goalie stats, outages, and layout regression
+        run: node --test tests/nhl-active-six-live.mjs tests/nba-scoring-flash-v4.mjs tests/nba-scoring-flash-live.mjs
+      - name: Confirm NHL engine and existing NBA flash published on the exact production board
+        run: |
+          node --input-type=module <<'JS'
+          const root='https://broncos5523.github.io/left-right-/';
+          for(let attempt=0;attempt<15;attempt++){
+            try{
+              const read=async name=>{
+                const res=await fetch(root+name+'?v='+Date.now(),{cache:'no-store'});
+                if(!res.ok)throw Error(name+' HTTP '+res.status);
+                return res.text();
+              };
+              const [board,engine,preview]=await Promise.all([
+                read('team-board.html'),read('nhl-on-ice-engine.js'),read('team-board-nba-flash-preview-v4.html')]);
+              if(board.includes('nhl-on-ice-engine.js?v=20261117-active-six-v1')&&
+                board.includes('nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4')&&
+                engine.includes('summary.onIce')&&engine.includes('setInterval(refresh,12000)')&&
+                preview.includes('nhl-on-ice-engine.js?v=20261117-active-six-v1')){
+                console.log('PASS_PUBLISHED_NHL_ON_ICE_LIVE_AND_APPROVED_NBA_FLASH');process.exit(0);
+              }
+            }catch(e){console.log('PAGES_NOT_YET_PUBLISHED',attempt+1,String(e));}
+            await new Promise(r=>setTimeout(r,7000));
+          }
+          throw Error('Live NHL on-ice engine not yet published');
+          JS
