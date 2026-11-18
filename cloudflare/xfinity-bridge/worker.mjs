@@ -20,6 +20,7 @@ const APP_ACTIONS=Object.freeze({netflix:'Netflix',prime:'Watch Prime Video',
 const PAIR_MS=180000,REFRESH_MS=35*60000;
 const enc=new TextEncoder(),dec=new TextDecoder();
 let publicKeys=null,keysUntil=0,oauthToken=null,oauthUntil=0;
+let publicProbeUntil=0,publicProbe=null;
 
 function bytesToB64(bytes){
  let str='';for(let i=0;i<bytes.length;i+=8192)
@@ -149,6 +150,32 @@ async function db(cfg,path,method='GET',value,opts={}){
  if(!response.ok)throw new BridgeError('FIREBASE_DATABASE_UNAVAILABLE');
  if(method==='DELETE')return {data:null};
  return {data:await response.json(),etag:response.headers.get('ETag')};
+}
+// Public-only diagnostics: never access service credentials, Firebase user
+// data or Xfinity tokens. Cache even failures to prevent repeated upstream
+// requests from health checks.
+async function publicKeyProbe(){
+ if(publicProbe&&Date.now()<publicProbeUntil)return publicProbe;
+ let result;
+ try{
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),8500);
+  let response;
+  try{response=await fetch(JWKS,{redirect:'manual',signal:controller.signal});}
+  finally{clearTimeout(timer);}
+  if(!response.ok){
+   result={reachable:false,http:response.status,reason:'HTTP_NOT_OK'};
+  }else{
+   try{
+    const body=await response.json();
+    const keys=Array.isArray(body?.keys)?body.keys.filter(k=>k.kid&&k.kty==='RSA'&&k.n&&k.e):[];
+    result={reachable:keys.length>0,http:response.status,
+     reason:keys.length?'OK':'NO_RSA_SIGNING_KEYS'};
+   }catch{result={reachable:false,http:response.status,reason:'INVALID_JSON'};}
+  }
+ }catch{result={reachable:false,http:null,reason:'NETWORK_OR_REDIRECT'};}
+ publicProbe=result;publicProbeUntil=Date.now()+60000;
+ return result;
 }
 async function getKeys(){
  if(publicKeys&&Date.now()<keysUntil)return publicKeys;
@@ -376,8 +403,11 @@ export default{
   }
   if(path==='/health'&&req.method==='GET'){
    let configured=false;try{config(env);configured=true;}catch{}
+   const check=url.searchParams.get('check');
+   if(check&&check!=='signing-keys')return fail(req,400,'Unsupported health check.');
+   const details=check==='signing-keys'?{signingKeys:await publicKeyProbe()}:{};
    return json(req,{ok:true,service:'man-cave-xfinity-bridge',
-    runtime:'cloudflare-workers',configured});
+    runtime:'cloudflare-workers',configured,...details});
   }
   // These previously shared the Render host with the private bridge.
   // Preserve their strict read-only behavior on Cloudflare without requiring
