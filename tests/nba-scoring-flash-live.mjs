@@ -41,6 +41,7 @@ function game(plays,state='in'){
 
 function wing(team,side){
  let current=null,nextId=0;
+ const updatedScores=[];
  const timers=new Map();
  const active=new Set();
  const overlay={
@@ -65,6 +66,7 @@ function wing(team,side){
  const window={};
  const context=vm.createContext({
   document,window,URLSearchParams,
+  setScore(value){updatedScores.push(String(value));},
   location:{search:'?sport=nba&team='+encodeURIComponent(team)+'&eventId=401585607&side='+side+'&tv=1'},
   fetch:async uri=>{
    assert.match(String(uri),/site\.api\.espn\.com\/apis\/site\/v2\/sports\/basketball\/nba\/summary\?event=401585607/);
@@ -76,11 +78,12 @@ function wing(team,side){
   setTimeout(fn,ms){const n=++nextId;timers.set(n,{fn,ms});return n;},
   clearTimeout(id){timers.delete(id);}
  });
- const snippet=overlayCode.replace('poll();setInterval(poll,12000);','window.__nbaStep=poll;');
+ const snippet=overlayCode.replace('poll();setInterval(poll,10000);','window.__nbaStep=poll;');
  assert.notEqual(snippet,overlayCode,'test must exercise real polling logic, not a fake implementation');
  vm.runInContext(snippet,context);
  return {
   overlay,
+  scores:()=>updatedScores.slice(),
   active:()=>overlay.classList.contains('active'),
   async tick(summary){current=summary;await window.__nbaStep();},
   advance(){
@@ -127,6 +130,23 @@ test('NBA scorer flashes only on own wing, from real ESPN plays, then returns to
  await Promise.all([left.tick(torontoBasket),right.tick(torontoBasket)]);
  assert.equal(left.active(),false,'same ESPN basket cannot flash twice');
  assert.equal(right.active(),false,'same ESPN basket cannot flash twice');
+});
+
+test('same ESPN snapshot updates scoreboard before a live NBA scoring flash',async()=>{
+ const h=wing('Orlando Magic','right');
+ const makeFrame=(plays,score)=>{
+  const frame=game(plays);
+  frame.header.competitions[0].competitors=frame.header.competitions[0].competitors.map(x=>
+   String(x.team?.id)==='19'?{...x,score:String(score)}:x);
+  return frame;
+ };
+ await h.tick(makeFrame(archive.plays.slice(0,3),18));
+ assert.deepEqual(h.scores(),['18']);
+ assert.equal(h.active(),false);
+ await h.tick(makeFrame(archive.plays.slice(0,4),20));
+ assert.deepEqual(h.scores(),['18','20']);
+ assert.equal(h.active(),true);
+ assert.match(h.overlay.innerHTML,/PAOLO BANCHERO/i);
 });
 
 test('when no NBA game is selected, other sports preserve their existing player boards',()=>{
