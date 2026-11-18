@@ -45,6 +45,9 @@ function mockEndpoints(){
   status,headers:{'Content-Type':'application/json',...headers}});
  globalThis.fetch=async(url,opts={})=>{
   const target=new URL(String(url)),headers=new Headers(opts.headers||{});
+  // Workers rejects redirect:error before making a subrequest. Every
+  // upstream request must use manual, with redirects denied separately.
+  assert.equal(opts.redirect,'manual','All upstream fetches must use Worker-compatible manual redirects');
   if(target.hostname==='www.googleapis.com'){
    return result({keys:[{...jwk,alg:'RS256',use:'sig',kid:'test-key'}]},200,
     {'Cache-Control':'public,max-age=300'});
@@ -188,6 +191,28 @@ test('upstream network failures identify Firebase vs Xfinity without leaking tok
    assert.ok(!JSON.stringify(error).includes('sensitive-network-error'));
   }finally{mock.restore();}
  }
+});
+
+test('upstream redirects are blocked rather than forwarding credentials',async()=>{
+ const mock=mockEndpoints(),base=globalThis.fetch;
+ let contacted=0;
+ globalThis.fetch=async(url,opts)=>{
+  const host=new URL(String(url)).hostname;
+  if(host==='remote.xfinity.com'){
+   assert.equal(opts.redirect,'manual');
+   contacted++;
+   return new Response(null,{status:302,headers:{Location:'https://attacker.invalid/steal'}});
+  }
+  return base(url,opts);
+ };
+ try{
+  const res=await worker.fetch(api('/api/pair/start',{
+   method:'POST',body:{box:'Center'}}),config);
+  assert.equal(res.status,502);
+  const result=await res.json();
+  assert.match(result.error,/redirect/i);
+  assert.equal(contacted,1);
+ }finally{mock.restore();}
 });
 
 test('original encryption key mismatch fails closed without overwriting saved pairing',async()=>{
