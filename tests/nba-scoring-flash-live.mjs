@@ -39,7 +39,7 @@ function game(plays,state='in'){
   plays};
 }
 
-function wing(team,side){
+function wing(team,side,delaySeconds=0){
  let current=null,nextId=0;
  const updatedScores=[];
  const timers=new Map();
@@ -67,7 +67,7 @@ function wing(team,side){
  const context=vm.createContext({
   document,window,URLSearchParams,
   setScore(value){updatedScores.push(String(value));},
-  location:{search:'?sport=nba&team='+encodeURIComponent(team)+'&eventId=401585607&side='+side+'&tv=1'},
+  location:{search:'?sport=nba&team='+encodeURIComponent(team)+'&eventId=401585607&side='+side+'&tv=1&broadcastDelay='+delaySeconds},
   fetch:async uri=>{
    assert.match(String(uri),/site\.api\.espn\.com\/apis\/site\/v2\/sports\/basketball\/nba\/summary\?event=401585607/);
    if(!current)throw Error('No test summary');
@@ -153,4 +153,28 @@ test('when no NBA game is selected, other sports preserve their existing player 
  assert.match(overlayCode,/if\(qs\.get\('sport'\)!=='nba'\)return;/);
  assert.match(read('left.html'),/\.\/team-board\.html\?sport=/);
  assert.match(read('right.html'),/\.\/team-board\.html\?sport=/);
+});
+
+test('30-second NBA broadcast sync holds team score and shot flash together',async()=>{
+ const right=wing('Orlando Magic','right',30);
+ const scored=(plays,score)=>{
+  const snapshot=game(plays);
+  snapshot.header.competitions[0].competitors=snapshot.header.competitions[0].competitors.map(x=>
+   String(x.team?.id)==='19'?{...x,score:String(score)}:x);
+  return snapshot;
+ };
+ await right.tick(scored(archive.plays.slice(0,3),18));
+ assert.equal(right.active(),false);
+ assert.deepEqual(right.scores(),[],'no future score while waiting for broadcast');
+ assert.equal(right.advance(),30000);
+ assert.deepEqual(right.scores(),['18']);
+ await right.tick(scored(archive.plays.slice(0,4),20));
+ assert.equal(right.active(),false);
+ assert.deepEqual(right.scores(),['18'],'no early score before the scoring graphic');
+ assert.equal(right.advance(),30000);
+ assert.deepEqual(right.scores(),['18','20']);
+ assert.equal(right.active(),true);
+ assert.match(right.overlay.innerHTML,/PAOLO BANCHERO/i);
+ assert.equal(right.advance(),6000);
+ assert.equal(right.active(),false);
 });
