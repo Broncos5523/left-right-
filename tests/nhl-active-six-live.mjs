@@ -63,7 +63,7 @@ function harness(){
  const window={};
  const clock=[];
  const ctx=vm.createContext({
-  sport:'nhl',team:'Boston Bruins',p:{get:()=> '401892728'},
+  sport:'nhl',team:'Boston Bruins',p:{get:key=>key==='eventId'?'401892728':null},
   app,window,document,Date,setHeader:()=>{},setScore:()=>{},
   setInterval:(fn,delay)=>{clock.push(delay);return 1;},
   fetch:async()=>({ok:true,json:async()=>current}),
