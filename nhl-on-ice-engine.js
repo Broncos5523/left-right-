@@ -102,8 +102,13 @@ function render(summary,match){
  const roster=rosterFor(summary,match);
  const status=summary.header?.competitions?.[0]?.status||summary.header?.status||{};
  const state=String(status.type?.state||status.state||'').toLowerCase();
- const ids=state==='in'?onIceIds(summary,match,roster):null;
- if(ids){lastVerifiedIds=ids;lastVerification=Date.now();}
+ // The feed preserves the final shift through intermission. Keep the players
+ // visible, but do not claim that a period-break lineup is actively on ice.
+ const periodBreak=state==='in'&&/END_PERIOD|INTERMISSION|END OF PERIOD/i.test(
+  String(status.type?.name||'')+' '+String(status.type?.description||''));
+ const reported=state==='in'?onIceIds(summary,match,roster):null;
+ if(reported){lastVerifiedIds=reported;lastVerification=Date.now();}
+ const ids=periodBreak?null:reported;
  const held=lastVerifiedIds.length&&lastVerifiedIds.every(id=>roster.has(id));
  const selected=ids||(held?lastVerifiedIds:fallbackIds(roster));
  const chosen=selected.map(id=>roster.get(id)).filter(Boolean).sort(byPosition).slice(0,6);
@@ -119,8 +124,10 @@ function render(summary,match){
   note.textContent='Players are selected from ESPN onIce athlete IDs for this team; current-game stats refresh independently. Provider updates may be delayed.';
  }else if(held){
   band.textContent='LAST ON ICE';lastMode='held';
-  meta.textContent='ESPN · WAITING FOR NEXT LINEUP UPDATE';
-  note.textContent='Holding the last verified six from '+new Date(lastVerification).toLocaleTimeString()+'. Current on-ice lineup is not available from the latest ESPN response.';
+  meta.textContent=periodBreak?'ESPN · INTERMISSION · LAST VERIFIED LINEUP':'ESPN · WAITING FOR NEXT LINEUP UPDATE';
+  note.textContent=periodBreak?
+   'Between periods: showing the last verified players. Fresh on-ice lineup updates resume when play starts.':
+   'Holding the last verified players from '+new Date(lastVerification).toLocaleTimeString()+'. Current on-ice lineup is not available from the latest ESPN response.';
  }else{
   band.textContent='GAME PLAYERS';lastMode='unverified';
   meta.textContent='ESPN · LIVE LINEUP NOT VERIFIED';
