@@ -53,6 +53,14 @@ jobs:
             const src=await r.text();
             if(!r.ok||!src.includes(host)||src.includes('man-cave-xfinity-bridge.onrender.com'))
               throw Error('V47 endpoint mismatch '+file);
+            if(file==='xfinity-pairing-v47.html'){
+              const fn=src.slice(src.indexOf('async function refreshBoxes(){'),src.indexOf('async function pairStatus(){'));
+              if(!/const result=await api\('\/api\/boxes'\)/.test(fn)||
+                 !/if\(result\?\.ok!==true\|\|!Array\.isArray\(result\.boxes\)\)/.test(fn)||
+                 !/bridgeReady=true;\s*renderBoxes\(\)/.test(fn))
+                throw Error('Published pairing page does not unlock EasyPair after authenticated box status refresh');
+              console.log('PASS_PUBLISHED_V47_EASYPAIR_UNLOCK_AFTER_BOX_REFRESH');
+            }
           }
           console.log('PASS_PUBLISHED_FIVE_CLOUDFLARE_ONLY_XFINITY_SOURCES');
           JS
