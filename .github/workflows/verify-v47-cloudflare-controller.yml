@@ -54,11 +54,23 @@ jobs:
             if(!r.ok||!src.includes(host)||src.includes('man-cave-xfinity-bridge.onrender.com'))
               throw Error('V47 endpoint mismatch '+file);
             if(file==='xfinity-pairing-v47.html'){
-              const fn=src.slice(src.indexOf('async function refreshBoxes(){'),src.indexOf('async function pairStatus(){'));
-              if(!/const result=await api\('\/api\/boxes'\)/.test(fn)||
-                 !/if\(result\?\.ok!==true\|\|!Array\.isArray\(result\.boxes\)\)/.test(fn)||
-                 !/bridgeReady=true;\s*renderBoxes\(\)/.test(fn))
-                throw Error('Published pairing page does not unlock EasyPair after authenticated box status refresh');
+              let unlock=false;
+              // Pages deployment is asynchronous and GitHub's edge cache can
+              // briefly return an older file after the repository has updated.
+              // Check only this exact V47 file, never the working V46 controller.
+              for(let attempt=0;attempt<18;attempt++){
+                const updated=attempt===0?src:await (await fetch(
+                  root+'/'+file+'?verify='+Date.now(),{cache:'no-store'})).text();
+                const fn=updated.slice(updated.indexOf('async function refreshBoxes(){'),
+                  updated.indexOf('async function pairStatus(){'));
+                unlock=/const result=await api\('\/api\/boxes'\)/.test(fn)&&
+                  /if\(result\?\.ok!==true\|\|!Array\.isArray\(result\.boxes\)\)/.test(fn)&&
+                  /bridgeReady=true;\s*renderBoxes\(\)/.test(fn);
+                if(unlock)break;
+                console.log('V47_PAIRING_PUBLISH_PENDING',attempt+1);
+                await new Promise(r=>setTimeout(r,8000));
+              }
+              if(!unlock)throw Error('Published pairing page does not unlock EasyPair after authenticated box status refresh');
               console.log('PASS_PUBLISHED_V47_EASYPAIR_UNLOCK_AFTER_BOX_REFRESH');
             }
           }
