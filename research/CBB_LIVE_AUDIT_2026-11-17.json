@@ -1,0 +1,657 @@
+{
+  "checkedAt": "2026-11-18T02:41:40.200Z",
+  "day": "20261117",
+  "league": "mens-college-basketball",
+  "status": "ok",
+  "error": null,
+  "games": [
+    {
+      "id": "401906761",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T00:30Z",
+      "teams": [
+        "Alabama Crimson Tide",
+        "Kennesaw State Owls"
+      ],
+      "playCount": 601,
+      "shotCount": 112,
+      "locatedCount": 112,
+      "playerIds": 112,
+      "teamIds": 112,
+      "misses": 60,
+      "makes": 52,
+      "coordinates": [
+        {
+          "x": 36,
+          "y": 23,
+          "playerId": "5082704",
+          "teamId": "333",
+          "text": "Drew Fielder makes 25-foot three point jumper"
+        },
+        {
+          "x": 20,
+          "y": 6,
+          "playerId": "5312348",
+          "teamId": "338",
+          "text": "Amir Taylor makes 8-foot turnaround jump shot (Jacoby Hill assists)"
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "playerId": "4711306",
+          "teamId": "333",
+          "text": "Brandon Garrison misses 23-foot three point jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Kennesaw State Owls",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Alabama Crimson Tide",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401909566",
+      "state": "post",
+      "status": "Final",
+      "start": "2026-11-18T00:00Z",
+      "teams": [
+        "Duke Blue Devils",
+        "Illinois Fighting Illini"
+      ],
+      "playCount": 594,
+      "shotCount": 136,
+      "locatedCount": 136,
+      "playerIds": 136,
+      "teamIds": 136,
+      "misses": 81,
+      "makes": 55,
+      "coordinates": [
+        {
+          "x": 27,
+          "y": 2,
+          "playerId": "5287474",
+          "teamId": "150",
+          "text": "Dame Sarr makes layup (Cayden Boozer assists)"
+        },
+        {
+          "x": 40,
+          "y": 19,
+          "playerId": "5307569",
+          "teamId": "356",
+          "text": "Quentin Coleman misses 24-foot three point jumper"
+        },
+        {
+          "x": 25,
+          "y": 1,
+          "playerId": "5325990",
+          "teamId": "356",
+          "text": "Ethan Brown makes 0-foot tip in layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Illinois Fighting Illini",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Duke Blue Devils",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401906773",
+      "state": "post",
+      "status": "Final",
+      "start": "2026-11-17T21:51Z",
+      "teams": [
+        "Florida Gators",
+        "Notre Dame Fighting Irish"
+      ],
+      "playCount": 475,
+      "shotCount": 108,
+      "locatedCount": 108,
+      "playerIds": 108,
+      "teamIds": 108,
+      "misses": 53,
+      "makes": 55,
+      "coordinates": [
+        {
+          "x": 23,
+          "y": 3,
+          "playerId": "5174971",
+          "teamId": "57",
+          "text": "Rueben Chinyelu makes layup (Alex Condon assists)"
+        },
+        {
+          "x": 37,
+          "y": 21,
+          "playerId": "5108811",
+          "teamId": "87",
+          "text": "Ethan Roberts misses 24-foot three point pullup jump shot"
+        },
+        {
+          "x": 25,
+          "y": 3,
+          "playerId": "5174971",
+          "teamId": "57",
+          "text": "Rueben Chinyelu makes layup (Boogie Fland assists)"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Notre Dame Fighting Irish",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Florida Gators",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401920511",
+      "state": "post",
+      "status": "Final",
+      "start": "2026-11-17T19:00Z",
+      "teams": [
+        "Houston Cougars",
+        "Rutgers Scarlet Knights"
+      ],
+      "playCount": 522,
+      "shotCount": 107,
+      "locatedCount": 107,
+      "playerIds": 107,
+      "teamIds": 107,
+      "misses": 57,
+      "makes": 50,
+      "coordinates": [
+        {
+          "x": 23,
+          "y": 7,
+          "playerId": "5108093",
+          "teamId": "248",
+          "text": "Delrecco Gillespie misses 8-foot hook shot"
+        },
+        {
+          "x": 27,
+          "y": 10,
+          "playerId": "5177229",
+          "teamId": "164",
+          "text": "Darin Smith Jr. misses 10-foot turnaround jump shot"
+        },
+        {
+          "x": 27,
+          "y": 3,
+          "playerId": "5101850",
+          "teamId": "164",
+          "text": "Christian Gurdak makes layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Rutgers Scarlet Knights",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Houston Cougars",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401916289",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T00:30Z",
+      "teams": [
+        "Indiana Hoosiers",
+        "Arkansas Razorbacks"
+      ],
+      "playCount": 454,
+      "shotCount": 105,
+      "locatedCount": 105,
+      "playerIds": 105,
+      "teamIds": 105,
+      "misses": 60,
+      "makes": 45,
+      "coordinates": [
+        {
+          "x": 7,
+          "y": 1,
+          "playerId": "5165276",
+          "teamId": "8",
+          "text": "Jeremiah Wilkinson makes 18-foot jumper (Jordan Smith Jr. assists)"
+        },
+        {
+          "x": 28,
+          "y": 6,
+          "playerId": "4873184",
+          "teamId": "84",
+          "text": "Aiden Sherrell makes 6-foot floating jump shot (Markus Burton assists)"
+        },
+        {
+          "x": 24,
+          "y": 14,
+          "playerId": "5176136",
+          "teamId": "8",
+          "text": "Cooper Bowser misses 13-foot floating jump shot"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Arkansas Razorbacks",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Indiana Hoosiers",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401921722",
+      "state": "post",
+      "status": "Final",
+      "start": "2026-11-18T00:00Z",
+      "teams": [
+        "Miami Hurricanes",
+        "Rider Broncs"
+      ],
+      "playCount": 537,
+      "shotCount": 131,
+      "locatedCount": 131,
+      "playerIds": 131,
+      "teamIds": 131,
+      "misses": 79,
+      "makes": 52,
+      "coordinates": [
+        {
+          "x": 30,
+          "y": 4,
+          "playerId": "5142723",
+          "teamId": "2390",
+          "text": "Caleb Gaskins misses layup"
+        },
+        {
+          "x": 26,
+          "y": 4,
+          "playerId": "5238203",
+          "teamId": "2390",
+          "text": "Somto Cyril misses layup"
+        },
+        {
+          "x": 26,
+          "y": 1,
+          "playerId": "5101809",
+          "teamId": "2390",
+          "text": "Shelton Henderson makes layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Rider Broncs",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Miami Hurricanes",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401906851",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T02:00Z",
+      "teams": [
+        "Tennessee Volunteers",
+        "Michigan State Spartans"
+      ],
+      "playCount": 136,
+      "shotCount": 31,
+      "locatedCount": 31,
+      "playerIds": 31,
+      "teamIds": 31,
+      "misses": 20,
+      "makes": 11,
+      "coordinates": [
+        {
+          "x": 22,
+          "y": 3,
+          "playerId": "5142710",
+          "teamId": "2633",
+          "text": "DeWayne Brown II makes layup (Jalen Haralson assists)"
+        },
+        {
+          "x": 39,
+          "y": 21,
+          "playerId": "5196931",
+          "teamId": "127",
+          "text": "Jordan Scott misses 25-foot three point jumper"
+        },
+        {
+          "x": 8,
+          "y": 21,
+          "playerId": "4872740",
+          "teamId": "127",
+          "text": "Coen Carr misses 27-foot three point jumper"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Michigan State Spartans",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Tennessee Volunteers",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401921826",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T01:00Z",
+      "teams": [
+        "Vanderbilt Commodores",
+        "Eastern Illinois Panthers"
+      ],
+      "playCount": 382,
+      "shotCount": 96,
+      "locatedCount": 96,
+      "playerIds": 96,
+      "teamIds": 96,
+      "misses": 45,
+      "makes": 51,
+      "coordinates": [
+        {
+          "x": 31,
+          "y": 28,
+          "playerId": "5311759",
+          "teamId": "238",
+          "text": "Chandler Bing misses 29-foot three point jumper"
+        },
+        {
+          "x": 32,
+          "y": 26,
+          "playerId": "5187600",
+          "teamId": "238",
+          "text": "Tyler Tanner makes 27-foot three point jumper (Chandler Bing assists)"
+        },
+        {
+          "x": 32,
+          "y": 32,
+          "playerId": "5184415",
+          "teamId": "2197",
+          "text": "Tanner Vogel makes 32-foot three point jumper (Jaden Miller assists)"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Eastern Illinois Panthers",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Vanderbilt Commodores",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "401920426",
+      "state": "in",
+      "status": "In Progress",
+      "start": "2026-11-18T02:00Z",
+      "teams": [
+        "Virginia Cavaliers",
+        "Old Dominion Monarchs"
+      ],
+      "playCount": 157,
+      "shotCount": 46,
+      "locatedCount": 46,
+      "playerIds": 46,
+      "teamIds": 46,
+      "misses": 30,
+      "makes": 16,
+      "coordinates": [
+        {
+          "x": 25,
+          "y": 26,
+          "playerId": "5150404",
+          "teamId": "258",
+          "text": "Chance Mallory misses 26-foot three point jumper"
+        },
+        {
+          "x": 48,
+          "y": 1,
+          "playerId": "5457336",
+          "teamId": "258",
+          "text": "Nolan Adekunle misses 23-foot three point jumper"
+        },
+        {
+          "x": 23,
+          "y": 3,
+          "playerId": "5311844",
+          "teamId": "258",
+          "text": "Johann Grunloh misses driving layup"
+        }
+      ],
+      "playShape": [
+        "id",
+        "sequenceNumber",
+        "type",
+        "text",
+        "awayScore",
+        "homeScore",
+        "period",
+        "clock",
+        "scoringPlay",
+        "scoreValue",
+        "wallclock",
+        "shootingPlay",
+        "coordinate",
+        "pointsAttempted",
+        "shortDescription"
+      ],
+      "boxscoreTeams": [
+        {
+          "team": "Old Dominion Monarchs",
+          "statCategories": [
+            ""
+          ]
+        },
+        {
+          "team": "Virginia Cavaliers",
+          "statCategories": [
+            ""
+          ]
+        }
+      ],
+      "error": null
+    }
+  ]
+}
