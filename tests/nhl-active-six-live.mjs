@@ -48,7 +48,7 @@ function summary(ids,withOnIce=true,state='in'){
   onIce:withOnIce?[{teamId:'1',entries:ids.map(id=>({athleteid:id,whereabouts:{id:'1',description:'In Play'}}))}]:[]
  };
 }
-function harness(){
+function harness(delaySeconds=0){
  let current=null;
  const txt=()=>({textContent:'',style:{},hidden:false,getAttribute(){return this.src||''}});
  const rows=Array.from({length:6},()=>({
@@ -61,17 +61,18 @@ function harness(){
  const app={querySelector:key=>single[key],querySelectorAll:key=>key==='.row'?rows:[]};
  const document={hidden:true,createElement:()=>({src:'',alt:'',style:{}})};
  const window={};
- const clock=[];
+ const clock=[],delayed=[];
  const ctx=vm.createContext({
-  sport:'nhl',team:'Boston Bruins',p:{get:key=>key==='eventId'?'401892728':null},
+  sport:'nhl',team:'Boston Bruins',p:{get:key=>key==='eventId'?'401892728':key==='broadcastDelay'?String(delaySeconds):null},
   app,window,document,Date,setHeader:()=>{},setScore:()=>{},
   setInterval:(fn,delay)=>{clock.push(delay);return 1;},
+  setTimeout:(fn,delay)=>{delayed.push({fn,delay});return delayed.length;},
   fetch:async()=>({ok:true,json:async()=>current}),
   console
  });
  vm.runInContext(code,ctx);
  document.hidden=false;
- return {rows,single,clock,async update(value){current=value;await window.ManCaveNhlOnIce.refresh();},
+ return {rows,single,clock,advance(){const pending=delayed.shift();assert.ok(pending,'expected a delayed NHL snapshot');pending.fn();return pending.delay;},async update(value){current=value;await window.ManCaveNhlOnIce.refresh();},
    status:()=>window.ManCaveNhlOnIce.status()};
 }
 test('six real IDs sort C/F/D/G and update when the live NHL lineup changes',async()=>{
@@ -128,4 +129,19 @@ test('power plays and overtime can show fewer players without inventing active p
  assert.equal(h.rows[4].name.textContent,'NO PLAYER ON ICE');
  assert.equal(h.rows[5].name.textContent,'NO PLAYER ON ICE');
  assert.equal(h.single['.band'].textContent,'ON ICE');
+});
+
+test('30-second NHL broadcast sync holds live score and line changes without slowing fetch checks',async()=>{
+ const h=harness(30);
+ await h.update(summary(['11','12','13','14','15','16']));
+ assert.equal(h.clock[0],10000,'feed continues checking every 10 seconds');
+ assert.equal(h.rows[0].name.textContent,'','do not spoil a fresh NHL shift before broadcast delay');
+ assert.equal(h.advance(),30000);
+ assert.equal(h.rows[0].name.textContent,'BRUINS CENTER');
+ assert.equal(h.single['.band'].textContent,'ON ICE');
+ await h.update(summary(['17','12','13','14','15','16']));
+ assert.equal(h.rows[0].name.textContent,'BRUINS CENTER');
+ assert.equal(h.advance(),30000);
+ assert.equal(h.rows[0].name.textContent,'BRUINS SUBSTITUTE');
+ assert.equal(h.status().broadcastDelaySeconds,30);
 });
