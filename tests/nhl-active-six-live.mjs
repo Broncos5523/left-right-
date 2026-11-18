@@ -87,7 +87,7 @@ test('six real IDs sort C/F/D/G and update when the live NHL lineup changes',asy
  assert.equal(h.rows[5].values[0].textContent,'26');
  const priorImg=h.rows[0].portrait.image;
  await h.update(summary(['16','15','14','13','12','17']));
- assert.equal(h.rows[0].name.textContent,'BRUINS WING A');
+ assert.equal(h.rows[0].name.textContent,'BRUINS SUBSTITUTE');
  assert.ok(h.rows.some(r=>r.name.textContent==='BRUINS SUBSTITUTE'));
  assert.ok(!h.rows.some(r=>r.name.textContent==='BRUINS CENTER'));
  assert.equal(h.status().verifiedCount,6);
