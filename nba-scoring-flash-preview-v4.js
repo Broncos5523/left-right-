@@ -5,6 +5,7 @@ const qs=new URLSearchParams(location.search);
 if(qs.get('sport')!=='nba')return;
 const team=qs.get('team')||'',eventId=qs.get('eventId')||'';
 const preview=qs.get('preview')==='1';
+const broadcastDelayMs=preview?0:Math.min(120,Math.max(0,Number(qs.get('broadcastDelay')||0)||0))*1000;
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const val=x=>x===null||x===undefined||x===''?null:Number.isFinite(Number(x))?Number(x):null;
@@ -198,7 +199,11 @@ async function poll(){
   }
   const res=await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event='+encodeURIComponent(eventId),{cache:'no-store'});
   if(!res.ok)throw Error('ESPN HTTP '+res.status);
-  usingArchive=false;process(await res.json());failure='';
+  usingArchive=false;
+  const snapshot=await res.json();
+  if(broadcastDelayMs)setTimeout(()=>process(snapshot),broadcastDelayMs);
+  else process(snapshot);
+  failure='';
  }catch(e){
   failure=String(e.message||e);
   const lab=document.getElementById('nbaFeedStatus');if(lab)lab.textContent='Play-by-play unavailable: '+failure;
@@ -206,7 +211,7 @@ async function poll(){
  finally{busy=false;}
 }
 const api={
- status:()=>({eventId,team,phase,initialized:loaded,error:failure,knownEvents:seen.size}),
+ status:()=>({eventId,team,phase,initialized:loaded,broadcastDelaySeconds:broadcastDelayMs/1000,error:failure,knownEvents:seen.size}),
  replay:()=>{if(!last||!latest)return false;display(last,latest);return true;},
  leader:()=>{
   if(!latest)return false;
