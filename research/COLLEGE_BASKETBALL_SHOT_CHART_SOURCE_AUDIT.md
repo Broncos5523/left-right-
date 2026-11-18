@@ -5,6 +5,18 @@ Status: Research complete at provider/documentation level; live game-by-game cov
 ## User requirement
 Provide **individual player** and **whole-team** shot charts, built from every real field-goal attempt, for every college basketball game in the controller. Display made shots green, missed shots red, no invented locations. Preserve approved NBA V4 visuals and Fire TV assignments. Broadcast delay must apply to shot charts, score and scoring flash together.
 
+## Verified ESPN live audit — Nov. 17, 2026, 9:45 PM Eastern (02:45 UTC Nov. 18)
+- Successfully ran a real GitHub Actions fetch against the ESPN men's basketball **Division I full-day scoreboard**, using `groups=50&limit=500`.
+- The scoreboard returned **68 scheduled games**, **61 already in progress/final**, and we tested all 61 live/event summaries.
+- **6,563** field-goal attempts were found in play-by-play. **All 6,563** carried plausible X/Y coordinates and a team ID; **6,562** carried a shooter/athlete ID.
+- **59/61 games** matched aggregated player boxscore field-goal attempt counts for both teams.
+- Exceptions: Northern Arizona vs Embry-Riddle AZ (1 boxscore attempt missing from ESPN PBP for Embry-Riddle); Southern Miss vs UT Arlington (one missed from PBP per team); Illinois State vs Bellarmine (one PBP attempt with no athlete ID). These are snapshot observations during in-progress games; may self-correct later. 
+- Shot samples show distinct plausible coordinates: e.g. near-basket layups at (27,2), perimeter threes at (40,19) and (2,2); do not assume all provider coordinate systems match.
+- **This changes feasibility materially:** current ESPN men's college live coverage appears sufficient for a broadly functional team + individual chart, including low-major matches. Do not declare 100% lifetime completeness/precision from this one-night sample.
+- Important user design point: team chart can place the one unidentified-player shot, because its team ID and coordinates exist; player chart must exclude or mark the unassigned event, never guess player.
+- No production board changes made in this audit.
+- Raw complete findings: [full 61-game audit](CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.md) and [JSON details](CBB_LIVE_AUDIT_ALL_STARTED_2026-11-17.json).
+
 ## Critical finding
 A team chart does NOT need another data provider if each shot has a team identifier. Filter the normalized game shot set by player ID for an individual chart or by team ID for a team chart.
 
