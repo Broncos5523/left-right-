@@ -165,6 +165,31 @@ test('four Xfinity boxes pair independently and preserve encrypted Firebase reco
   assert.equal((await after.json()).boxes.length,4);
  }finally{mock.restore();}
 });
+test('upstream network failures identify Firebase vs Xfinity without leaking tokens',async()=>{
+ const failures=[
+  {host:'remote.xfinity.com',path:'/api/pair/start',
+   method:'POST',body:{box:'Center'},expected:'Cloudflare could not reach Xfinity remote pairing service'},
+  {host:'man-cave-left-right-default-rtdb.firebaseio.com',path:'/api/boxes',
+   expected:'Firebase pairing records are temporarily unavailable'}
+ ];
+ for(const scenario of failures){
+  const mock=mockEndpoints(),standard=globalThis.fetch;
+  globalThis.fetch=async(url,init)=>{
+   const host=new URL(String(url)).hostname;
+   if(host===scenario.host)throw new TypeError('sensitive-network-error');
+   return standard(url,init);
+  };
+  try{
+   const response=await worker.fetch(api(scenario.path,{
+    method:scenario.method,body:scenario.body}),config);
+   assert.equal(response.status,502);
+   const error=await response.json();
+   assert.match(error.error,new RegExp(scenario.expected));
+   assert.ok(!JSON.stringify(error).includes('sensitive-network-error'));
+  }finally{mock.restore();}
+ }
+});
+
 test('original encryption key mismatch fails closed without overwriting saved pairing',async()=>{
  const mock=mockEndpoints();
  try{
