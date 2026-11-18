@@ -144,6 +144,23 @@ test('new Kennesaw two flashes on its own side for six seconds',async()=>{
  assert.equal(h.active(),false);
 });
 
+
+test('two quick college scoring events queue in game order without duplicate playback',async()=>{
+ const h=wing(teamNames[0]);
+ const next=shot('a7',7,'333','5082704','Drew Fielder makes 25-foot three point jumper',3,{x:36,y:23});
+ await h.tick(game(baseline));
+ await h.tick(game([...baseline,alabamaThree,next],'in',23,16));
+ assert.equal(h.active(),true);
+ assert.match(h.overlay.innerHTML,/>3<small>PTS/);
+ assert.equal(h.advance(),8000);
+ assert.equal(h.active(),true,'second made shot should follow the first');
+ assert.match(h.overlay.innerHTML,/>6<small>PTS/);
+ assert.equal(h.advance(),8000);
+ assert.equal(h.active(),false);
+ await h.tick(game([...baseline,alabamaThree,next],'in',23,16));
+ assert.equal(h.active(),false,'repeat poll must not replay either made basket');
+});
+
 test('30-second TV delay holds score and shot graphic in order without slowing 10-second feed',async()=>{
  const h=wing(teamNames[0],30);
  await h.tick(game(baseline));
