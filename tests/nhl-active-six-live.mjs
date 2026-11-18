@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const code=read('nhl-on-ice-engine.js');
-const chosenTag='<script src="./nhl-on-ice-engine.js?v=20261117-active-six-v1"></script>';
+const chosenTag='<script src="./nhl-on-ice-engine.js?v=20261117-active-six-v2"></script>';
 
 test('production and approved preview use identical six-row NHL engine without touching layout',()=>{
  const prod=read('team-board.html'),preview=read('team-board-nba-flash-preview-v4.html');
