@@ -32,6 +32,11 @@ function visibleByWindow(game,now=Date.now()){
  return game.state==='upcoming'&&
   Number.isFinite(HOURS[game.league])&&start>=now-60*60000&&start<=now+HOURS[game.league]*HOURS_MS;
 }
+// A favorite's next scheduled game may be months away. Keep it accessible,
+// but label/group it separately from games within the rolling upcoming window.
+function isDistantFavorite(game,now=Date.now()){
+ return !!(game?.favorite&&game.state==='upcoming'&&!visibleByWindow(game,now));
+}
 function select(games,now=Date.now()){
  const all=[...new Map((games||[]).filter(g=>g?.id).map(g=>[g.id,g])).values()];
  const chosen=new Map(all.filter(g=>visibleByWindow(g,now)).map(g=>[g.id,g]));
@@ -50,5 +55,5 @@ function dayOffsets(league){
  const days=Math.ceil((HOURS[league]??48)/24);
  return Array.from({length:days+3},(_,i)=>i-2);
 }
-window.ManCaveGameWindows=Object.freeze({HOURS,FAVORITES,visibleByWindow,select,dayOffsets});
+window.ManCaveGameWindows=Object.freeze({HOURS,FAVORITES,visibleByWindow,isDistantFavorite,select,dayOffsets});
 })();
