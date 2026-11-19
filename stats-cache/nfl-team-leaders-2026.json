@@ -1,17 +1,17 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-19T05:00:34.360Z",
-  "source": "ESPN NFL 2026 regular-season athlete statistics (verified team IDs)",
+  "generatedAt": "2026-11-19T05:03:18.897Z",
+  "source": "ESPN completed-game NFL player box scores, 2026 regular season (all verified games)",
   "teams": {
     "7": {
       "teamId": "7",
       "team": "Denver Broncos",
       "season": 2026,
-      "updatedAt": "2026-11-19T05:00:33.501Z",
-      "verifiedAthletes": 49,
-      "rosterCount": 80,
-      "statsMissing": 31,
-      "statsFailures": 0,
+      "updatedAt": "2026-11-19T05:03:18.656Z",
+      "verifiedAthletes": 47,
+      "gamesExpected": 9,
+      "gamesVerified": 9,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-08T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
@@ -61,17 +61,17 @@
       "teamId": "13",
       "team": "Las Vegas Raiders",
       "season": 2026,
-      "updatedAt": "2026-11-19T05:00:34.360Z",
-      "verifiedAthletes": 44,
-      "rosterCount": 75,
-      "statsMissing": 31,
-      "statsFailures": 0,
+      "updatedAt": "2026-11-19T05:03:18.896Z",
+      "verifiedAthletes": 46,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-15T21:05Z",
       "leaders": [
         {
           "metric": "Passing Yards",
-          "name": "Fernando Mendoza",
-          "value": "191",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4837248.png"
+          "name": "Kirk Cousins",
+          "value": "2,340",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/14880.png"
         },
         {
           "metric": "Rushing Yards",
@@ -84,6 +84,12 @@
           "name": "Brock Bowers",
           "value": "676",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4432665.png"
+        },
+        {
+          "metric": "Passing Touchdowns",
+          "name": "Kirk Cousins",
+          "value": "20",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/14880.png"
         },
         {
           "metric": "Total Tackles",
