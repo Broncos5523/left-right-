@@ -68,7 +68,7 @@ test('NHL: goal, saved and missed shots included, blocked shots with bad team at
   mk('hit','2',52,'Wrong Event')
  ]};
  const shots=api.helpers.shots(d,g);
- assert.deepEqual(shots.map(x=>x.outcome),['GOAL','SAVE','MISS']);
+ assert.deepEqual(Array.from(shots,x=>x.outcome),['GOAL','SAVE','MISS']);
  assert.match(api.helpers.rinkSVG(shots),/David Pastrnak/);
 });
 test('football: live/final charts use actual ESPN scoring changes not invented receiver routes',()=>{
