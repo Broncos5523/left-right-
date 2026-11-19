@@ -1,4 +1,4 @@
-name: Diagnose Raiders Broncos 2026 NFL leaders feeds
+name: Diagnose ESPN NFL teamleaders exact player and team fields
 on:
   push:
     paths:
@@ -8,38 +8,30 @@ permissions: {contents: read}
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 3
     steps:
-      - name: Inspect ESPN team leader sources and schema
+      - name: Compare Raiders and Broncos team-specific categories and athlete stats
         run: |
           node --input-type=module <<'JS'
-          const teams=[{name:'Raiders',id:13},{name:'Broncos',id:7}];
-          const base='https://site.api.espn.com/apis/site/v2/sports/football/nfl';
-          const urls=t=>[
-            ['site-leaders',base+'/teams/'+t.id+'/leaders'],
-            ['site-team',base+'/teams/'+t.id],
-            ['site-team-enable',base+'/teams/'+t.id+'?enable=stats'],
-            ['site-team-statistics',base+'/teams/'+t.id+'/statistics'],
-            ['web-teamleaders','https://site.web.api.espn.com/apis/site/v3/sports/football/nfl/teamleaders?team='+t.id],
-            ['web-team-leaders','https://site.web.api.espn.com/apis/site/v3/sports/football/nfl/teams/'+t.id+'/leaders'],
-            ['web-team-stats','https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/teams/'+t.id+'/statistics']
-          ];
-          const shape=(x,depth=0)=>depth>2||x==null?null:
-            Array.isArray(x)?{count:x.length,first:x.length?shape(x[0],depth+1):null}:
-            typeof x==='object'?Object.fromEntries(Object.entries(x).slice(0,20)
-              .map(([k,v])=>[k,(typeof v==='object'&&v!==null)?shape(v,depth+1):typeof v==='string'?v.slice(0,110):v])):x;
-          for(const team of teams){
-            const result=await Promise.all(urls(team).map(async ([label,url])=>{
-              try{
-                const r=await fetch(url,{signal:AbortSignal.timeout(12000)});
-                const x=await r.json().catch(()=>null);
-                const categories=x?.leaders??x?.categories??x?.team?.leaders??x?.statistics;
-                return {label,status:r.status,cors:r.headers.get('access-control-allow-origin'),
-                  keys:Object.keys(x||{}).slice(0,24),
-                  leadersShape:shape(categories),teamLeadersShape:shape(x?.team?.leaders),
-                  team:shape(x?.team),sample:label==='web-teamleaders'?shape(x):null};
-              }catch(err){return{label,error:String(err).slice(0,110)}}
-            }));
-            console.log('TEAM_AUDIT',JSON.stringify({team:team.name,id:team.id,requests:result}));
+          const base='https://site.web.api.espn.com/apis/site/v3/sports/football/nfl/teamleaders';
+          for(const [id,team] of [['7','Denver'],['13','Las Vegas'],['31','New York Giants']]){
+            for(const param of ['?team='+id,'?teamId='+id,'?team='+id+'&season=2026']){
+             const r=await fetch(base+param,{signal:AbortSignal.timeout(12000)});
+             const d=await r.json().catch(()=>({}));
+             const groups=d.teamLeaders?.categories||d.categories||[];
+             console.log('TEAM_LEADER_SHAPE',JSON.stringify({team,id,param,status:r.status,
+              rootKeys:Object.keys(d),teamLeaders:d.teamLeaders?{id:d.teamLeaders.id,name:d.teamLeaders.name,keys:Object.keys(d.teamLeaders)}:null,
+              categories:groups.map(c=>({
+                category:c.name,displayName:c.displayName,abbreviation:c.abbreviation,keys:Object.keys(c),
+                leaders:(c.leaders||c.athletes||[]).slice(0,2).map(l=>({
+                  keys:Object.keys(l),
+                  name:l.athlete?.displayName||l.athlete?.fullName||l.displayName||l.name,
+                  athleteId:l.athlete?.id,athleteTeam:l.athlete?.team,
+                  value:l.displayValue??l.value,
+                  statistics:l.statistics,
+                  athleteHeadshot:l.athlete?.headshot
+                }))
+              }))}));
+            }
           }
           JS
