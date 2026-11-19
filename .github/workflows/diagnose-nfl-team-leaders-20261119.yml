@@ -1,4 +1,4 @@
-name: Probe ESPN NFL athlete season stats and roster fields
+name: Probe 2026 NFL passing rushing receiving defense per-player stats
 on:
   push:
     paths:
@@ -10,33 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
-      - name: Inspect season stats per NFL player on Broncos and Raiders
+      - name: Verify per-player stat dimensions for Broncos and Raiders
         run: |
           node --input-type=module <<'JS'
-          const ROOT='https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/';
-          const get=async url=>{const r=await fetch(url,{signal:AbortSignal.timeout(11000)});return{status:r.status,data:await r.json().catch(()=>({}))}};
+          const get=async u=>{const r=await fetch(u,{signal:AbortSignal.timeout(11000)});if(!r.ok)throw Error('HTTP '+r.status);return r.json()};
           for(const id of [7,13]){
-            const q=await get(ROOT+id+'?enable=roster,stats');
-            const a=q.data.team?.athletes||[];
-            console.log('ROSTER_FIELDS',JSON.stringify({id,status:q.status,athletes:a.length,hasStatistics:a.filter(x=>x.statistics||x.stats).length,
-              samples:a.filter(x=>x.position?.abbreviation==='QB'||x.position?.abbreviation==='RB'||x.position?.abbreviation==='WR'||x.position?.abbreviation==='LB').slice(0,7)
-               .map(x=>({name:x.displayName,position:x.position?.abbreviation,id:x.id,keys:Object.keys(x),stats:x.statistics||x.stats}))}));
-            const qb=a.find(x=>x.position?.abbreviation==='QB')||a[0];
-            if(!qb)continue;
-            for(const [label,url] of [
-              ['athlete-stats','https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/athletes/'+qb.id+'/stats?season=2026'],
-              ['athlete-splits','https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/athletes/'+qb.id+'/splits?season=2026'],
-              ['athlete-core','https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/types/2/athletes/'+qb.id+'/statistics/0'],
-              ['site-team-season-stats',ROOT+id+'/statistics?season=2026'],
-              ['site-v3-leaders','https://site.api.espn.com/apis/site/v3/sports/football/nfl/leaders?season=2026']
-            ]){
-             try{const q=await get(url),d=q.data;
-               console.log('STATS_ENDPOINT',JSON.stringify({id,player:qb.displayName,label,status:q.status,
-                 keys:Object.keys(d||{}).slice(0,30),
-                 splits:JSON.stringify(d.splits||{}).slice(0,2000),
-                 categories:JSON.stringify(d.categories||d.results||d.statistics||d.leaders||{}).slice(0,2000),
-                 season:JSON.stringify(d.season||d.requestedSeason||{}).slice(0,300)}));
-             }catch(e){console.log('STATS_ENDPOINT_ERROR',label,String(e))}
-            }
+           const roster=await get('https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/'+id+'?enable=roster');
+           const athletes=roster.team?.athletes||[];
+           const picks=['QB','RB','WR','TE','LB','DE','DT','CB','S'].map(pos=>athletes.find(a=>a.position?.abbreviation===pos)).filter(Boolean);
+           for(const player of picks){
+            const data=await get('https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/athletes/'+player.id+'/stats?season=2026');
+            const categories=(data.categories||[]).map(c=>{
+             const row=(c.statistics||[]).find(s=>s.season?.year===2026&&String(s.teamId)===String(id));
+             if(!row)return null;
+             return{category:c.name,statNames:c.names,values:row.stats,teamId:row.teamId,season:row.season};
+            }).filter(Boolean);
+            console.log('ATHLETE_STATS',JSON.stringify({teamId:id,player:player.displayName,id:player.id,position:player.position?.abbreviation,categories}));
+           }
           }
           JS
