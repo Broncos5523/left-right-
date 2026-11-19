@@ -88,7 +88,7 @@ export function parseMarkets(event){
     overUnder:null,overPrice:null,underPrice:null};
   for(const market of event.markets){
    const marketID=Number(market.market_id);
-   if(![1,2,3].includes(marketID)||Number(market.period_id||0)>0)continue;
+   if(![1,2,3].includes(marketID))continue; // These IDs denote full-game main markets.
    for(const participant of market.participants||[]){
     const side=matchTeam(participant.name,away.name)?'Away':
       matchTeam(participant.name,home.name)?'Home':null;
