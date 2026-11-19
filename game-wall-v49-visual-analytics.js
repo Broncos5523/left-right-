@@ -222,6 +222,9 @@ function pregameVisual(){
 function plot(){
  const g=s.game,d=s.data,kind=shotKind(g);
  if(!d)return reportCard('Waiting for data','ESPN matchup data is loading.');
+ // No sport has current-game shot coordinates before the game starts.
+ // Upcoming basketball AND hockey show real season scouting bars instead.
+ if(g.state==='upcoming')return pregameVisual();
  if(kind){
   const points=shots(d,g),has=points.length>0;
   if(!has)return reportCard(g.state==='upcoming'?'Pregame shot chart not published':'No verified shot locations',
@@ -252,7 +255,6 @@ function plot(){
    'ESPN reported rink locations. Blocked shots are excluded because some are credited to the blocking team. Attack direction may vary by period.':
    'Actual ESPN field-goal play coordinates. Free throws and invalid coordinates are excluded. This is not a season tendency estimate.');
  }
- if(g.state==='upcoming')return pregameVisual();
  const events=scoreEvents(d);
  return '<div class="vaSection">SCORING PROGRESSION</div>'+(
   events.length>=2?'<div class="vaChart vaGraph">'+graphSVG(events,g)+'</div><div class="vaLegend"><span><i style="background:#63e3b6"></i>'+esc(nameFor(g,'away'))+'</span><span><i style="background:#f4c477"></i>'+esc(nameFor(g,'home'))+'</span></div>':
