@@ -162,7 +162,10 @@ function process(data){
   maxOrder=Math.max(-1,...c.all.map(e=>e.order));
   return;
  }
- const fresh=c.shotMakes.filter(e=>!seen.has(e.key)&&e.order>=maxOrder-3)
+ // ESPN can backfill a legitimate made shot with a sequence older than
+ // a later timeout/rebound. ID deduplication, not sequence proximity,
+ // determines whether a basket is NEW after our first-load baseline.
+ const fresh=c.shotMakes.filter(e=>!seen.has(e.key))
    .sort((a,b)=>a.order-b.order);
  c.shotMakes.forEach(e=>seen.add(e.key));
  maxOrder=Math.max(maxOrder,...c.all.map(e=>e.order));
