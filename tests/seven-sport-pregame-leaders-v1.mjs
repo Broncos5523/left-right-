@@ -132,3 +132,13 @@ test('future MLB or WNBA scouting sheets never display an ESPN placeholder 12AM 
  assert.match(display,/TIME TBD/);
  assert.doesNotMatch(display,/12:00 AM/);
 });
+
+test('TBD tournament opponents show an honest missing-data message rather than another team leader',async()=>{
+ const h=harness('NCAAB','basketball/mens-college-basketball');
+ h.game.away.fullName='TBD';
+ h.game.away.id='-1';
+ const view=await renderTeamTab(h);
+ assert.match(view,/Opponent not yet determined/);
+ assert.doesNotMatch(view,/Real Away Scorer/);
+ assert.match(view,/Real Home Scorer/);
+});
