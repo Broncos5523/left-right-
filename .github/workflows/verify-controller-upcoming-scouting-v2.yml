@@ -1,0 +1,21 @@
+name: Verify real pregame analytics scouting panels
+on:
+  push:
+    paths:
+      - game-wall-v49-visual-analytics.js
+      - game-wall-v49-visual-analytics.css
+      - game-wall-v47-home-screen.html
+      - tests/controller-upcoming-scouting-v2.mjs
+      - .github/workflows/verify-controller-upcoming-scouting-v2.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm ESPN Arizona Kansas State season charts render, use correct teams and open on Scouting
+        run: node --test tests/controller-upcoming-scouting-v2.mjs
+      - name: Confirm existing seven-sport chart source and controller regressions
+        run: node --test tests/controller-visual-analytics-v1.mjs tests/seven-sport-pregame-leaders-v1.mjs
