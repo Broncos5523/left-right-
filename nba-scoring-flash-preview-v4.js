@@ -143,11 +143,14 @@ function display(entry,c,sample=false){
  timer=setTimeout(()=>{overlay.classList.remove('active');if(pending.length){const next=pending.shift();display(next.entry,next.c);}},isThree?8000:6000);
 }
 function process(data){
+ // Production receives the already-delayed, already-rendered scoreboard snapshot.
+ // Preview/test standalones retain their independent ESPN polling path.
+ const shared=typeof window!=='undefined'&&window.ManCaveBasketballSharedFeed===true;
  const c=build(data);latest=c;
  // Synchronize the persistent wing scoreboard from the SAME ESPN snapshot
  // before showing the scoring flash; the 10-second roster poll may race this fetch.
  const scoredTeam=data?.header?.competitions?.[0]?.competitors?.find(x=>String(x.team?.id||'')===c.selectedId);
- if(scoredTeam?.score!=null&&typeof setScore==='function')setScore(scoredTeam.score);
+ if(!shared&&scoredTeam?.score!=null&&typeof setScore==='function')setScore(scoredTeam.score);
  phase=String(data?.header?.competitions?.[0]?.status?.type?.state||data?.header?.status?.type?.state||'').toLowerCase();
  const lab=document.getElementById('nbaFeedStatus');if(lab)lab.textContent=c.selectedId?'NBA '+(phase||'loaded')+' · '+c.shots.length+' shots':'Team not found in game';
  if(!c.selectedId)return;
@@ -161,11 +164,21 @@ function process(data){
   maxOrder=Math.max(-1,...c.all.map(e=>e.order));
   return;
  }
- const fresh=c.shotMakes.filter(e=>!seen.has(e.key)&&e.order>=maxOrder-3)
+ const fresh=c.shotMakes.filter(e=>!seen.has(e.key))
    .sort((a,b)=>a.order-b.order);
  c.shotMakes.forEach(e=>seen.add(e.key));
  maxOrder=Math.max(maxOrder,...c.all.map(e=>e.order));
  if(phase!=='in'||!fresh.length)return;
+ if(shared){
+  // In LIVE wing mode, new scoreboard snapshots take priority over a backlog of
+  // earlier 6/8-second animations. Otherwise several makes can lag by 45+ seconds.
+  // Do not modify approved animation durations or visual layout.
+  pending.length=0;
+  if(timer){clearTimeout(timer);timer=null;}
+  overlay.classList.remove('active');
+  display(fresh[fresh.length-1],c);
+  return;
+ }
  // Process *every* newly identified scoring play, in game order. The older
  // implementation silently dropped all but the newest basket per ESPN poll.
  // Cap the queue only to prevent an old/backfilled feed overwhelming the TV.
@@ -237,5 +250,13 @@ window.ManCaveNbaFlash=Object.freeze(api);
 document.getElementById('nbaReplay')?.addEventListener('click',()=>{if(!api.replay())document.getElementById('nbaFeedStatus').textContent='No confirmed made basket loaded yet';});
 document.getElementById('nbaLeader')?.addEventListener('click',()=>{if(!api.leader())document.getElementById('nbaFeedStatus').textContent='No scored shots available for this team';});
 document.getElementById('nbaDemo')?.addEventListener('click',api.demo);
-poll();setInterval(poll,10000);
+// Production shares one delayed ESPN summary with the scoreboard; no second
+// polling loop or second 30-second delay may drift the graphic behind the score.
+window.addEventListener?.('mancave-basketball-snapshot',e=>{
+ if(window.ManCaveBasketballSharedFeed!==true)return;
+ const detail=e.detail||{};
+ if(detail.sport!=='nba'||String(detail.eventId)!==eventId||!detail.summary)return;
+ process(detail.summary);
+});
+if(!window.ManCaveBasketballSharedFeed){poll();setInterval(poll,10000);}
 })();
