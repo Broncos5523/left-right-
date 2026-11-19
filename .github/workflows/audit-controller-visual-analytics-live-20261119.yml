@@ -1,0 +1,16 @@
+name: Verify ESPN live-source analytics all seven sports
+on:
+  push:
+    paths:
+      - tests/controller-visual-analytics-live-20261119.mjs
+      - .github/workflows/audit-controller-visual-analytics-live-20261119.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate actual court rink football and baseball charts against ESPN finals and upcoming games
+        run: node --test tests/controller-visual-analytics-live-20261119.mjs
