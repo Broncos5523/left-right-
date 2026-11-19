@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {LEAGUES,matchTeam,matchFixture,parseMarkets,addMatchedOdds} from '../scripts/odds-rundown-adapter.mjs';
+import {LEAGUES,matchTeam,providerTeamName,matchFixture,parseMarkets,addMatchedOdds} from '../scripts/odds-rundown-adapter.mjs';
 const mk=(name,price,value=null)=>({name,lines:[{value,prices:{'19':{price}}}]});
 const events=[{
  sport_id:5,event_id:'test-external-id',event_date:'2026-11-19T23:00:00Z',
@@ -21,6 +21,20 @@ test('same league fixture matches high-confidence Arizona vs UConn aliases and U
  assert.equal(matchTeam('North Carolina Tar Heels','North Carolina State Wolfpack'),false);
  const collision=[...espn,{...espn[0],id:'NCAAB-other'}];
  assert.equal(matchFixture('NCAAB',events[0],collision),null,'do not auto-assign ambiguous odds');
+});
+test('fixture reconciliation rebuilds separated city and mascot without guessing teams',()=>{
+ const nba=[{id:'NBA-1',league:'NBA',state:'upcoming',start:'2026-11-19T23:00:00Z',
+  away:{fullName:'Toronto Raptors'},home:{fullName:'New York Knicks'}}];
+ const event={event_date:'2026-11-19T23:00:00Z',teams:[
+  {name:'Toronto',mascot:'Raptors',is_away:true,is_home:false},
+  {name:'New York',mascot:'Knicks',is_home:true,is_away:false}
+ ]};
+ assert.equal(providerTeamName(event.teams[0]),'Toronto Raptors');
+ assert.equal(providerTeamName({name:'New York Knicks',mascot:'Knicks'}),'New York Knicks');
+ assert.equal(matchFixture('NBA',event,nba)?.id,'NBA-1');
+ assert.equal(matchFixture('NBA',{...event,teams:[
+  {...event.teams[0],mascot:'Maple Leafs'},event.teams[1]]},nba),null,
+  'Never attach another sport/team by city name alone');
 });
 test('normalize three markets from ONE actual named bookmaker',()=>{
  const got=parseMarkets(events[0]);
