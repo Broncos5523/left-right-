@@ -49,6 +49,6 @@ test('iPhone controller uses small cached ESPN season results, preserving NHL an
  assert.match(source,/Team Comparison/);
  assert.match(source,/Team Leaders/);
  assert.match(source,/Previous Games/);
- assert.match(controller,/game-wall-v47-nhl-leaders-cloudflare\.js\?v=espn-2026-nfl-season-leaders-20261119/);
+ assert.match(controller,/game-wall-v47-nhl-leaders-cloudflare\.js\?v=seven-sport-scouting-20261119b/);
  assert.doesNotMatch(source,/\.\.\/scripts\/refresh-nfl-pregame-leaders/);
 });
