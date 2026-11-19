@@ -61,11 +61,17 @@ async function openWithReconnect(id){
   if(!email||!password)return;
   button.disabled=true;message('Signing in to the existing Firebase controller…');
   try{
-   const credential=await signInWithEmailAndPassword(auth,email,password);
+   const credential=await Promise.race([
+    signInWithEmailAndPassword(auth,email,password),
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('Firebase sign-in timed out. Check your connection and retry.')),18000))
+   ]);
    if(games.state)games.state.user=credential.user;
    const field=form.querySelector('#realReconnectPassword');if(field)field.value='';
-   message('Connected. Checking screen availability…');
-   await openWithReconnect(id);
+   // The previous automatic reopen awaited a new Xfinity pairing check,
+   // leaving the sign-in popup apparently frozen on slow networks.
+   // Let Firebase's shared auth observer update the connection instead.
+   message('Firebase connected. Close this popup and choose Tune to TV again to refresh destinations.');
+   button.textContent='Connected';
   }catch(error){
    message('Connection failed: '+(error.code||error.message||'Unknown error'));
    button.disabled=false;
