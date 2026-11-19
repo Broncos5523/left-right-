@@ -11,7 +11,7 @@ const leagues=[
  ['WNBA','basketball/wnba'],['NCAAF','football/college-football'],
  ['NCAAB','basketball/mens-college-basketball']
 ];
-function harness(league,path,{wrongTeam=false,nflCache=false}={}){
+function harness(league,path,{wrongTeam=false,nflCache=false,longPassing=false}={}){
  const ids=['7','13'];
  const game={
   id:league+'-401920517',eventId:'401920517',league,path,state:'upcoming',
@@ -44,11 +44,11 @@ function harness(league,path,{wrongTeam=false,nflCache=false}={}){
   if(url.includes('/summary?event=')){
    const g=(id,name)=>
     ({team:{id:String(wrongTeam?id==='7'?'999':id:id)},leaders:[
-     {name:'pointsPerGame',displayName:'Points Per Game',leaders:[
-      {displayValue:'22.3',athlete:{displayName:name,headshot:{href:'https://a.espncdn.com/i/headshots/nba/players/full/1.png'}}}]}
+     {name:longPassing?'passingYards':'pointsPerGame',displayName:longPassing?'Passing Yards':'Points Per Game',leaders:[
+      {displayValue:longPassing?'251/350, 3,150 YDS, 24 TD, 6 INT':'22.3',athlete:{displayName:name,headshot:{href:'https://a.espncdn.com/i/headshots/nba/players/full/1.png'}}}]}
     ]});
    return response({header:{competitions:[{competitors:[{team:{id:ids[0]}},{team:{id:ids[1]}}]}]},
-    leaders:[g(ids[0],'Real Away Scorer'),g(ids[1],'Real Home Scorer')]});
+    leaders:[g(ids[0],longPassing?'Noah Fifita':'Real Away Scorer'),g(ids[1],longPassing?'Avery Johnson':'Real Home Scorer')]});
   }
   if(url.includes('/schedule'))return response({events:[]});
   if(url.includes('/teams/')){const id=url.split('/teams/')[1].split('?')[0].split('/')[0];
@@ -144,8 +144,11 @@ test('TBD tournament opponents show an honest missing-data message rather than a
 });
 
 test('college football passing card protects QB full names from wide ESPN stat breakdown',async()=>{
- const h=harness('NCAAF','football/college-football');
+ const h=harness('NCAAF','football/college-football',{longPassing:true});
  const content=await renderTeamTab(h);
+ assert.match(content,/Noah Fifita/);
+ assert.match(content,/Avery Johnson/);
+ assert.match(content,/251\/350, 3,150 YDS, 24 TD, 6 INT/);
  assert.match(content,/pgLeaderCategory--passing/);
  assert.match(source,/\^passing\\s\*yards\$/i);
  const stylesheet=read('game-wall-v36-team-leaders.css');
