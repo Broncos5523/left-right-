@@ -1,0 +1,19 @@
+name: Verify official NFL pregame team leaders restore
+on:
+  push:
+    paths:
+      - game-wall-v47-nhl-leaders-cloudflare.js
+      - game-wall-v47-home-screen.html
+      - stats-cache/nfl-team-leaders-2026.json
+      - tests/nfl-pregame-leaders-v1.mjs
+      - .github/workflows/verify-nfl-pregame-leaders-v1.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Raiders and Broncos official stat sources and approved scouting interface
+        run: node --test tests/nfl-pregame-leaders-v1.mjs
