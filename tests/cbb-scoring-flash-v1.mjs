@@ -53,14 +53,15 @@ function game(plays,state='in',alabamaScore=17,kennesawScore=16){
  };
 }
 
-function wing(team,delaySeconds=0){
+function wing(team,delaySeconds=0,sharedFeed=false){
  let current=null,nextId=0;
- const scores=[],timers=new Map(),classes=new Set(),events=[];
+ const scores=[],timers=new Map(),classes=new Set(),events=[],handlers={};
  const overlay={innerHTML:'',style:{setProperty(){}},
-  classList:{contains:key=>classes.has(key),add:key=>classes.add(key),remove:key=>classes.delete(key)}};
+  classList:{contains:key=>classes.has(key),add:key=>{classes.add(key);if(key==='active')events.push('flash');},remove:key=>classes.delete(key)}};
  const document={hidden:false,head:{appendChild(){}},body:{appendChild(){}},
   createElement:tag=>tag==='style'?{textContent:''}:overlay,getElementById:()=>null};
- const window={};
+ const normName=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const window=sharedFeed?{ManCaveBasketballSharedFeed:true,addEventListener:(name,fn)=>{handlers[name]=fn;}}:{};
  const env=vm.createContext({
   document,window,URLSearchParams,
   location:{search:'?sport=cbb&team='+encodeURIComponent(team)+'&eventId=401906761&tv=1&broadcastDelay='+delaySeconds},
@@ -82,6 +83,14 @@ function wing(team,delaySeconds=0){
   overlay,scores,events,
   active:()=>classes.has('active'),
   async tick(snapshot){current=snapshot;await window.__collegeTick();},
+  emitScoreSnapshot(snapshot){
+   assert.equal(sharedFeed,true,'only shared-feed tests emit main-board snapshots');
+   const score=snapshot.header.competitions[0].competitors
+    .find(c=>normName(c.team.displayName)===normName(team))?.score;
+   scores.push(String(score));events.push('score:'+score);
+   assert.ok(handlers['mancave-basketball-snapshot'],'live shot graphic must subscribe to scoreboard');
+   handlers['mancave-basketball-snapshot']({detail:{sport:'cbb',eventId:'401906761',summary:snapshot}});
+  },
   advance(){const item=timers.entries().next().value;assert.ok(item,'pending timer');const [key,t]=item;timers.delete(key);t.fn();return t.ms;},
   remaining:()=>timers.size,
   api:window.ManCaveCbbFlash
@@ -98,6 +107,9 @@ test('CBB production, NBA review, and CBB review share the same locked scoreboar
  assert.doesNotMatch(nbaCode,/mens-college-basketball\/summary/);
  assert.match(collegeCode,/mens-college-basketball\/summary/);
  assert.match(live,/\['nba','cbb'\]\.includes\(sport\)/);
+ assert.match(live,/window\.ManCaveBasketballSharedFeed=true/);
+ assert.match(live,/mancave-basketball-snapshot/);
+ assert.match(live,/setTimeout\(\(\)=>window\.dispatchEvent/);
  assert.doesNotMatch(live,/<script>\s*if\(sport==='cbb'\)/,'old immediate, undelayed CBB header must be removed');
  for(const side of ['left','right'])assert.match(read(side+'.html'),/team-board\.html\?sport=/);
 });
@@ -174,6 +186,28 @@ test('late ESPN backfill still flashes a new basket even when a later timeout al
  assert.equal(h.advance(),8000);
  await h.tick(game([...baseline,backfilled,timeout], 'in',20,16));
  assert.equal(h.active(),false,'backfilled play ID must not flash twice');
+});
+
+test('production college flash follows the already-delayed wing score with no second timer or stale animation backlog',()=>{
+ const h=wing(teamNames[0],30,true);
+ h.emitScoreSnapshot(game(baseline));
+ assert.equal(h.active(),false,'baseline must never replay previous scoring');
+ assert.deepEqual(h.scores,['17']);
+ const one=game([...baseline,alabamaThree],'in',20,16);
+ h.emitScoreSnapshot(one);
+ assert.deepEqual(h.events.slice(-2),['score:20','flash'],'main score must change before the shot graphic');
+ assert.equal(h.active(),true);
+ assert.equal(h.remaining(),1,'only the approved flash duration timer remains; no second 30s delay');
+ const two=shot('new-3b',8,'333','5082704','Drew Fielder makes 23-foot three point jumper',3,{x:27,y:20});
+ h.emitScoreSnapshot(game([...baseline,alabamaThree,two],'in',23,16));
+ assert.deepEqual(h.events.slice(-2),['score:23','flash']);
+ assert.equal(h.remaining(),1,'new score replaces previous flash instead of adding 8s backlog');
+ assert.match(h.overlay.innerHTML,/>6<small>PTS/);
+ assert.equal(h.advance(),8000);
+ assert.equal(h.active(),false);
+ h.emitScoreSnapshot(game([...baseline,alabamaThree,two],'in',23,16));
+ assert.equal(h.active(),false,'repeated snapshot must never flash again');
+ assert.equal(h.events.filter(x=>x==='interval:10000').length,0,'shared live mode must not run an independent ESPN poll');
 });
 
 test('30-second TV delay holds score and shot graphic in order without slowing 10-second feed',async()=>{
