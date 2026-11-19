@@ -28,5 +28,9 @@ test('inline javascript remains syntactically valid, with all fixed references p
  assert.ok(inline,'inline preview script exists');
  new vm.Script(inline[1],{filename:'analytics-32-inch-preview-v1.html'});
  const ids=[...new Set([...inline[1].matchAll(/setText\('(\w+)'/g)].map(m=>m[1]))];
- for(const id of ids)assert.ok(html.includes('id="'+id+'"'),id+' missing DOM node');
+ for(const id of ids){
+  // KPI labels use generated numeric suffixes in the original controller.
+  const dynamic=/^(?:kLabel|kValue|kDetail|kFill)$/.test(id);
+  assert.ok(html.includes('id="'+id+(dynamic?'0':'')+'"'),id+' missing DOM node');
+ }
 });
