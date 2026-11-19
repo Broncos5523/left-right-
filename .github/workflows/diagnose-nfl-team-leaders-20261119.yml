@@ -1,0 +1,45 @@
+name: Diagnose Raiders Broncos 2026 NFL leaders feeds
+on:
+  push:
+    paths:
+      - .github/workflows/diagnose-nfl-team-leaders-20261119.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Inspect ESPN team leader sources and schema
+        run: |
+          node --input-type=module <<'JS'
+          const teams=[{name:'Raiders',id:13},{name:'Broncos',id:7}];
+          const base='https://site.api.espn.com/apis/site/v2/sports/football/nfl';
+          const urls=t=>[
+            ['site-leaders',base+'/teams/'+t.id+'/leaders'],
+            ['site-team',base+'/teams/'+t.id],
+            ['site-team-enable',base+'/teams/'+t.id+'?enable=stats'],
+            ['site-team-statistics',base+'/teams/'+t.id+'/statistics'],
+            ['web-teamleaders','https://site.web.api.espn.com/apis/site/v3/sports/football/nfl/teamleaders?team='+t.id],
+            ['web-team-leaders','https://site.web.api.espn.com/apis/site/v3/sports/football/nfl/teams/'+t.id+'/leaders'],
+            ['web-team-stats','https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/teams/'+t.id+'/statistics']
+          ];
+          const shape=(x,depth=0)=>depth>2||x==null?null:
+            Array.isArray(x)?{count:x.length,first:x.length?shape(x[0],depth+1):null}:
+            typeof x==='object'?Object.fromEntries(Object.entries(x).slice(0,20)
+              .map(([k,v])=>[k,(typeof v==='object'&&v!==null)?shape(v,depth+1):typeof v==='string'?v.slice(0,110):v])):x;
+          for(const team of teams){
+            const result=await Promise.all(urls(team).map(async ([label,url])=>{
+              try{
+                const r=await fetch(url,{signal:AbortSignal.timeout(12000)});
+                const x=await r.json().catch(()=>null);
+                const categories=x?.leaders??x?.categories??x?.team?.leaders??x?.statistics;
+                return {label,status:r.status,cors:r.headers.get('access-control-allow-origin'),
+                  keys:Object.keys(x||{}).slice(0,24),
+                  leadersShape:shape(categories),teamLeadersShape:shape(x?.team?.leaders),
+                  team:shape(x?.team),sample:label==='web-teamleaders'?shape(x):null};
+              }catch(err){return{label,error:String(err).slice(0,110)}}
+            }));
+            console.log('TEAM_AUDIT',JSON.stringify({team:team.name,id:team.id,requests:result}));
+          }
+          JS
