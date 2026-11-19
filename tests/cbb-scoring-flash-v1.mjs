@@ -110,6 +110,7 @@ test('CBB production, NBA review, and CBB review share the same locked scoreboar
  assert.match(live,/window\.ManCaveBasketballSharedFeed=true/);
  assert.match(live,/mancave-basketball-snapshot/);
  assert.match(live,/setTimeout\(\(\)=>window\.dispatchEvent/);
+ assert.ok(live.indexOf("setScore(match.score??'—')")<live.indexOf("window.dispatchEvent(new CustomEvent('mancave-basketball-snapshot'"),'shared scoreboard update must precede the CBB flash event');
  assert.doesNotMatch(live,/<script>\s*if\(sport==='cbb'\)/,'old immediate, undelayed CBB header must be removed');
  for(const side of ['left','right'])assert.match(read(side+'.html'),/team-board\.html\?sport=/);
 });
