@@ -1,4 +1,4 @@
-name: Diagnose ESPN NFL teamleaders exact player and team fields
+name: Probe current-season NFL roster statistics shape
 on:
   push:
     paths:
@@ -8,30 +8,44 @@ permissions: {contents: read}
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 4
     steps:
-      - name: Compare Raiders and Broncos team-specific categories and athlete stats
+      - name: Identify structured NFL team player stats for both clubs
         run: |
           node --input-type=module <<'JS'
-          const base='https://site.web.api.espn.com/apis/site/v3/sports/football/nfl/teamleaders';
-          for(const [id,team] of [['7','Denver'],['13','Las Vegas'],['31','New York Giants']]){
-            for(const param of ['?team='+id,'?teamId='+id,'?team='+id+'&season=2026']){
-             const r=await fetch(base+param,{signal:AbortSignal.timeout(12000)});
-             const d=await r.json().catch(()=>({}));
-             const groups=d.teamLeaders?.categories||d.categories||[];
-             console.log('TEAM_LEADER_SHAPE',JSON.stringify({team,id,param,status:r.status,
-              rootKeys:Object.keys(d),teamLeaders:d.teamLeaders?{id:d.teamLeaders.id,name:d.teamLeaders.name,keys:Object.keys(d.teamLeaders)}:null,
-              categories:groups.map(c=>({
-                category:c.name,displayName:c.displayName,abbreviation:c.abbreviation,keys:Object.keys(c),
-                leaders:(c.leaders||c.athletes||[]).slice(0,2).map(l=>({
-                  keys:Object.keys(l),
-                  name:l.athlete?.displayName||l.athlete?.fullName||l.displayName||l.name,
-                  athleteId:l.athlete?.id,athleteTeam:l.athlete?.team,
-                  value:l.displayValue??l.value,
-                  statistics:l.statistics,
-                  athleteHeadshot:l.athlete?.headshot
-                }))
-              }))}));
-            }
+          const base='https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/';
+          for(const id of [7,13]){
+            const paths=[
+              ['roster',base+id+'/roster'],
+              ['roster-enable',base+id+'/roster?enable=roster,projection,stats'],
+              ['team-enable-roster',base+id+'?enable=roster'],
+              ['team-enable-stats',base+id+'?enable=roster,projection,stats'],
+              ['team-statistics',base+id+'/statistics?season=2026&seasontype=2'],
+              ['site-v3-leaders','https://site.api.espn.com/apis/site/v3/sports/football/nfl/leaders?season=2026'],
+              ['site-v3-team','https://site.api.espn.com/apis/site/v3/sports/football/nfl/teams/'+id+'/leaders']
+            ];
+            const res=await Promise.all(paths.map(async ([label,url])=>{
+              try {
+                const rsp=await fetch(url,{signal:AbortSignal.timeout(10000)});
+                const obj=await rsp.json().catch(()=>({}));
+                const athletes=Array.isArray(obj.athletes)?obj.athletes:Array.isArray(obj.team?.athletes)?obj.team.athletes:[];
+                const first=athletes?.[0];
+                const firstAthlete=(Array.isArray(first?.items)?first.items[0]:first)?.athlete||first;
+                const shape=(v)=>Array.isArray(v)?{length:v.length,first:v.slice(0,2)}:v;
+                return {
+                  label,status:rsp.status,rootKeys:Object.keys(obj).slice(0,30),
+                  roster:shape(obj.roster)?.first?{keys:Object.keys(obj.roster),first:JSON.stringify(obj.roster).slice(0,1500)}:null,
+                  athletesLength:athletes.length,
+                  firstAthlete:JSON.stringify(firstAthlete).slice(0,1800),
+                  teamAthletesLength:obj.team?.athletes?.length,
+                  teamKeys:Object.keys(obj.team||{}).slice(0,35),
+                  resultsType:typeof obj.results,resultsKeys:Object.keys(obj.results||{}).slice(0,24),
+                  resultsSample:JSON.stringify(obj.results||{}).slice(0,1300),
+                  leaderKeys:Object.keys(obj.leaders||{}).slice(0,15),
+                  headers:{cors:rsp.headers.get('access-control-allow-origin')}
+                };
+              }catch(e){return{label,error:String(e).slice(0,150)}}
+            }));
+            console.log('TEAM_STATS_PROBE',JSON.stringify({teamId:id,results:res}));
           }
           JS
