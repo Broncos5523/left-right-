@@ -1,0 +1,108 @@
+name: Audit every upcoming Game Center scouting matchup
+on:
+  push:
+    paths:
+      - .github/workflows/audit-all-game-scouting-coverage-20261119.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check Team Leaders for every upcoming matchup across seven sports
+        run: |
+          node --input-type=module <<'JS'
+          const leagues=[
+           ['NFL','football/nfl',168],['NBA','basketball/nba',48],
+           ['NHL','hockey/nhl',48],['MLB','baseball/mlb',48],
+           ['WNBA','basketball/wnba',48],['NCAAF','football/college-football',168],
+           ['NCAAB','basketball/mens-college-basketball',72]
+          ];
+          const now=Date.now();
+          const fmt=offset=>{
+           const d=new Date(now+offset*86400000);
+           const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+           const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));
+           return p.year+p.month+p.day;
+          };
+          async function fetchJSON(url){
+           const response=await fetch(url,{signal:AbortSignal.timeout(14000)});
+           if(!response.ok)throw Error('HTTP '+response.status);
+           return response.json();
+          }
+          const all=[];
+          for(const [league,path,hours] of leagues){
+           const d=Array.from({length:Math.ceil(hours/24)+1},(_,i)=>i);
+           const batches=await Promise.all(d.map(async offset=>{
+            const url='https://site.api.espn.com/apis/site/v2/sports/'+path+'/scoreboard?dates='+fmt(offset)+'&limit='+
+             (league==='NCAAB'?500:250)+(league==='NCAAB'?'&groups=50':league==='NCAAF'?'&groups=80':'');
+            const x=await fetchJSON(url);
+            return x.events||[];
+           }));
+           const games=[...new Map(batches.flat().filter(x=>x.status?.type?.state==='pre'&&
+            new Date(x.date).getTime()>=now-60*60000&&new Date(x.date).getTime()<=now+hours*3600000)
+            .map(x=>[x.id,x])).values()];
+           for(const event of games)all.push({league,path,id:String(event.id),name:event.name,
+            competitors:(event.competitions?.[0]?.competitors||[]).map(x=>({id:String(x.team?.id||''),name:x.team?.displayName}))});
+           console.log('SCOUTING_SCHEDULE',JSON.stringify({league,upcomingGames:games.length,windowHours:hours}));
+          }
+          const checked=[],errors=[];
+          let cursor=0;
+          await Promise.all(Array.from({length:10},async()=>{
+           while(cursor<all.length){
+            const g=all[cursor++];
+            try{
+             const d=await fetchJSON('https://site.api.espn.com/apis/site/v2/sports/'+g.path+'/summary?event='+g.id);
+             const actual=(d.header?.competitions?.[0]?.competitors||[]).map(x=>String(x.team?.id||''));
+             const entries=[];
+             for(const team of g.competitors){
+              const filtered=(d.leaders||[]).filter(x=>String(x.team?.id)===team.id);
+              const cats=filtered.length===1?(filtered[0].leaders||[]).filter(x=>(x.leaders||[]).some(y=>y.athlete?.displayName||y.athlete?.fullName)):[];
+              entries.push({team:team.name,id:team.id,categories:cats.length,
+               matchedHeader:actual.includes(team.id),groups:filtered.length});
+             }
+             checked.push({...g,entries});
+            }catch(e){errors.push({league:g.league,id:g.id,name:g.name,error:String(e).slice(0,100)});}
+           }
+          }));
+          for(const [league] of leagues){
+           const games=checked.filter(x=>x.league===league),failed=errors.filter(x=>x.league===league);
+           const two=games.filter(x=>x.entries.length===2&&x.entries.every(t=>t.categories>0&&t.matchedHeader&&t.groups===1));
+           const some=games.filter(x=>x.entries.some(t=>t.categories>0));
+           const missing=games.filter(x=>x.entries.some(t=>!t.categories||!t.matchedHeader||t.groups!==1));
+           console.log('SCOUTING_COVERAGE',JSON.stringify({league,checked:games.length,bothTeams:two.length,
+             atLeastOne:some.length,incomplete:missing.length,fetchErrors:failed.length,
+             missingExamples:missing.slice(0,10).map(x=>({id:x.id,name:x.name,entries:x.entries})),
+             failures:failed.slice(0,5)}));
+          }
+          console.log('SCOUTING_TOTALS',JSON.stringify({scheduled:all.length,checked:checked.length,failed:errors.length,
+           bothTeams:checked.filter(x=>x.entries.length===2&&x.entries.every(y=>y.categories>0&&y.matchedHeader&&y.groups===1)).length}));
+          if(errors.length>all.length*0.1)throw Error('More than 10% of games lacked an accessible summary');
+          JS
+      - name: Spot-check Team Comparison and Previous Games feeds for each active league
+        run: |
+          node --input-type=module <<'JS'
+          const samples=[
+           ['NFL','football/nfl','7'],['NBA','basketball/nba','2'],
+           ['NHL','hockey/nhl','1'],['NCAAF','football/college-football','12'],
+           ['NCAAB','basketball/mens-college-basketball','12']
+          ];
+          for(const [league,path,id] of samples){
+           const base='https://site.api.espn.com/apis/site/v2/sports/'+path+'/teams/'+id;
+           const check=async(url)=>{
+            const r=await fetch(url,{signal:AbortSignal.timeout(12000)});
+            const d=await r.json().catch(()=>({}));
+            return{status:r.status,data:d};
+           };
+           const [detail,schedule]=await Promise.all([check(base),check(base+'/schedule')]);
+           const completed=(schedule.data.events||[]).filter(x=>x.competitions?.[0]?.status?.type?.completed===true);
+           const completeWithScores=completed.filter(e=>(e.competitions?.[0]?.competitors||[]).every(x=>x.score!=null));
+           console.log('SCOUTING_TABS',JSON.stringify({league,teamId:id,detailHttp:detail.status,
+            record:detail.data.team?.record?.items?.map(x=>({name:x.name,type:x.type,summary:x.summary})).slice(0,2),
+            scheduleHttp:schedule.status,events:schedule.data.events?.length,
+            completed:completed.length,completedWithScores:completeWithScores.length,
+            sampleGame:completeWithScores.slice(-1).map(x=>({id:x.id,name:x.name,competition:x.competitions?.[0]?.competitors?.map(c=>({
+             team:c.team?.displayName,homeAway:c.homeAway,score:c.score}))}))}));
+          }
+          JS
