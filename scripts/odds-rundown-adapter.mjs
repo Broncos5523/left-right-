@@ -100,8 +100,8 @@ export function parseMarkets(event){
    const marketID=Number(market.market_id);
    if(![1,2,3].includes(marketID))continue; // These IDs denote full-game main markets.
    for(const participant of market.participants||[]){
-    const side=matchTeam(participant.name,away.name)?'Away':
-      matchTeam(participant.name,home.name)?'Home':null;
+    const side=matchTeam(participant.name,providerTeamName(away))?'Away':
+      matchTeam(participant.name,providerTeamName(home))?'Home':null;
     const outcome=teamKey(participant.name).replace(/\s+/g,'');
     for(const ln of participant.lines||[]){
      const q=offer(ln,book);if(!q)continue;
