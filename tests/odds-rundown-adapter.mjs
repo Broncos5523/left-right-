@@ -19,7 +19,7 @@ test('same league fixture matches high-confidence Arizona vs UConn aliases and U
  assert.equal(matchFixture('NCAAB',events[0],espn)?.id,'NCAAB-401909742');
  assert.equal(matchFixture('NBA',events[0],espn),null);
  assert.equal(matchTeam('North Carolina Tar Heels','North Carolina State Wolfpack'),false);
- const collision=[...espn,{...espn,id:'NCAAB-other'}];
+ const collision=[...espn,{...espn[0],id:'NCAAB-other'}];
  assert.equal(matchFixture('NCAAB',events[0],collision),null,'do not auto-assign ambiguous odds');
 });
 test('normalize three markets from ONE actual named bookmaker',()=>{
