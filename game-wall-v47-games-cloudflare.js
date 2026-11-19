@@ -85,6 +85,8 @@ function parse(event,league,path){
  }
  return {id:league+'-'+event.id,eventId:String(event.id),league,path,state:status,
   away:t(away),home:t(home),start:when,
+  // ESPN future schedules can assign midnight when the actual tip/puck/drop is TBD.
+  timeConfirmed:event.timeValid!==false&&c?.timeValid!==false,
   endedAt:event.status?.type?.completedAt||c.endDate||event.endDate||'',
   detail:event.status?.type?.shortDetail||event.status?.type?.detail||'',
   broadcasts:broadcasters(event,c),
