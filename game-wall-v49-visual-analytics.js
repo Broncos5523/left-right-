@@ -161,6 +161,64 @@ function periodSVG(data,g){
 function reportCard(title,detail){return '<div class="vaEmpty"><strong>'+esc(title)+'</strong><p>'+esc(detail)+'</p></div>';}
 function evidenceLine(value){return '<div class="vaNote">'+esc(value)+'</div>';}
 function nameFor(g,w){return String(g[w]?.abbr||g[w]?.name||w.toUpperCase());}
+// Upcoming games: render the actual season-to-date team averages ESPN
+// publishes in /summary.boxscore.teams. This is a scouting comparison, NOT a
+// fictional shot map, pregame possession path, or model projection.
+const PREGAME_ORDER={
+ NFL:['totalPointsPerGame','yardsPerGame','passingYardsPerGame','rushingYardsPerGame','totalPointsPerGameAllowed','yardsPerGameAllowed'],
+ NCAAF:['totalPointsPerGame','yardsPerGame','passingYardsPerGame','rushingYardsPerGame','totalPointsPerGameAllowed','yardsPerGameAllowed'],
+ NBA:['avgPoints','pointsPerGame','fieldGoalPct','threePointFieldGoalPct','totalRebounds','avgRebounds','assists','turnovers'],
+ WNBA:['avgPoints','pointsPerGame','fieldGoalPct','threePointFieldGoalPct','totalRebounds','avgRebounds','assists','turnovers'],
+ NCAAB:['avgPoints','pointsPerGame','fieldGoalPct','threePointFieldGoalPct','totalRebounds','avgRebounds','assists','turnovers'],
+ NHL:['avgGoals','goalsPerGame','avgShots','shotsPerGame','powerPlayPct','penaltyKillPct','savePct'],
+ MLB:['avgRuns','runsPerGame','avgHits','battingAverage','onBasePct','earnedRunAverage']
+};
+function pregameRows(data,g){
+ const teams=arr(data?.boxscore?.teams);
+ const find=side=>teams.find(x=>matching(x.team?.id,teamId(g,side)));
+ const away=find('away'),home=find('home');
+ if(!away||!home)return [];
+ const toMap=t=>new Map(arr(t.statistics)
+  .filter(x=>typeof x.name==='string')
+  .map(x=>[x.name.toLowerCase(),x]));
+ const a=toMap(away),h=toMap(home),order=arr(PREGAME_ORDER[g.league]);
+ const keys=[...new Set([...order.map(k=>k.toLowerCase()),...a.keys()])]
+  .filter(k=>a.has(k)&&h.has(k));
+ return keys.map(k=>{
+  const x=a.get(k),y=h.get(k);
+  const awayVal=num(x.displayValue??x.value),homeVal=num(y.displayValue??y.value);
+  const label=String(x.label||x.displayName||x.name||'').trim();
+  return{key:k,label,away:awayVal,home:homeVal};
+ }).filter(x=>x.away!==null&&x.home!==null&&x.away>=0&&x.home>=0&&
+    x.label&&x.label.length<=48)
+   .slice(0,8);
+}
+function pregameVisual(){
+ const g=s.game,rows=pregameRows(s.data,g);
+ if(!rows.length){
+  // For competitions without team season averages, compare ESPN's reported
+  // category leaders. No invented stats, charts, or assumed player locations.
+  return matchup();
+ }
+ const teamA=nameFor(g,'away'),teamH=nameFor(g,'home');
+ let out='<div class="vaSection">PREGAME SCOUTING · SEASON TEAM AVERAGES</div>'+
+  '<div class="vaSeasonLegend"><span><i class="away"></i>'+esc(teamA)+'</span>'+
+  '<span><i class="home"></i>'+esc(teamH)+'</span></div>';
+ out+=rows.map((row,index)=>{
+  const scale=Math.max(1,row.away,row.home);
+  const left=Math.max(0,Math.min(100,row.away/scale*100));
+  const right=Math.max(0,Math.min(100,row.home/scale*100));
+  const label=row.label.replace(/([a-z])([A-Z])/g,'$1 $2');
+  const lowerBetter=/allowed|against|turnover|penalty|errors|earned run average/i.test(label);
+  return '<section class="vaSeasonCard"><div class="vaSeasonTitle"><strong>'+esc(label)+'</strong>'+
+   (lowerBetter?'<small>LOWER IS BETTER</small>':'<small>SEASON AVERAGE</small>')+'</div>'+
+   '<div class="vaSeasonRow"><span>'+esc(teamA)+'</span><div class="vaSeasonTrack">'+
+   '<i class="away" style="width:'+left.toFixed(2)+'%"></i></div><b>'+esc(fmt(row.away))+'</b></div>'+
+   '<div class="vaSeasonRow"><span>'+esc(teamH)+'</span><div class="vaSeasonTrack">'+
+   '<i class="home" style="width:'+right.toFixed(2)+'%"></i></div><b>'+esc(fmt(row.home))+'</b></div></section>';
+ }).join('');
+ return out+evidenceLine('Bars compare ESPN-reported season-to-date team averages, not a prediction. Each pair uses its own scale; the label identifies categories where lower is better.');
+}
 function plot(){
  const g=s.game,d=s.data,kind=shotKind(g);
  if(!d)return reportCard('Waiting for data','ESPN matchup data is loading.');
@@ -194,7 +252,7 @@ function plot(){
    'ESPN reported rink locations. Blocked shots are excluded because some are credited to the blocking team. Attack direction may vary by period.':
    'Actual ESPN field-goal play coordinates. Free throws and invalid coordinates are excluded. This is not a season tendency estimate.');
  }
- if(g.state==='upcoming')return reportCard('Pregame matchup','No completed-game path exists yet. Open Matchup or Player Leaders for verified pregame analysis.');
+ if(g.state==='upcoming')return pregameVisual();
  const events=scoreEvents(d);
  return '<div class="vaSection">SCORING PROGRESSION</div>'+(
   events.length>=2?'<div class="vaChart vaGraph">'+graphSVG(events,g)+'</div><div class="vaLegend"><span><i style="background:#63e3b6"></i>'+esc(nameFor(g,'away'))+'</span><span><i style="background:#f4c477"></i>'+esc(nameFor(g,'home'))+'</span></div>':
@@ -290,7 +348,7 @@ function render(){
  if(!g||!body||!shade||!title)return;
  shade.classList.add('open');title.textContent='Game Analytics · '+g.league;
  delete body.dataset.statsEvent;delete body.dataset.pregameEvent;body.dataset.analyticsEvent=g.id;
- const tabs=[['map',shotKind(g)?'Shot Map':'Visual'],['flow','Game Flow'],['matchup','Matchup'],['players','Leaders']];
+ const tabs=[['map',g.state==='upcoming'?'Scouting':shotKind(g)?'Shot Map':'Visual'],['flow','Game Flow'],['matchup','Matchup'],['players','Leaders']];
  const desc=g.state==='upcoming'?'PRE-GAME SCOUTING':g.state==='live'?'LIVE GAME ANALYTICS':'FINAL GAME ANALYSIS';
  let out='<div class="vaHero"><small>MAN CAVE SPORTS BOOK · '+esc(desc)+'</small><strong>'+esc(name(g))+'</strong><span>'+esc(g.league)+' · '+esc(g.detail||g.state.toUpperCase())+'</span></div>'+
   '<div class="vaTabs" role="tablist" aria-label="Advanced analytics">'+tabs.map(([id,label])=>
@@ -333,7 +391,7 @@ function open(g){
  if(!safeGame(g))return false;
  window.ManCaveStats?.deactivate?.();
  s.token++;s.game=g;s.data=null;s.error='';s.loading=false;s.lastFetch=0;
- s.team='all';s.player='all';s.period='all';s.tab=g.state==='upcoming'?'matchup':'map';
+ s.team='all';s.player='all';s.period='all';s.tab='map';
  render();load();return true;
 }
 function openById(id){
@@ -348,5 +406,5 @@ setInterval(()=>{
  if(Date.now()-s.lastFetch>28000)load();
 },30000);
 window.ManCaveVisualAnalytics=Object.freeze({open,openById,
- helpers:Object.freeze({shots,scoreEvents,teamLines,shotKind,graphSVG,courtSVG,rinkSVG,periodSVG,safeGame})});
+ helpers:Object.freeze({shots,scoreEvents,teamLines,shotKind,graphSVG,courtSVG,rinkSVG,periodSVG,safeGame,pregameRows})});
 })();
