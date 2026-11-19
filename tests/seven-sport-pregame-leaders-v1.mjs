@@ -87,7 +87,7 @@ test('Never attach a different team summary to the selected team',async()=>{
  const content=await renderTeamTab(h);
  assert.doesNotMatch(content,/Real Away Scorer/);
  assert.match(content,/Real Home Scorer/);
- assert.match(content,/Team leaders unavailable/);
+ assert.match(content,/No verified season leaders currently published/);
 });
 test('NFL continues to prefer complete ESPN box-score season leader cache over ESPN preview leaders',async()=>{
  const h=harness('NFL','football/nfl',{nflCache:true});
@@ -106,4 +106,29 @@ test('No visual rewrite: approved scouting tabs and TV controller remain in plac
  assert.match(source,/data\?\.leaders/);
  assert.match(html,/game-wall-v47-nhl-leaders-cloudflare\.js/);
  assert.match(html,/data-assign-game/);
+});
+
+test('completed-game matchup results parse ESPN score objects for Previous Games and comparison',()=>{
+ const ctx=vm.createContext({window:{},document:{getElementById(){return null;}},Date,console,setTimeout,clearTimeout,AbortController});
+ vm.runInContext(source,ctx);
+ const team={id:'7',abbr:'DEN',fullName:'Denver Broncos'};
+ const schedule={events:[{id:'401873041',date:'2026-11-15T18:00:00Z',
+  competitions:[{status:{type:{state:'post',completed:true}},competitors:[
+   {team:{id:'7',displayName:'Denver Broncos'},homeAway:'away',score:{value:26,displayValue:'26'}},
+   {team:{id:'29',displayName:'Carolina Panthers'},homeAway:'home',score:{value:21,displayValue:'21'}}
+  ]}]}]};
+ const games=ctx.window.ManCavePregame.helpers.previous(schedule,team,Date.parse('2026-11-19T05:00:00Z'));
+ assert.equal(games.length,1);
+ assert.equal(games[0].x,26);
+ assert.equal(games[0].y,21);
+ assert.equal(games[0].result,'W');
+ assert.equal(games[0].against,'Carolina Panthers');
+});
+test('future MLB or WNBA scouting sheets never display an ESPN placeholder 12AM time',async()=>{
+ const h=harness('MLB','baseball/mlb');
+ h.game.timeConfirmed=false;
+ h.game.start='2027-03-25T04:00:00Z';
+ const display=await renderTeamTab(h);
+ assert.match(display,/TIME TBD/);
+ assert.doesNotMatch(display,/12:00 AM/);
 });
