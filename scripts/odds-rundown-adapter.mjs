@@ -40,6 +40,16 @@ export function matchTeam(a,b){
  return true;
 }
 const validTime=t=>{const x=Date.parse(t||'');return Number.isFinite(x)?x:null;};
+// TheRundown's event teams often use a city/school-only "name" and a
+// separate "mascot" (e.g. "Toronto" + "Raptors"). Market participants
+// use full names. Always reconstruct a full identity before ESPN matching.
+export function providerTeamName(team){
+ const base=String(team?.name||'').trim(),mascot=String(team?.mascot||'').trim();
+ if(!base||!mascot)return base;
+ const normalizedBase=teamKey(base),normalizedMascot=teamKey(mascot);
+ return normalizedBase===normalizedMascot||normalizedBase.endsWith(' '+normalizedMascot)
+  ?base:base+' '+mascot;
+}
 export function matchFixture(league,external,espnGames){
  const home=external?.teams?.find(x=>x.is_home===true||x.isHome===true);
  const away=external?.teams?.find(x=>x.is_home===false||x.isHome===false);
@@ -48,7 +58,7 @@ export function matchFixture(league,external,espnGames){
  if(time===null)return null;
  const candidates=espnGames.filter(g=>g.league===league&&g.state==='upcoming'
   &&Math.abs((validTime(g.start)??-1e20)-time)<=3*60*60*1000
-  &&matchTeam(g.home.fullName,home.name)&&matchTeam(g.away.fullName,away.name));
+  &&matchTeam(g.home.fullName,providerTeamName(home))&&matchTeam(g.away.fullName,providerTeamName(away)));
  return candidates.length===1?candidates[0]:null;
 }
 function number(value){
