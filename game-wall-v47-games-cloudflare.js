@@ -108,20 +108,26 @@ async function fetchFavoriteNext(favorite,now=Date.now(),force=false){
    if(!response.ok)throw Error('ESPN team schedule '+response.status);
    const data=await response.json();
    return (data.events||[]).map(e=>parse(e,favorite.league,path)).filter(g=>
-    g?.state==='upcoming'&&Date.parse(g.start)>now&&
-    (g.away.fullName===favorite.name||g.home.fullName===favorite.name));
+    g&&(g.away.fullName===favorite.name||g.home.fullName===favorite.name));
   }finally{clearTimeout(timer);}
  };
  let games=[],failed=false;
  try{games=await request('');}catch(e){failed=true;}
  if(!games.length){
-  // ESPN may publish an off-season favorite's NEXT calendar-year schedule.
-  // Never invent a game if next season has not been announced.
   const year=new Date(now).getUTCFullYear()+1;
   try{games=await request('?season='+year);}catch(e){if(failed)throw e;}
  }
- const earliest=games.sort((a,b)=>Date.parse(a.start)-Date.parse(b.start))[0];
- const out=earliest?[earliest]:[];
+ // A favorite's LIVE game must still appear if the bulk scoreboard misses it.
+ // A not-yet-updated ESPN 'pre' status gets an hour of grace after tip-off.
+ const recent=games.filter(g=>{
+  const start=Date.parse(g.start);
+  if(!Number.isFinite(start)||start<now-48*3600000)return false;
+  return g.state==='live'||g.state==='final'||
+   (g.state==='upcoming'&&start>=now-60*60000&&start<=now);
+ });
+ const next=games.filter(g=>g.state==='upcoming'&&Date.parse(g.start)>now)
+  .sort((a,b)=>Date.parse(a.start)-Date.parse(b.start))[0];
+ const out=[...new Map([...recent,...(next?[next]:[])].map(g=>[g.id,g])).values()];
  favoriteScheduleCache.set(key,{at:Date.now(),games:out});
  return out;
 }
@@ -161,9 +167,9 @@ async function refresh(force=false){
  const games=new Map();
  for(const r of successes)for(const g of r.value)games.set(g.id,g);
  // Only favorite teams can contribute one upcoming game outside the general windows.
- const favoritesNeedingLookup=(policy?.FAVORITES||[]).filter(f=>![...games.values()].some(g=>
-  g.league===f.league&&g.state==='upcoming'&&Date.parse(g.start)>now&&
-  (g.away.fullName===f.name||g.home.fullName===f.name)));
+ // Check favorites independently of the league scoreboard. Do not skip the
+ // favorite lookup just because a different upcoming game is already listed.
+ const favoritesNeedingLookup=policy?.FAVORITES||[];
  const favoriteResults=await Promise.allSettled(favoritesNeedingLookup.map(f=>fetchFavoriteNext(f,now,force)));
  let favoriteErrors=0;
  for(const result of favoriteResults){
