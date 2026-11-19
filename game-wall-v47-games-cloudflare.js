@@ -481,6 +481,11 @@ async function openAssign(id){
   loadNflCoverage(eastern(game.start).date):Promise.resolve()]);
  const route=routeFor(game),selectedTVs=new Set(),selectedWings=new Set();
  let swapWings=false;
+ const canDelay=['NBA','NCAAB','NHL'].includes(game.league);
+ const allowedDelays=[0,15,30,45,60,90,120];
+ let savedDelay=30;
+ try{const stored=localStorage.getItem('mancave-wing-broadcast-delay');if(stored!==null&&allowedDelays.includes(Number(stored)))savedDelay=Number(stored);}catch(e){}
+ let broadcastDelay=canDelay?savedDelay:0;
  const status=()=>window.ManCaveBridge?.wingStatus?.()||{connected:false,busy:false};
  const wingButtons=()=>[['left','Left Wing'],['right','Right Wing']].map(([side,title])=>
   '<button type="button" class="realWingChoice" data-real-wing="'+side+'" aria-pressed="false">'+
@@ -508,6 +513,12 @@ async function openAssign(id){
    '<div class="realWingControls"><button type="button" class="realWingSwap" id="realWingSwap">⇄ Swap Teams</button>'+
     '<span id="realWingConnection" class="realWingConnection"></span></div>'+
    '<div id="realWingSettingsSlot"></div>'+
+   (canDelay?'<label for="realWingBroadcastDelay" class="realGameFine" style="display:block;margin:14px 0 5px;font-weight:750">Match the TV broadcast · Player board delay</label>'+
+    '<select id="realWingBroadcastDelay" style="width:100%;padding:11px 12px;background:#102235;color:#fff;border:1px solid #46667b;border-radius:9px;font:inherit">'+
+    allowedDelays.map(seconds=>'<option value="'+seconds+'"'+(seconds===broadcastDelay?' selected':'')+'>'+(
+      seconds===0?'No delay · live ESPN data':seconds+' seconds'+(seconds===30?' · recommended starting point':'')
+    )+'</option>').join('')+'</select>'+
+    '<p class="realWingHelp">NBA, college basketball and NHL: delay wing scores, player stats and scoring graphics together. This does not delay the cable broadcast or Game Finder.</p>':'')+
    '<p class="realWingHelp">Default: Away team on Left, Home team on Right. Choose either wing, both, or cable TVs too. Assignments stay until you manually change them.</p>'+
   '</section>'+
   '<div class="realGameReceipt" role="status" id="realGameReceipt">'+
@@ -572,10 +583,16 @@ async function openAssign(id){
  document.getElementById('realWingSwap')?.addEventListener('click',()=>{
   if(state.busy)return;swapWings=!swapWings;repaint();
  });
- document.getElementById('realGameCancel').onclick=()=>document.getElementById('modalShade').classList.remove('open');
+ document.getElementById('realWingBroadcastDelay')?.addEventListener('change',e=>{
+   const next=Number(e.target.value);
+   if(!allowedDelays.includes(next))return;
+   broadcastDelay=next;
+   try{localStorage.setItem('mancave-wing-broadcast-delay',String(next));}catch(e){}
+  });
+  document.getElementById('realGameCancel').onclick=()=>document.getElementById('modalShade').classList.remove('open');
  button.onclick=async()=>{
   if(state.busy)return;
-  const tvs=[...selectedTVs],wings={left:selectedWings.has('left'),right:selectedWings.has('right'),swap:swapWings};
+  const tvs=[...selectedTVs],wings={left:selectedWings.has('left'),right:selectedWings.has('right'),swap:swapWings,broadcastDelay:canDelay?broadcastDelay:0};
   const wingCount=Number(wings.left)+Number(wings.right);
   const wingConnection=status();
   if(!tvs.length&&!wingCount)return;
