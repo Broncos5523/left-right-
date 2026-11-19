@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-11-19T02:33:48.869Z",
+  "game": "Duke Blue Devils vs Illinois Fighting Illini",
+  "eventId": "401909566",
+  "source": "ESPN Site v2 men's basketball",
+  "status": "ok",
+  "totalPlays": 594,
+  "fieldGoalAttempts": 136,
+  "withCoordinates": 136,
+  "withPlayerIds": 136,
+  "withTeamIds": 136,
+  "hasCompetitors": true,
+  "hasBoxscore": true
+}
