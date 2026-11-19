@@ -12,7 +12,7 @@ const leagues=[
  ['NCAAB','basketball/mens-college-basketball']
 ];
 function harness(league,path,{wrongTeam=false,nflCache=false}={}){
- const ids=['713','1313'];
+ const ids=['7','13'];
  const game={
   id:league+'-401920517',eventId:'401920517',league,path,state:'upcoming',
   start:'2026-11-21T23:30:00Z',
@@ -34,16 +34,16 @@ function harness(league,path,{wrongTeam=false,nflCache=false}={}){
   if(url.includes('stats-cache/nfl-team-leaders')){
    if(!nflCache)return {ok:false,status:404};
    return response({season:2026,teams:{
-    '713':{season:2026,teamId:'713',updatedAt:new Date().toISOString(),
+    '7':{season:2026,teamId:'7',updatedAt:new Date().toISOString(),
      leaders:[{metric:'Passing Yards',name:'Verified Away Passer',value:'1,234'}]},
-    '1313':{season:2026,teamId:'1313',updatedAt:new Date().toISOString(),
+    '13':{season:2026,teamId:'13',updatedAt:new Date().toISOString(),
      leaders:[{metric:'Passing Yards',name:'Verified Home Passer',value:'2,345'}]}
    }});
   }
   if(url.includes('/nhl-team-leaders?'))return {ok:false,status:503};
   if(url.includes('/summary?event=')){
    const g=(id,name)=>
-    ({team:{id:String(wrongTeam?id==='713'?'999':id:id)},leaders:[
+    ({team:{id:String(wrongTeam?id==='7'?'999':id:id)},leaders:[
      {name:'pointsPerGame',displayName:'Points Per Game',leaders:[
       {displayValue:'22.3',athlete:{displayName:name,headshot:{href:'https://a.espncdn.com/i/headshots/nba/players/full/1.png'}}}]}
     ]});
@@ -52,7 +52,7 @@ function harness(league,path,{wrongTeam=false,nflCache=false}={}){
   }
   if(url.includes('/schedule'))return response({events:[]});
   if(url.includes('/teams/')){const id=url.split('/teams/')[1].split('?')[0].split('/')[0];
-   return response({team:{id,displayName:id==='713'?'Away Team':'Home Team',record:{items:[{type:'total',summary:'5-3'}]}}});
+   return response({team:{id,displayName:id==='7'?'Away Team':'Home Team',record:{items:[{type:'total',summary:'5-3'}]}}});
   }
   throw Error('Unexpected request '+url);
  };
