@@ -1,13 +1,13 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-19T05:03:18.897Z",
+  "generatedAt": "2026-11-19T05:05:33.719Z",
   "source": "ESPN completed-game NFL player box scores, 2026 regular season (all verified games)",
   "teams": {
     "7": {
       "teamId": "7",
       "team": "Denver Broncos",
       "season": 2026,
-      "updatedAt": "2026-11-19T05:03:18.656Z",
+      "updatedAt": "2026-11-19T05:05:33.467Z",
       "verifiedAthletes": 47,
       "gamesExpected": 9,
       "gamesVerified": 9,
@@ -61,7 +61,7 @@
       "teamId": "13",
       "team": "Las Vegas Raiders",
       "season": 2026,
-      "updatedAt": "2026-11-19T05:03:18.896Z",
+      "updatedAt": "2026-11-19T05:05:33.719Z",
       "verifiedAthletes": 46,
       "gamesExpected": 10,
       "gamesVerified": 10,
