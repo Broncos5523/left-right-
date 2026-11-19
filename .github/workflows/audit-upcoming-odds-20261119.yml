@@ -1,0 +1,63 @@
+name: Audit upcoming odds coverage across seven Man Cave leagues
+on:
+  push:
+    paths:
+      - .github/workflows/audit-upcoming-odds-20261119.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Count availability in scoreboard, summary, core odds and pickcenter
+        run: |
+          node --input-type=module <<'JS'
+          const leagues=[
+           ['NFL','football/nfl'],['NBA','basketball/nba'],['NHL','hockey/nhl'],
+           ['MLB','baseball/mlb'],['WNBA','basketball/wnba'],
+           ['NCAAF','football/college-football'],['NCAAB','basketball/mens-college-basketball']
+          ];
+          const days=['20261119','20261120','20261121'];
+          const now=Date.now(),get=async url=>{
+           const r=await fetch(url,{signal:AbortSignal.timeout(11500)});
+           if(!r.ok)throw Error('HTTP '+r.status);
+           return r.json();
+          };
+          async function parallel(items,max,fn){
+           let next=0;const arr=Array(items.length);
+           await Promise.all(Array.from({length:Math.min(max,items.length)},async()=>{
+            while(next<items.length){const ix=next++;try{arr[ix]=await fn(items[ix]);}catch(e){arr[ix]={error:String(e.message||e)};}}
+           }));
+           return arr;
+          }
+          const records=await parallel(leagues.flatMap(([league,path])=>days.map(date=>({league,path,date}))),6,async q=>{
+           const params='?dates='+q.date+'&limit='+(q.league==='NCAAB'?500:250)+
+            (q.league==='NCAAB'?'&groups=50':q.league==='NCAAF'?'&groups=80':'');
+           const d=await get('https://site.api.espn.com/apis/site/v2/sports/'+q.path+'/scoreboard'+params);
+           return {...q,events:(d.events||[]).filter(e=>e.status?.type?.state==='pre'&&new Date(e.date).getTime()>=now-3e6)
+           .map(e=>({id:String(e.id),teams:(e.competitions?.[0]?.competitors||[]).map(x=>x.team?.displayName),
+             odds:(e.competitions?.[0]?.odds||e.odds||[]).length}))};
+          });
+          for(const [league,path] of leagues){
+           const slate=records.filter(x=>x.league===league);
+           const all=slate.flatMap(x=>x.events||[]);
+           const missing=all.filter(x=>!x.odds);
+           console.log('SCOREBOARD_COVERAGE',JSON.stringify({league,total:all.length,priced:all.filter(x=>x.odds).length,unpriced:missing.length,errors:slate.filter(x=>x.error).length,samples:missing.slice(0,5)}));
+           const targets=missing.slice(0,4);
+           const checks=await parallel(targets,3,async game=>{
+            const url='https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+game.id;
+            const summary=await get(url);
+            const comp=summary.header?.competitions?.[0]||{};
+            const pc=summary.pickcenter||summary.pickCenter||[];
+            const ss=comp.odds||summary.odds||[];
+            const [sport,division]=path.split('/');
+            const core='https://sports.core.api.espn.com/v2/sports/'+sport+'/leagues/'+division+'/events/'+game.id+'/competitions/'+game.id+'/odds?limit=15';
+            const co=await get(core).catch(e=>({error:String(e.message||e)}));
+            return {...game,summaryOdds:ss.length,pickcenter:pc.length,coreCount:co.count??null,coreError:co.error||null,
+              samplePickcenter:pc[0]?{provider:pc[0].provider?.name,details:pc[0].details,overUnder:pc[0].overUnder,
+               moneyline:pc[0].moneyline?.home?.close?.odds}:null};
+           });
+           console.log('FALLBACK_COVERAGE',JSON.stringify({league,checks}));
+          }
+          JS
