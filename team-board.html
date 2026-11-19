@@ -168,6 +168,10 @@ if(['nba','wnba','cbb'].includes(sport)){
  const path={nba:'basketball/nba',wnba:'basketball/wnba',cbb:'basketball/mens-college-basketball'}[sport];
  const id=p.get('eventId'),meta=app.querySelector('.meta'),band=app.querySelector('.band');
  const broadcastDelayMs=['nba','cbb'].includes(sport)?Math.min(120,Math.max(0,Number(p.get('broadcastDelay')||0)||0))*1000:0;
+ // Share ONE scoreboard/PBP snapshot after the configured broadcast delay.
+ // Both approved NBA and CBB flashes consume it rather than polling independently.
+ if(['nba','cbb'].includes(sport))window.ManCaveBasketballSharedFeed=true;
+ let nextFetchSeq=0,lastAppliedSeq=0;
  band.textContent='ON COURT';
  const get=async()=>{const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+encodeURIComponent(id),{cache:'no-store'});if(!r.ok)throw Error('ESPN HTTP '+r.status);return r.json()};
  const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
@@ -213,17 +217,27 @@ if(['nba','wnba','cbb'].includes(sport)){
    setGamePhaseHeading(data);
    meta.textContent='ESPN · VERIFIED CURRENT-GAME STATS';
    app.querySelector('.note').textContent='Players shown are current-game box-score participants, not confirmed five players presently on court. Live stats may be delayed.';
+   // Score and five-player stats are already committed to the portrait screen.
+   // A short paint gap ensures the shot alert appears AFTER the score change.
+   // This is NOT an additional 30-second ESPN/broadcast delay.
+   if(window.ManCaveBasketballSharedFeed===true){
+    setTimeout(()=>window.dispatchEvent(new CustomEvent('mancave-basketball-snapshot',{
+     detail:{sport,eventId:String(id||''),summary:data}
+    })),220);
+   }
   }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
  }
  async function update(){
   if(!id){meta.textContent='SELECT A LIVE GAME TO LOAD STATS';return}
+  const seq=++nextFetchSeq;
   try{
    const data=await get();
-   if(broadcastDelayMs)setTimeout(()=>apply(data),broadcastDelayMs);
-   else apply(data);
+   const commit=()=>{if(seq<=lastAppliedSeq)return;lastAppliedSeq=seq;apply(data);};
+   if(broadcastDelayMs)setTimeout(commit,broadcastDelayMs);
+   else commit();
   }catch(e){meta.textContent='BASKETBALL FEED UNAVAILABLE · RETRYING';app.querySelector('.note').textContent='Unable to refresh current-game box score: '+e.message}
  }
  update();setInterval(update,10000);
 }
 </script>
-<script src="./football-personnel.js?v=cfb-edge-stats-v1"></script><script src="./football-personnel-nfl-engine.js?v=nfl-edge-stats-v1"></script><script src="./football-board.js?v=cfb-possession-v5"></script><script src="./mlb-board.js?v=phase-headings-v1"></script><script src="./nfl-status-indicators.js?v=nfl-status-v1"></script><script src="./nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4&score-sync=10s-broadcast-delay-v2"></script><script src="./cbb-scoring-flash-preview-v1.js?gold-master-nba-v4&cbb-live-espn-backfill-20261118"></script></body></html>
+<script src="./football-personnel.js?v=cfb-edge-stats-v1"></script><script src="./football-personnel-nfl-engine.js?v=nfl-edge-stats-v1"></script><script src="./football-board.js?v=cfb-possession-v5"></script><script src="./mlb-board.js?v=phase-headings-v1"></script><script src="./nfl-status-indicators.js?v=nfl-status-v1"></script><script src="./nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4&score-sync=single-snapshot-20261118"></script><script src="./cbb-scoring-flash-preview-v1.js?gold-master-nba-v4&cbb-score-locked-20261118"></script></body></html>
