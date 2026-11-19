@@ -36,6 +36,21 @@ test('fixture reconciliation rebuilds separated city and mascot without guessing
   {...event.teams[0],mascot:'Maple Leafs'},event.teams[1]]},nba),null,
   'Never attach another sport/team by city name alone');
 });
+test('markets correctly attribute both sides when provider lists only a short city name',()=>{
+ const event={teams:[
+  {name:'Utah',mascot:'Utes',is_away:true},
+  {name:'Miami',mascot:'Hurricanes',is_home:true}
+ ],markets:[{market_id:1,participants:[
+  mk('Utah Utes',+220),mk('Miami Hurricanes',-260)
+ ]},{market_id:2,participants:[
+  mk('Utah Utes',-110,'+6.5'),mk('Miami Hurricanes',-110,'-6.5')
+ ]}]};
+ const quote=parseMarkets(event);
+ assert.equal(quote.moneyAway,'+220');
+ assert.equal(quote.moneyHome,'-260');
+ assert.equal(quote.spreadAway,'+6.5');
+ assert.equal(quote.spreadHome,'-6.5');
+});
 test('normalize three markets from ONE actual named bookmaker',()=>{
  const got=parseMarkets(events[0]);
  assert.equal(got.provider,'DraftKings');
