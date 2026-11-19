@@ -100,7 +100,7 @@ function people(){
     '</div></div>').join('')+'</div>':
    blank(s.game.league==='NHL'?'Team leaders unavailable — NHL and ESPN did not return usable team statistics.':'Team leaders unavailable — ESPN has not supplied statistical leaders for this team.'))+'</section>';
  }).join('')+
- '<p class="pgFootnote">Each row shows a verified category leader. NFL: ESPN 2026 season athlete totals when cached; NHL: official NHL team statistics; other sports: ESPN.</p>';
+ '<p class="pgFootnote">Season-to-date team leaders: ESPN matchup reports; NFL uses verified completed-game totals when available, NHL uses official NHL statistics when available.</p>';
 }
 function past(){
  return '<div class="pgSectionTitle">PREVIOUS FIVE GAMES</div>'+['away','home'].map(which=>{
@@ -167,10 +167,9 @@ async function officialNhl(g,side){
   encodeURIComponent(team)+'&season='+season);
  return Array.isArray(result?.leaders)&&result.leaders.length?result:null;
 }
-// NFL season player leaders are compiled from the verified ESPN athlete stats
-// endpoint. The older site-v2 /teams/{id}/leaders endpoint returns HTTP 200
-// with {} for both the Broncos and Raiders. A tiny daily JSON cache avoids
-// fetching 150 player records on a phone.
+// NFL season player leaders are compiled from every completed ESPN game box
+// score, including players not on today's roster. Share this small published
+// JSON across all upcoming NFL matchup sheets.
 const nflCache=new Map();
 async function officialNfl(g,which){
  const d=new Date(g.start),year=d.getUTCFullYear()-(d.getUTCMonth()<6?1:0);
@@ -191,18 +190,50 @@ async function officialNfl(g,which){
  if(!Number.isFinite(when)||now-when>7*86400000)return null;
  return Array.isArray(group.leaders)&&group.leaders.length?{leaders:group.leaders}:null;
 }
+// A game's ESPN /summary returns BOTH teams' season leaders, with actual
+// athlete names/headshots/values. In every active league tested, the old
+// /teams/{id}/leaders request returned HTTP 200 and empty JSON instead.
+const MATCH_CACHE=new Map();
+async function matchup(g,force=false){
+ const id=String(g?.eventId||'');
+ if(!VALID.has(g?.path)||!/^\d{5,15}$/.test(id))return null;
+ const key=g.path+'|'+id,now=Date.now();
+ let item=MATCH_CACHE.get(key);
+ if(force||!item||now-item.at>12*60000){
+  const promise=request(ROOT+g.path+'/summary?event='+encodeURIComponent(id))
+   .catch(()=>null);
+  item={at:now,promise};MATCH_CACHE.set(key,item);
+ }
+ return item.promise;
+}
+async function matchupLeaders(g,which,force=false){
+ const id=teamID(g,which);
+ if(!id)return null;
+ const data=await matchup(g,force);
+ // Verify the team is actually in the selected match. Never attach another
+ // club's leaders because a provider returns groups in an unexpected order.
+ const competitors=data?.header?.competitions?.[0]?.competitors||[];
+ if(!competitors.some(x=>String(x.team?.id)===id))return null;
+ const groups=(data?.leaders||[]).filter(x=>String(x.team?.id)===id);
+ if(groups.length!==1)return null;
+ const cats=arr(groups[0].leaders).filter(c=>arr(c.leaders).some(x=>x.athlete?.displayName||x.athlete?.fullName));
+ return cats.length?{leaders:cats}:null;
+}
 async function lookup(g,which,force=false){
  const id=teamID(g,which);
  if(!id)return {detail:null,leaders:null,schedule:null};
  const key=g.path+'|'+id,now=Date.now(),cached=CACHE.get(key);
  if(!force&&cached&&now-cached.at<15*60000)return cached.data;
  const base=ROOT+g.path+'/teams/'+encodeURIComponent(id);
- const responses=await Promise.allSettled([request(base),request(base+'/leaders'),request(base+'/schedule'),
+ const responses=await Promise.allSettled([request(base),request(base+'/schedule'),matchupLeaders(g,which,force),
   ...(g.league==='NHL'?[officialNhl(g,which)]:g.league==='NFL'?[officialNfl(g,which)]:[])]);
+ const summary=responses[2]?.status==='fulfilled'?responses[2].value:null;
+ const independent=responses[3]?.status==='fulfilled'?responses[3].value:null;
  const val={detail:responses[0].status==='fulfilled'?responses[0].value:cached?.data.detail||null,
-  leaders:['NHL','NFL'].includes(g.league)&&responses[3]?.status==='fulfilled'&&responses[3].value?.leaders?.length?
-   responses[3].value:responses[1].status==='fulfilled'?responses[1].value:cached?.data.leaders||null,
-  schedule:responses[2].status==='fulfilled'?responses[2].value:cached?.data.schedule||null};
+  // NFL verified all-completed-game totals, NHL official statistics, otherwise
+  // ESPN pregame matchup leaders for THIS exact team and event.
+  leaders:independent?.leaders?.length?independent:summary?.leaders?.length?summary:cached?.data.leaders||null,
+  schedule:responses[1].status==='fulfilled'?responses[1].value:cached?.data.schedule||null};
  CACHE.set(key,{at:now,data:val});return val;
 }
 async function load(force=false){
