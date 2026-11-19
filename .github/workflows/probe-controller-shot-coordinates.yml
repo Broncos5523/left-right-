@@ -1,0 +1,38 @@
+name: Check real court and rink shot markers, coordinates and athlete IDs
+on:
+  push:
+    paths: [.github/workflows/probe-controller-shot-coordinates.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Validate real shot-event filters for NBA WNBA NCAA and NHL
+        run: |
+          node --input-type=module <<'JS'
+          const cases=[['NBA','basketball/nba','401910015'],['WNBA','basketball/wnba','401918022'],
+           ['NCAAB','basketball/mens-college-basketball','401909742'],['NHL','hockey/nhl','401892739']];
+          for(const [league,path,id] of cases){
+           const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+id,{signal:AbortSignal.timeout(13000)});
+           const d=await r.json(),plays=d.plays?.allPlays||d.plays||[];
+           const types={};let shooting=0,shotKinds={};
+           let sample=[],invalid=0,missing=0,minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9;
+           for(const p of plays){
+            const t=p.type?.abbreviation||p.type?.text||p.type?.type||'unknown';types[t]=(types[t]||0)+1;
+            let candidate=league==='NHL'?/shot|goal/i.test(t):p.shootingPlay===true;
+            if(!candidate)continue;
+            shooting++;shotKinds[t]=(shotKinds[t]||0)+1;
+            const x=Number(p.coordinate?.x),y=Number(p.coordinate?.y);
+            if(!Number.isFinite(x)||!Number.isFinite(y)){missing++;continue;}
+            if(league==='NHL'?(Math.abs(x)>100||Math.abs(y)>50):(x<0||x>50||y<0||y>50)){invalid++;continue;}
+            minx=Math.min(minx,x);maxx=Math.max(maxx,x);miny=Math.min(miny,y);maxy=Math.max(maxy,y);
+            if(sample.length<4)sample.push({type:t,scoring:p.scoringPlay,score:p.scoreValue,coord:p.coordinate,
+              team:p.team?.id,athlete:p.participants?.[0]?.athlete?.displayName,
+              participants:p.participants?.slice(0,2).map(o=>({name:o.athlete?.displayName,type:o.type})),text:p.text});
+           }
+           console.log('SHOT_COVERAGE',JSON.stringify({league,plays:plays.length,shooting,invalid,missing,bounds:{minx,maxx,miny,maxy},
+            kinds:shotKinds,sample}));
+          }
+          JS
