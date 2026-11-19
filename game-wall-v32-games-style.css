@@ -109,3 +109,16 @@
  .games .gameCard .teamName{font-size:11px}
  .games .gameCard .gameBannerDivider{font-size:9px}
 }
+
+/* Next available favorite teams can be months away (e.g. 2027 MLB).
+   Keep their approved game cards but separate them from the immediate slate. */
+.games .gameFutureHeading{
+ grid-column:1 / -1;
+ margin:11px 0 1px;
+ padding:12px 13px;
+ border-top:1px solid #52677c;
+ display:flex;flex-direction:column;gap:4px;
+ color:#f0cf8d;
+}
+.games .gameFutureHeading strong{font-size:12px;font-weight:950;letter-spacing:1px}
+.games .gameFutureHeading span{font-size:11px;color:#a7bed2;line-height:1.35}
