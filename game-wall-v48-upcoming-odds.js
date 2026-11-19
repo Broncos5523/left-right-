@@ -3,6 +3,8 @@
 (()=>{
 'use strict';
 const cache=new Map(),pending=new Set(),queue=[];
+let externalQuotes=Object.create(null),externalLoaded=false,externalPromise=null;
+const coverage=o=>['moneyAway','moneyHome','spreadAway','spreadHome','overUnder'].filter(k=>o?.[k]).length;
 let active=0,observer=null;
 const concurrency=3,cacheMs=12*60*1000;
 const esc=x=>String(x??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -57,8 +59,12 @@ function col(label,body,sub=''){
 function markup(g){
  if(!g||g.state!=='upcoming')return '';
  const cached=cache.get(g.id);
- const odds=(cached&&cached.expires>Date.now()?cached.odds:null)||pick(g.oddsRaw);
- const source=odds?'<span>'+esc(odds.provider)+' · via ESPN</span>':'<span>ESPN pregame lines</span>';
+ const espn=(cached&&cached.expires>Date.now()?cached.odds:null)||pick(g.oddsRaw);
+ const secondary=externalQuotes[g.id];
+ // Choose one provider's internally consistent quote, not a mix of books.
+ const odds=coverage(secondary)>coverage(espn)?secondary:espn||secondary||null;
+ const source=odds?'<span>'+esc(odds.provider)+' · via '+esc(odds.source||'ESPN')+'</span>':
+  '<span>ESPN + multi-book fallback</span>';
  let body='';
  if(odds){
   const away=abbrev(g.away),home=abbrev(g.home);
@@ -128,10 +134,43 @@ function drain(){
   })();
  }
 }
+async function loadExternalOnce(){
+ if(externalLoaded)return;
+ if(externalPromise)return externalPromise;
+ externalPromise=(async()=>{
+  try{
+   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8500);
+   let response;
+   try{response=await fetch('./odds-cache/therundown.json',{cache:'no-store',signal:controller.signal});}
+   finally{clearTimeout(timer);}
+   if(!response.ok)return;
+   const data=await response.json();
+   const expires=Date.parse(data.validUntil||'');
+   if(!Number.isFinite(expires)||expires<=Date.now()||!data.games||typeof data.games!=='object')return;
+   const safe=Object.create(null);
+   for(const [id,o] of Object.entries(data.games)){
+    if(!/^(?:NFL|NBA|NHL|MLB|WNBA|NCAAF|NCAAB)-\d{5,15}$/.test(id)||!o||typeof o!=='object')continue;
+    if(!['DraftKings','FanDuel','BetMGM'].includes(String(o.provider)))continue;
+    if(coverage(o))safe[id]={...o,source:'TheRundown'};
+   }
+   externalQuotes=safe;
+  }catch(e){/* Unconfigured, old, offline, or optional feed. ESPN still works. */}
+  finally{
+   externalLoaded=true;
+   // Keep ESPN-loaded odds and update only the compact odds rail, never the
+   // approved banner, TV buttons or other Game Finder state.
+   for(const el of [...document.querySelectorAll('.games .mcOdds[data-odds-for]')])
+    paint(el.dataset.oddsFor);
+   hydrate();
+  }
+ })();
+ return externalPromise;
+}
 function hydrate(){
  observer?.disconnect();observer=null;
  const nodes=[...document.querySelectorAll('.games .mcOdds[data-odds-for]')];
  if(!nodes.length)return;
+ if(!externalLoaded)loadExternalOnce();
  if(typeof IntersectionObserver==='function'){
   observer=new IntersectionObserver(entries=>{
    for(const entry of entries)if(entry.isIntersecting){
