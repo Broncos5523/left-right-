@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-19T04:28:25.548Z",
-  "validUntil": "2026-11-20T10:28:15.286Z",
+  "generatedAt": "2026-11-19T04:29:27.923Z",
+  "validUntil": "2026-11-20T10:29:18.177Z",
   "source": "TheRundown pre-match odds (5-minute-delayed free tier)",
   "games": {
     "NCAAB-401918959": {
@@ -160,14 +160,14 @@
       "underPrice": "-108"
     },
     "NCAAB-401921028": {
-      "provider": "BetMGM",
+      "provider": "DraftKings",
       "source": "TheRundown",
-      "moneyAway": "+145",
-      "moneyHome": "-180",
-      "spreadAway": null,
-      "spreadHome": null,
-      "spreadPriceAway": null,
-      "spreadPriceHome": null,
+      "moneyAway": null,
+      "moneyHome": null,
+      "spreadAway": "+3.5",
+      "spreadHome": "-3.5",
+      "spreadPriceAway": "-105",
+      "spreadPriceHome": "-115",
       "overUnder": "148.5",
       "overPrice": "-115",
       "underPrice": "-105"
@@ -318,7 +318,7 @@
   },
   "stats": {
     "espnUpcoming": 258,
-    "needsSecondary": 142,
+    "needsSecondary": 141,
     "candidates": 7,
     "queried": 7,
     "matched": 130,
