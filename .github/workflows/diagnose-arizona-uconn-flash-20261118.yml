@@ -1,0 +1,36 @@
+name: Diagnose Arizona UConn CBB made-shot feed 2026-11-18
+on:
+  push:
+    paths:
+      - .github/workflows/diagnose-arizona-uconn-flash-20261118.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Inspect exact ESPN shot events and join keys without modifying production
+        run: |
+          node --input-type=module <<'JS'
+          const event='401909742';
+          const u='https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/summary?event='+event;
+          const r=await fetch(u,{signal:AbortSignal.timeout(25000)});
+          console.log('HTTP',r.status);if(!r.ok)throw Error('ESPN HTTP '+r.status);
+          const d=await r.json();
+          const comp=d.header?.competitions?.[0];
+          const teams=(comp?.competitors||[]).map(c=>({id:String(c.team?.id),name:c.team?.displayName,score:c.score}));
+          const players=new Map();
+          for(const group of d.boxscore?.players||[])for(const block of group.statistics||[])for(const row of block.athletes||[])
+            if(row.athlete?.id)players.set(String(row.athlete.id),{name:row.athlete.displayName,teamId:String(group.team?.id)});
+          const pbs=Array.isArray(d.plays)?d.plays:Array.isArray(d.playByPlay?.plays)?d.playByPlay.plays:[];
+          const athleteId=p=>String(p?.participants?.[0]?.athlete?.id||p?.participants?.[0]?.id||p?.athletesInvolved?.[0]?.id||p?.athletesInvolved?.[0]?.athlete?.id||p?.athletes?.[0]?.id||p?.athlete?.id||p?.athleteId||'');
+          const tid=p=>String(p?.team?.id||p?.teamId||'');
+          const originalAttempt=p=>!/free\\s*throw/i.test((p?.text||'')+' '+(p?.type?.text||''))&&(p?.shootingPlay===true||/\\b(jumper|layup|dunk|hook shot|tip shot|three point|three-pointer)\\b/i.test(p?.text||''));
+          const shots=pbs.filter(originalAttempt);
+          const made=shots.filter(p=>p.scoringPlay===true&&[2,3].includes(Number(p.scoreValue)));
+          console.log('INFO',JSON.stringify({event,teams,status:comp?.status?.type?.state,plays:pbs.length,shotAttempts:shots.length,madeShots:made.length,withId:made.filter(p=>athleteId(p)).length,madeJoined:made.filter(p=>players.has(athleteId(p))).length,madeWithTeam:made.filter(p=>tid(p)).length,roster:players.size,playShape:pbs[0]?Object.keys(pbs[0]):[]}));
+          console.log('LATEST',JSON.stringify(pbs.slice(-12).map(p=>({seq:p.sequenceNumber,id:p.id,text:p.text,shootingPlay:p.shootingPlay,scoringPlay:p.scoringPlay,scoreValue:p.scoreValue,athleteId:athleteId(p),teamId:tid(p),onRoster:players.has(athleteId(p)),keys:Object.keys(p)}))));
+          console.log('LAST_MADE',JSON.stringify(made.slice(-12).map(p=>({text:p.text,seq:p.sequenceNumber,athleteId:athleteId(p),onRoster:players.has(athleteId(p)),teamId:tid(p),scoreValue:p.scoreValue,coord:p.coordinate}))));
+          JS
