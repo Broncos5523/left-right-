@@ -1,0 +1,58 @@
+name: Build verified NFL team season leaders for pregame scouting
+on:
+  push:
+    paths:
+      - scripts/refresh-nfl-pregame-leaders.mjs
+      - .github/workflows/refresh-nfl-pregame-leaders.yml
+  schedule:
+    - cron: "45 07 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: nfl-season-player-leaders
+  cancel-in-progress: false
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Calculate leaders from ESPN 2026 season player statistics
+        env:
+          SEASON: "2026"
+          TEAM_IDS: "7,13"
+        run: node scripts/refresh-nfl-pregame-leaders.mjs
+      - name: Validate that both exact NFL teams have real, attributed metrics
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const doc=JSON.parse(fs.readFileSync('stats-cache/nfl-team-leaders-2026.json','utf8'));
+          for(const [id,team] of [['7','Denver Broncos'],['13','Las Vegas Raiders']]){
+            const x=doc.teams?.[id];
+            if(x?.team!==team||x.season!==2026||x.verifiedAthletes<8||x.leaders.length<3)
+              throw Error('Missing or misattributed verified NFL leaders: '+team);
+            if(x.leaders.some(l=>!l.metric||!l.name||!l.value))
+              throw Error('Invalid player metric: '+team);
+            console.log('VERIFIED_LEADERS',JSON.stringify({team,verified:x.verifiedAthletes,leaders:x.leaders}));
+          }
+          JS
+      - name: Publish small read-only season leaders cache
+        run: |
+          cp stats-cache/nfl-team-leaders-2026.json "${RUNNER_TEMP}/nfl-leaders.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p stats-cache
+            cp "${RUNNER_TEMP}/nfl-leaders.json" stats-cache/nfl-team-leaders-2026.json
+            git add stats-cache/nfl-team-leaders-2026.json
+            git diff --cached --quiet && exit 0
+            git commit -m "Refresh ESPN-verified NFL pregame player leaders"
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 2
+          done
+          exit 1
