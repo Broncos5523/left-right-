@@ -98,7 +98,11 @@ function people(){
      (p.pic?'<img src="'+esc(p.pic)+'" alt="" loading="lazy" onerror="this.hidden=true">':'<span class="pgLeaderFallback">★</span>')+
      '<strong>'+esc(p.name)+'</strong><b class="pgLeaderValue">'+esc(p.value)+'</b>'+
     '</div></div>').join('')+'</div>':
-   blank(s.game.league==='NHL'?'Team leaders unavailable — NHL and ESPN did not return usable team statistics.':'Team leaders unavailable — ESPN has not supplied statistical leaders for this team.'))+'</section>';
+   blank(/^(?:TBD|TBA|to be determined)$/i.test(String(team.team.fullName||''))?
+    'Opponent not yet determined — team leaders will appear when the matchup is confirmed.':
+    ['MLB','WNBA'].includes(s.game.league)&&new Date(s.game.start).getTime()>Date.now()+30*86400000?
+    'New-season player leaders have not been published for this future matchup.':
+    'No verified season leaders currently published for this team.'))+'</section>';
  }).join('')+
  '<p class="pgFootnote">Season-to-date team leaders: ESPN matchup reports; NFL uses verified completed-game totals when available, NHL uses official NHL statistics when available.</p>';
 }
@@ -118,7 +122,9 @@ function render(){
  window.ManCaveStats?.deactivate?.();
  heading.textContent='Upcoming Game Stats · '+g.league;shade.classList.add('open');
  delete body.dataset.statsEvent;body.dataset.pregameEvent=g.id;
- const when=new Date(g.start).toLocaleString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+ const when=g.timeConfirmed===false?
+  new Date(g.start).toLocaleDateString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',year:'numeric'})+' · TIME TBD':
+  new Date(g.start).toLocaleString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
  let h='<div class="pgHero"><small>PREGAME SCOUTING REPORT · '+esc(g.league)+'</small>'+
  '<div class="pgMatch"><div>'+photo(g.away)+'<b>'+esc(g.away.name)+'</b></div>'+
  '<strong>VS<small>'+esc(when)+' ET</small></strong><div>'+photo(g.home)+'<b>'+esc(g.home.name)+'</b></div></div></div>'+
