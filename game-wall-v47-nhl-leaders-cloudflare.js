@@ -92,7 +92,7 @@ function people(){
   const team=side(which);
   return '<section class="pgTeamSection"><h4>'+photo(team.team)+esc(team.team.fullName)+'</h4>'+
   (team.players.length?'<div class="pgLeaders">'+team.players.map(p=>
-   '<div class="pgLeaderCategory">'+
+   '<div class="pgLeaderCategory'+(/^passing\s*yards$/i.test(p.metric)?' pgLeaderCategory--passing':'')+'">'+
     '<div class="pgLeaderMetric">'+esc(p.metric)+'</div>'+
     '<div class="pgLeaderPerson">'+
      (p.pic?'<img src="'+esc(p.pic)+'" alt="" loading="lazy" onerror="this.hidden=true">':'<span class="pgLeaderFallback">★</span>')+
