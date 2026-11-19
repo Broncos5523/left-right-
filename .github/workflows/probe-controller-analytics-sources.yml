@@ -1,0 +1,48 @@
+name: Probe ESPN game-event location data for advanced analytics
+on:
+  push:
+    paths: [.github/workflows/probe-controller-analytics-sources.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect summary scoring timeline and shot/event coordinates in all 7 leagues
+        run: |
+          node --input-type=module <<'JS'
+          const samples=[
+            ['NBA','basketball/nba','401910015'],
+            ['NCAAB','basketball/mens-college-basketball','401909742'],
+            ['NHL','hockey/nhl','401892739'],
+            ['NFL','football/nfl','401873041'],
+            ['NCAAF','football/college-football','401856864'],
+            ['WNBA','basketball/wnba','401918022']
+          ];
+          const fetchJ=async u=>{const r=await fetch(u,{signal:AbortSignal.timeout(13000)});return {http:r.status,data:await r.json().catch(()=>({}))};};
+          const b=await fetchJ('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/bos/schedule?season=2026');
+          const events=b.data.events||[],final=events.filter(e=>e.competitions?.[0]?.status?.type?.completed===true).at(-1);
+          if(final)samples.push(['MLB','baseball/mlb',String(final.id)]);
+          console.log('MLB_SAMPLE',JSON.stringify({schedule:b.http,count:events.length,id:final?.id}));
+          for(const [league,path,id] of samples){
+           const {http,data}=await fetchJ('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+id);
+           const getList=d=>Array.isArray(d?.plays)?d.plays:Array.isArray(d?.plays?.allPlays)?d.plays.allPlays:[];
+           const plays=getList(data),scoring=data.scoringPlays||[];
+           const coords=plays.filter(p=>p.coordinate||p.coordinates||p.shot||p.location||p.shootingPlay);
+           const pointShape=p=>({keys:Object.keys(p||{}),id:p.id,type:p.type,text:p.text?.slice(0,150),
+             scoring:p.scoringPlay,scoreValue:p.scoreValue,teamId:p.team?.id,athlete:p.participants?.[0]?.athlete?.displayName,
+             coordinate:p.coordinate,coordinates:p.coordinates,shot:p.shot,location:p.location,
+             period:p.period?.number,clock:p.clock?.displayValue,awayScore:p.awayScore,homeScore:p.homeScore});
+           console.log('ANALYTICS_SOURCE',JSON.stringify({league,id,http,keys:Object.keys(data||{}).slice(0,36),
+             plays:plays.length,scoring:scoring.length,withCoordinates:coords.length,
+             playSample:plays.slice(0,2).map(pointShape),
+             coordinateSample:coords.slice(0,3).map(pointShape),
+             scoringSample:scoring.slice(0,2).map(pointShape),
+             headerPeriod:data.header?.competitions?.[0]?.competitors?.map(c=>({id:c.team?.id,
+               name:c.team?.displayName,linescores:c.linescores?.slice(0,7)})),
+             boxTeams:(data.boxscore?.teams||[]).map(t=>({teamId:t.team?.id,
+               stats:t.statistics?.slice(0,7).map(s=>({name:s.name,value:s.displayValue??s.value}))}))
+           }));
+          }
+          JS
