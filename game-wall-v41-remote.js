@@ -49,6 +49,9 @@ async function sendWingGame(game,options={}){
  const leagueCodes={NFL:'nfl',NBA:'nba',NHL:'nhl',MLB:'mlb',WNBA:'wnba',NCAAF:'cfb',NCAAB:'cbb'};
  const sport=leagueCodes[String(game?.league||'')],eventId=String(game?.eventId||'');
  const left=options.left===true,right=options.right===true,swap=options.swap===true;
+ const allowedDelays=[0,15,30,45,60,90,120];
+ const requestedDelay=Number(options.broadcastDelay??0);
+ const broadcastDelay=['nba','cbb','nhl'].includes(sport)&&allowedDelays.includes(requestedDelay)?requestedDelay:0;
  if(!state.user)throw Error('Wing boards are disconnected. Sign in under Settings → Firebase & Board Connections.');
  if(state.busy)throw Error('Another board command is in progress.');
  if(!left&&!right)throw Error('Select Left Wing or Right Wing first.');
@@ -56,8 +59,8 @@ async function sendWingGame(game,options={}){
  const away=String(game.away?.fullName||''),home=String(game.home?.fullName||'');
  if(!away||!home||away.length>140||home.length>140)throw Error('The game is missing valid team names.');
  const key=sport+'-'+eventId,now=Date.now(),patch={};
- if(left)patch.left={type:'team',game:key,eventId,team:swap?home:away,updatedAt:now};
- if(right)patch.right={type:'team',game:key,eventId,team:swap?away:home,updatedAt:now};
+ if(left)patch.left={type:'team',game:key,eventId,team:swap?home:away,broadcastDelay,updatedAt:now};
+ if(right)patch.right={type:'team',game:key,eventId,team:swap?away:home,broadcastDelay,updatedAt:now};
  const ok=await send(patch,'Selected wing game boards assigned.');
  if(!ok)throw Error(state.message||'Firebase did not save the wing assignment.');
  return {saved:true,left:left?patch.left.team:null,right:right?patch.right.team:null,
