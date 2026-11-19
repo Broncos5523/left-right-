@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-19T04:29:27.923Z",
-  "validUntil": "2026-11-20T10:29:18.177Z",
+  "generatedAt": "2026-11-19T04:46:00.080Z",
+  "validUntil": "2026-11-20T10:45:49.947Z",
   "source": "TheRundown pre-match odds (5-minute-delayed free tier)",
   "games": {
     "NCAAB-401918959": {
@@ -64,19 +64,19 @@
       "spreadHome": "-10.5",
       "spreadPriceAway": "-105",
       "spreadPriceHome": "-115",
-      "overUnder": null,
-      "overPrice": null,
-      "underPrice": null
+      "overUnder": "136.5",
+      "overPrice": "-115",
+      "underPrice": "-105"
     },
     "NCAAB-401920413": {
       "provider": "BetMGM",
       "source": "TheRundown",
-      "moneyAway": null,
-      "moneyHome": null,
-      "spreadAway": null,
-      "spreadHome": null,
-      "spreadPriceAway": null,
-      "spreadPriceHome": null,
+      "moneyAway": "+675",
+      "moneyHome": "-1100",
+      "spreadAway": "+13.5",
+      "spreadHome": "-13.5",
+      "spreadPriceAway": "-110",
+      "spreadPriceHome": "-110",
       "overUnder": "144.5",
       "overPrice": "-105",
       "underPrice": "-115"
@@ -127,8 +127,8 @@
       "moneyHome": "-115",
       "spreadAway": "+1.5",
       "spreadHome": "-1.5",
-      "spreadPriceAway": "-115",
-      "spreadPriceHome": "-105",
+      "spreadPriceAway": "-125",
+      "spreadPriceHome": "+105",
       "overUnder": "159.5",
       "overPrice": "-115",
       "underPrice": "-105"
@@ -160,14 +160,14 @@
       "underPrice": "-108"
     },
     "NCAAB-401921028": {
-      "provider": "DraftKings",
+      "provider": "BetMGM",
       "source": "TheRundown",
-      "moneyAway": null,
-      "moneyHome": null,
-      "spreadAway": "+3.5",
-      "spreadHome": "-3.5",
-      "spreadPriceAway": "-105",
-      "spreadPriceHome": "-115",
+      "moneyAway": "+145",
+      "moneyHome": "-180",
+      "spreadAway": "+4.5",
+      "spreadHome": "-4.5",
+      "spreadPriceAway": "-118",
+      "spreadPriceHome": "-102",
       "overUnder": "148.5",
       "overPrice": "-115",
       "underPrice": "-105"
@@ -188,12 +188,12 @@
     "NCAAB-401920888": {
       "provider": "DraftKings",
       "source": "TheRundown",
-      "moneyAway": "+180",
-      "moneyHome": "-218",
+      "moneyAway": "+185",
+      "moneyHome": "-225",
       "spreadAway": "+4.5",
       "spreadHome": "-4.5",
-      "spreadPriceAway": "-115",
-      "spreadPriceHome": "-105",
+      "spreadPriceAway": "-108",
+      "spreadPriceHome": "-112",
       "overUnder": "139.5",
       "overPrice": "-105",
       "underPrice": "-115"
@@ -201,8 +201,8 @@
     "NCAAB-401911534": {
       "provider": "BetMGM",
       "source": "TheRundown",
-      "moneyAway": "+100",
-      "moneyHome": "-120",
+      "moneyAway": "+105",
+      "moneyHome": "-125",
       "spreadAway": "+1.5",
       "spreadHome": "-1.5",
       "spreadPriceAway": "-110",
@@ -289,6 +289,19 @@
       "overPrice": "-110",
       "underPrice": "-110"
     },
+    "NCAAB-401920518": {
+      "provider": "FanDuel",
+      "source": "TheRundown",
+      "moneyAway": "-122",
+      "moneyHome": "+102",
+      "spreadAway": "-1.5",
+      "spreadHome": "+1.5",
+      "spreadPriceAway": "-110",
+      "spreadPriceHome": "-110",
+      "overUnder": "150.5",
+      "overPrice": "-115",
+      "underPrice": "-105"
+    },
     "NBA-401910021": {
       "provider": "DraftKings",
       "source": "TheRundown",
@@ -318,12 +331,12 @@
   },
   "stats": {
     "espnUpcoming": 258,
-    "needsSecondary": 141,
+    "needsSecondary": 138,
     "candidates": 7,
     "queried": 7,
-    "matched": 130,
-    "quoted": 24,
-    "unmatched": 137,
+    "matched": 132,
+    "quoted": 25,
+    "unmatched": 135,
     "errors": []
   }
 }
