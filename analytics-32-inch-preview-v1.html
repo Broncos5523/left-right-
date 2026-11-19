@@ -12,22 +12,20 @@ body:not(.tv){min-height:100vh;padding:24px 14px 42px;background:radial-gradient
 .board{width:1920px;height:1080px;transform-origin:0 0;position:relative;overflow:hidden;isolation:isolate;display:flex;flex-direction:column;padding:25px 30px 26px;background:linear-gradient(130deg,#0b1524,#060f1d 65%,#11152a)}
 .board:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 680px 490px at 5% 0%,#19426070,transparent),radial-gradient(ellipse 660px 400px at 98% 92%,#1a334650,transparent);z-index:-1}
 .board:after{content:"";position:absolute;inset:0;z-index:-1;opacity:.13;pointer-events:none;background-image:linear-gradient(#2b4460 1px,transparent 1px),linear-gradient(90deg,#2b4460 1px,transparent 1px);background-size:58px 58px}
-.board-header{height:171px;flex:0 0 171px;display:grid;grid-template-columns:460px 1fr 460px;gap:20px;align-items:center;padding:12px 23px 18px;background:linear-gradient(90deg,#13273b,#0d1c2e 55%,#13273b);border:2px solid #365266;border-radius:21px}
-.team{display:flex;align-items:center;gap:22px;min-width:0}
-.team.home{flex-direction:row-reverse;text-align:right}
-.crest{width:105px;height:105px;border-radius:24px;border:3px solid var(--accent,#8dcbe7);background:linear-gradient(135deg,#233c53,#0b182a);display:grid;place-items:center;flex:0 0 auto;box-shadow:0 0 33px #52b7f11d}
-.crest strong{font-size:47px;color:#fff;text-shadow:0 2px 16px #0008;letter-spacing:-3px}
-.team .short{font-size:24px;color:#bed0df;font-weight:850;letter-spacing:1.3px}
-.team .name{margin-top:8px;font-size:43px;font-weight:950;line-height:1.04;letter-spacing:-1.4px}
-.match-center{text-align:center;align-self:center;min-width:0}
-.brand{font-size:22px;letter-spacing:3.4px;font-weight:950;color:#ffce7c}
-.brand small{font-size:18px;color:#b9d0de;letter-spacing:2.1px}
-.scoreline{display:flex;align-items:center;justify-content:center;gap:37px;height:89px}
-.scoreline .score{font-size:87px;font-weight:1000;letter-spacing:-4px;min-width:94px}
-.scoreline .separator{font-size:44px;color:#7196b6}
-.scoreline .status{font-size:28px;border-radius:100px;background:#233a50;padding:14px 23px;border:2px solid #4e6c83;letter-spacing:1.3px;font-weight:950;color:#ffdc99;white-space:nowrap}
-.scoreline .status.live{color:#70f1b5;border-color:#3d927a}
-.scoreline .status.final{color:#f4f9ff}
+
+/* 32" TV at 8 ft: no scoreboard; use narrow identification ribbon. */
+.analytics-header{height:90px;flex:0 0 90px;display:grid;grid-template-columns:500px minmax(0,1fr) 260px;align-items:center;gap:15px;padding:10px 24px 10px 27px;border:2px solid #34546b;border-radius:15px;background:linear-gradient(95deg,#142e42,#0c2234 58%,#142b3b)}
+.analytics-mark{display:flex;flex-direction:column;gap:5px;white-space:nowrap}
+.analytics-mark span{font-size:18px;color:#f3d28b;letter-spacing:2px;font-weight:900}
+.analytics-mark strong{font-size:24px;letter-spacing:1.4px;color:#e5f5fa;font-weight:1000}
+.analytics-match{display:flex;gap:18px;justify-content:center;align-items:center;min-width:0;white-space:nowrap;overflow:hidden}
+.analytics-match span{font-size:33px;font-weight:1000;letter-spacing:.1px;text-overflow:ellipsis;overflow:hidden}
+.analytics-match i{font-size:23px;color:#f5d187;font-style:normal;font-weight:900}
+.analytics-meta{display:flex;justify-content:flex-end;align-items:center;gap:13px}
+.analytics-meta>b{font-size:23px;color:#bddce7;letter-spacing:.8px}
+.analytics-meta>.phase{padding:12px 14px;font-size:21px;color:#84f0bb;font-weight:1000;letter-spacing:.7px;border:2px solid #437d79;border-radius:12px;background:#163b40}
+.analytics-meta>.phase.upcoming{color:#ffd292;border-color:#8d7750;background:#392e21}
+.analytics-meta>.phase.final{color:#ebf5ff;border-color:#61758f;background:#253447}
 .main{display:grid;grid-template-columns:minmax(0,1300px) minmax(0,1fr);gap:24px;margin-top:22px;flex:1;min-height:0}
 .hero{background:linear-gradient(160deg,#112336,#0a1c2d);border:2px solid #35536b;border-radius:20px;padding:22px 25px 15px;display:flex;flex-direction:column;min-height:0}
 .hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
@@ -72,7 +70,30 @@ body.tv .viewport{width:100vw;height:100vh;border:0;border-radius:0;box-shadow:n
 body.tv .intro,body.tv .controls{display:none}
 body.tv .board{margin:0}
 @media(max-width:750px){body:not(.tv){padding:15px 8px 35px}.intro{flex-direction:column;align-items:flex-start}.controls{padding:12px;gap:14px}.controls .group-label{width:100%;min-width:0}.controls button,.controls a{font-size:12px;padding:10px 11px}}
-</style></head><body><div class="intro"><div><h1>32″ Analytics TV — Concept 01</h1><p>Designed for a 16:9, 32-inch landscape TV viewed from approximately 8 feet.</p></div><div class="tag">SEPARATE PREVIEW · NO CONTROLLER CHANGES</div></div><div class="viewer"><div class="viewport" id="viewport"><div class="board" id="board"><div class="demo">DESIGN PROTOTYPE · SAMPLE DATA</div><header class="board-header"><div class="team away"><div class="crest" style="--accent:#70e2d0"><strong id="awayCrest">BOS</strong></div><div><div class="short" id="awayAbbr">BOS</div><div class="name" id="awayName">BOSTON</div></div></div><div class="match-center"><div class="brand">MAN CAVE <small>SPORTS BOOK</small> · <span id="league">NBA</span></div><div class="scoreline"><span class="score" id="awayScore">78</span><span class="separator">:</span><span class="score" id="homeScore">72</span><span id="status" class="status live">LIVE · Q3</span></div></div><div class="team home"><div class="crest" style="--accent:#f6c46e"><strong id="homeCrest">NYK</strong></div><div><div class="short" id="homeAbbr">NYK</div><div class="name" id="homeName">NEW YORK</div></div></div></header><div class="main"><section class="hero"><div class="hero-top"><div><h2 id="chartTitle">TEAM · SHOT MAP</h2><div class="descriptor" id="chartDescription">In-game locations · current matchup</div></div><div class="legend"><span class="item"><i class="dot"></i><span id="legendMake">MAKE</span></span><span class="item"><i class="dot miss"></i><span id="legendMiss">MISS</span></span></div></div><div class="chart-area" id="chart"></div><div class="hero-foot"><span>KEY: <b>LOCATION + OUTCOME</b></span><span>BIG DOTS · HIGH CONTRAST</span></div></section><aside class="side"><div class="insights-title">ADVANCED INSIGHTS</div><section class="kpi"><div class="k-label" id="kLabel0">PAINT ACCURACY</div><div class="k-value" id="kValue0">68%</div><div class="k-detail" id="kDetail0">AT THE RIM</div><div class="k-bar"><span id="kFill0"></span></div></section><section class="kpi"><div class="k-label" id="kLabel1">PAINT ACCURACY</div><div class="k-value" id="kValue1">68%</div><div class="k-detail" id="kDetail1">AT THE RIM</div><div class="k-bar"><span id="kFill1"></span></div></section><section class="trend"><h3 id="trendTitle">GAME FLOW</h3><div id="trendGraph"></div></section></aside></div><footer class="footer"><div class="foot-block"><b>VIEW</b><span id="footMode">CURRENT GAME</span></div><div class="foot-block"><b>VISUAL</b><span id="footChart">COURT SHOT SPOTS</span></div><div class="foot-block"><b>32″ / 8 FT</b><span>ONE HERO CHART · LARGE TYPE</span></div></footer></div></div></div><div class="controls"><p class="small-note"><strong>Interactive design mockup.</strong> All scores, shots, insights and player values are illustrative—not real game data. The full TV layout is fixed at 1920×1080 and scales to your screen; use Zoom in/pan on iPhone to inspect details.</p><div class="group"><span class="group-label">LEAGUE</span><button type="button" data-league="NBA" aria-pressed="false">NBA</button><button type="button" data-league="WNBA" aria-pressed="false">WNBA</button><button type="button" data-league="NCAAB" aria-pressed="false">NCAAB</button><button type="button" data-league="NHL" aria-pressed="false">NHL</button><button type="button" data-league="NFL" aria-pressed="false">NFL</button><button type="button" data-league="NCAAF" aria-pressed="false">NCAAF</button><button type="button" data-league="MLB" aria-pressed="false">MLB</button></div><div class="group"><span class="group-label">GAME STATE</span><button type="button" data-phase="UPCOMING" aria-pressed="false">UPCOMING</button><button type="button" data-phase="LIVE" aria-pressed="false">LIVE</button><button type="button" data-phase="FINAL" aria-pressed="false">FINAL</button></div><div class="group"><span class="group-label">CHART FOCUS</span><button type="button" data-focus="TEAM" aria-pressed="false">TEAM</button><button type="button" data-focus="PLAYER" aria-pressed="false">PLAYER</button></div><div class="group actions"><span class="group-label">PREVIEW</span><button id="zoom" type="button">Zoom in / pan</button><button id="tvOpen" type="button">Open fullscreen TV view</button><span class="small-note">A separate preview page. It doesn’t send commands or change approved boards.</span></div></div><script>
+
+.board{padding:22px 25px 23px}
+.main{grid-template-columns:minmax(0,1378px) minmax(0,1fr);gap:17px;margin-top:16px}
+.hero{padding:18px 21px 12px}
+.hero h2{font-size:47px}
+.hero .descriptor{font-size:26px}
+.chart-area{padding:0}
+.chart-area svg{max-height:730px}
+.side{gap:14px}
+.insights-title{height:43px;font-size:27px}
+.kpi{padding:19px 19px 17px}
+.kpi .k-value{font-size:85px}
+.trend{height:177px}
+.trend svg{height:109px}
+.footer{height:74px;flex-basis:74px;margin-top:14px;gap:12px}
+.footer .foot-block{padding:11px 16px}
+.footer .foot-block b{font-size:22px}
+.footer .foot-block span{font-size:21px}
+.demo{right:40px;top:8px;font-size:16px;opacity:.4}
+</style></head><body><div class="intro"><div><h1>32″ Analytics TV — Concept 02 · No Scoreboard</h1><p>Designed for a 16:9, 32-inch landscape TV viewed from approximately 8 feet.</p></div><div class="tag">SEPARATE PREVIEW · NO CONTROLLER CHANGES</div></div><div class="viewer"><div class="viewport" id="viewport"><div class="board" id="board"><div class="demo">DESIGN PROTOTYPE · SAMPLE DATA</div><header class="analytics-header">
+<div class="analytics-mark"><span>MAN CAVE SPORTS BOOK</span><strong>GAME INTELLIGENCE</strong></div>
+<div class="analytics-match"><span id="awayName">BOSTON</span><i>VS</i><span id="homeName">NEW YORK</span></div>
+<div class="analytics-meta"><b id="league">NBA</b><span class="phase" id="status">LIVE</span></div>
+</header><div class="main"><section class="hero"><div class="hero-top"><div><h2 id="chartTitle">TEAM · SHOT MAP</h2><div class="descriptor" id="chartDescription">In-game locations · current matchup</div></div><div class="legend"><span class="item"><i class="dot"></i><span id="legendMake">MAKE</span></span><span class="item"><i class="dot miss"></i><span id="legendMiss">MISS</span></span></div></div><div class="chart-area" id="chart"></div><div class="hero-foot"><span>KEY: <b>LOCATION + OUTCOME</b></span><span>BIG DOTS · HIGH CONTRAST</span></div></section><aside class="side"><div class="insights-title">ADVANCED INSIGHTS</div><section class="kpi"><div class="k-label" id="kLabel0">PAINT ACCURACY</div><div class="k-value" id="kValue0">68%</div><div class="k-detail" id="kDetail0">AT THE RIM</div><div class="k-bar"><span id="kFill0"></span></div></section><section class="kpi"><div class="k-label" id="kLabel1">PAINT ACCURACY</div><div class="k-value" id="kValue1">68%</div><div class="k-detail" id="kDetail1">AT THE RIM</div><div class="k-bar"><span id="kFill1"></span></div></section><section class="trend"><h3 id="trendTitle">GAME FLOW</h3><div id="trendGraph"></div></section></aside></div><footer class="footer"><div class="foot-block"><b>VIEW</b><span id="footMode">CURRENT GAME</span></div><div class="foot-block"><b>VISUAL</b><span id="footChart">COURT SHOT SPOTS</span></div><div class="foot-block"><b>32″ / 8 FT</b><span>ONE HERO CHART · LARGE TYPE</span></div></footer></div></div></div><div class="controls"><p class="small-note"><strong>Interactive design mockup.</strong> All scores, shots, insights and player values are illustrative—not real game data. The full TV layout is fixed at 1920×1080 and scales to your screen; use Zoom in/pan on iPhone to inspect details.</p><div class="group"><span class="group-label">LEAGUE</span><button type="button" data-league="NBA" aria-pressed="false">NBA</button><button type="button" data-league="WNBA" aria-pressed="false">WNBA</button><button type="button" data-league="NCAAB" aria-pressed="false">NCAAB</button><button type="button" data-league="NHL" aria-pressed="false">NHL</button><button type="button" data-league="NFL" aria-pressed="false">NFL</button><button type="button" data-league="NCAAF" aria-pressed="false">NCAAF</button><button type="button" data-league="MLB" aria-pressed="false">MLB</button></div><div class="group"><span class="group-label">GAME STATE</span><button type="button" data-phase="UPCOMING" aria-pressed="false">UPCOMING</button><button type="button" data-phase="LIVE" aria-pressed="false">LIVE</button><button type="button" data-phase="FINAL" aria-pressed="false">FINAL</button></div><div class="group"><span class="group-label">CHART FOCUS</span><button type="button" data-focus="TEAM" aria-pressed="false">TEAM</button><button type="button" data-focus="PLAYER" aria-pressed="false">PLAYER</button></div><div class="group actions"><span class="group-label">PREVIEW</span><button id="zoom" type="button">Zoom in / pan</button><button id="tvOpen" type="button">Open fullscreen TV view</button><span class="small-note">A separate preview page. It doesn’t send commands or change approved boards.</span></div></div><script>
 (function(){
 'use strict';
 const W=1920,H=1080;
@@ -178,13 +199,8 @@ function setText(id,value){$(id).textContent=value;}
 function render(){
  const c=config[state.league],sport=c.kind,phase=state.phase;
  setText('league',state.league);setText('awayName',c.teams[0]);setText('homeName',c.teams[1]);
- setText('awayAbbr',c.abbr[0]);setText('homeAbbr',c.abbr[1]);
- setText('awayCrest',c.abbr[0].slice(0,3));setText('homeCrest',c.abbr[1].slice(0,3));
- setText('awayScore',phase==='UPCOMING'?'—':sport==='basket'?'78':sport==='hockey'?'3':sport==='football'?'21':'5');
- setText('homeScore',phase==='UPCOMING'?'—':sport==='basket'?'72':sport==='hockey'?'2':sport==='football'?'17':'3');
- const status=phase==='UPCOMING'?'PREGAME':phase==='LIVE'?'LIVE · Q3':'FINAL';
- setText('status',status);
- $('status').className='status '+phase.toLowerCase();
+ setText('status',phase==='UPCOMING'?'PREVIEW':phase==='LIVE'?'LIVE':'FINAL');
+ $('status').className='phase '+phase.toLowerCase();
  const label={basket:'SHOT MAP',hockey:'SHOT LOCATION MAP',football:'PASS TARGET MAP',baseball:'PITCH LOCATION MAP'}[sport];
  setText('chartTitle',(state.focus==='PLAYER'?c.player:'TEAM')+' · '+label);
  setText('chartDescription',
