@@ -679,6 +679,8 @@ header.centeredControllerHeader .brandLogo{
 <div class="modalShade" id="modalShade"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalGrip"></div><div class="modalHeader"><h3 id="modalTitle">Details</h3><button class="close" id="closeModal" aria-label="Close">×</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast" role="status"></div>
 <script src="./game-wall-v30-peacock-logo.js"></script>
 <script src="./game-wall-v33-schedule-policy.js?v=tipoff-20261118"></script>
+<link rel="stylesheet" href="./game-wall-v48-upcoming-odds.css?v=odds-20261119">
+<script src="./game-wall-v48-upcoming-odds.js?v=odds-20261119"></script>
 <script src="./game-wall-v35-stats.js"></script>
 <script src="./game-wall-v47-nhl-leaders-cloudflare.js?v=v47-xfinity-stage"></script>
 <script>
@@ -806,7 +808,7 @@ function renderGames(){
    const gameContext=g.state==='live'?'LIVE SCORE · ESPN DATA':g.state==='final'?'FINAL RESULT':'UPCOMING MATCHUP';
    return '<div class="gameCard '+escapeHtml(g.state)+(g.favorite?' is-favorite':'')+'" style="--away-team:'+awayAccent+';--home-team:'+homeAccent+'"><div class="gameMeta"><span class="league">'+escapeHtml(g.league)+(g.favorite?' · ★ FAVORITE':'')+'</span><span class="status '+g.state+'">'+g.state.toUpperCase()+'</span></div>'+
     '<div class="matchup">'+team(g.away)+'<div class="score">'+score+'<small>'+time+'</small></div>'+team(g.home)+'</div>'+
-    broadcastRow+
+    broadcastRow+(g.state==='upcoming'?(window.ManCaveUpcomingOdds?.markup?.(g)||''):'')+
     '<div class="gameBannerDivider"><span>'+gameContext+'</span><i aria-hidden="true"></i></div>'+
     '<div class="gameActions"><button type="button" data-stats="'+escapeHtml(g.id)+'">Stats</button><button type="button" class="accent" data-assign-game="'+escapeHtml(g.id)+'">Tune to TV</button></div></div>';
   }).join('')+'</div>';
@@ -815,8 +817,9 @@ function renderGames(){
    '<p>'+(state?.loaded?'Choose another league or status.':'Live data will appear when ESPN responds. No sample matchups are substituted.')+'</p>'+
    '<button type="button" class="btn subtle" id="clearGameFilters">Clear filters</button></div>';
  }
- body+='<div class="note">Finals: last 48 hours. Upcoming: NBA, WNBA, MLB and NHL 48 hours; college basketball 72 hours; NFL and college football 7 days. Each favorite team also shows its next published game when available. Scores and broadcasts come from ESPN; regional availability and subscriptions still require verification. Tune to TV retains voice-first control.</div>';
+ body+='<div class="note">Odds: pregame lines from ESPN and the named sportsbook where available; prices may change. Finals: last 48 hours. Upcoming: NBA, WNBA, MLB and NHL 48 hours; college basketball 72 hours; NFL and college football 7 days. Each favorite team also shows its next published game when available. Scores and broadcasts come from ESPN; regional availability and subscriptions still require verification. Tune to TV retains voice-first control.</div>';
  $('content').innerHTML=body;
+ window.ManCaveUpcomingOdds?.hydrate?.();
  document.querySelectorAll('[data-filter]').forEach(el=>el.onclick=()=>{filter=el.dataset.filter;renderGames();});
  document.querySelectorAll('[data-league-filter]').forEach(el=>el.onclick=()=>{leagueFilter=el.dataset.leagueFilter;renderGames();});
  document.querySelectorAll('[data-stats]').forEach(el=>el.onclick=()=>window.ManCaveRealGames?.showStats?.(el.dataset.stats));
