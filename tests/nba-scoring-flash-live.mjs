@@ -8,7 +8,7 @@ const live=read('team-board.html');
 const preview=read('team-board-nba-flash-preview-v4.html');
 const overlayCode=read('nba-scoring-flash-preview-v4.js');
 const archive=JSON.parse(read('nba-scoring-archive-401585607.json'));
-const sharedTag='<script src="./nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4&score-sync=10s-broadcast-delay-v2"></script>';
+const sharedTag='<script src="./nba-scoring-flash-preview-v4.js?headshot=39pct-full-v4&score-sync=single-snapshot-20261118"></script>';
 
 test('production team board differs from Gold Master preview only in title',()=>{
  assert.ok(live.includes(sharedTag),'production board must load exact Gold Master');
@@ -39,16 +39,16 @@ function game(plays,state='in'){
   plays};
 }
 
-function wing(team,side,delaySeconds=0){
+function wing(team,side,delaySeconds=0,sharedFeed=false){
  let current=null,nextId=0;
- const updatedScores=[];
+ const updatedScores=[],events=[],handlers={};
  const timers=new Map();
  const active=new Set();
  const overlay={
   id:null,innerHTML:'',style:{setProperty(){}},
   classList:{
    contains(name){return active.has(name);},
-   add(name){active.add(name);},
+   add(name){active.add(name);if(name==='active')events.push('flash');},
    remove(name){active.delete(name);}
   }
  };
@@ -63,7 +63,7 @@ function wing(team,side,delaySeconds=0){
   },
   getElementById(){return null;}
  };
- const window={};
+ const window=sharedFeed?{ManCaveBasketballSharedFeed:true,addEventListener:(name,fn)=>{handlers[name]=fn;}}:{};
  const context=vm.createContext({
   document,window,URLSearchParams,
   setScore(value){updatedScores.push(String(value));},
@@ -86,6 +86,15 @@ function wing(team,side,delaySeconds=0){
   scores:()=>updatedScores.slice(),
   active:()=>overlay.classList.contains('active'),
   async tick(summary){current=summary;await window.__nbaStep();},
+  events,
+  emitScoreSnapshot(summary){
+   assert.equal(sharedFeed,true);
+   const homeId=team==='Orlando Magic'?'19':'28';
+   const score=summary.header.competitions[0].competitors.find(c=>String(c.team?.id)===homeId)?.score;
+   updatedScores.push(String(score));events.push('score:'+score);
+   assert.ok(handlers['mancave-basketball-snapshot']);
+   handlers['mancave-basketball-snapshot']({detail:{sport:'nba',eventId:'401585607',summary}});
+  },
   advance(){
    const first=timers.entries().next().value;
    assert.ok(first,'a scoring flash must schedule automatic return');
@@ -153,6 +162,27 @@ test('when no NBA game is selected, other sports preserve their existing player 
  assert.match(overlayCode,/if\(qs\.get\('sport'\)!=='nba'\)return;/);
  assert.match(read('left.html'),/\.\/team-board\.html\?sport=/);
  assert.match(read('right.html'),/\.\/team-board\.html\?sport=/);
+});
+
+test('NBA live wing uses one delayed scoreboard snapshot, with no second 30s wait or queued stale shot',()=>{
+ const h=wing('Orlando Magic','right',30,true);
+ const scored=(plays,score)=>{
+  const frame=game(plays);
+  frame.header.competitions[0].competitors=frame.header.competitions[0].competitors.map(x=>
+   String(x.team?.id)==='19'?{...x,score:String(score)}:x);
+  return frame;
+ };
+ h.emitScoreSnapshot(scored(archive.plays.slice(0,3),18));
+ assert.equal(h.active(),false);
+ h.emitScoreSnapshot(scored(archive.plays.slice(0,4),20));
+ assert.deepEqual(h.events.slice(-2),['score:20','flash']);
+ assert.equal(h.active(),true);
+ assert.equal(h.remaining(),1,'no independent extra 30s delay');
+ h.emitScoreSnapshot(scored(archive.plays.slice(0,7),25));
+ assert.deepEqual(h.events.slice(-2),['score:25','flash']);
+ assert.equal(h.remaining(),1,'latest basket preempts backlog instead of appearing tens of seconds late');
+ assert.equal(h.advance(),8000);
+ assert.equal(h.active(),false);
 });
 
 test('30-second NBA broadcast sync holds team score and shot flash together',async()=>{
