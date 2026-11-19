@@ -166,15 +166,22 @@ async function refresh(force=false){
  state.errors=responses.length-successes.length;
  const games=new Map();
  for(const r of successes)for(const g of r.value)games.set(g.id,g);
- // Only favorite teams can contribute one upcoming game outside the general windows.
- // Check favorites independently of the league scoreboard. Do not skip the
- // favorite lookup just because a different upcoming game is already listed.
+ // Independently recover favorite games from their team schedules,
+ // including games that ESPN's broad league feed missed at tip-off.
  const favoritesNeedingLookup=policy?.FAVORITES||[];
  const favoriteResults=await Promise.allSettled(favoritesNeedingLookup.map(f=>fetchFavoriteNext(f,now,force)));
  let favoriteErrors=0;
+ const rank={upcoming:0,live:1,final:2};
  for(const result of favoriteResults){
-  if(result.status==='fulfilled')for(const g of result.value)if(!games.has(g.id))games.set(g.id,g);
-  else favoriteErrors++;
+  if(result.status!=='fulfilled'){favoriteErrors++;continue;}
+  for(const g of result.value){
+   const current=games.get(g.id);
+   // Prefer a fresher LIVE/FINAL state over an older 'pre' state.
+   if(!current||(rank[g.state]??0)>(rank[current.state]??0)){
+    if(current&&!g.broadcasts.length)g.broadcasts=current.broadcasts;
+    games.set(g.id,g);
+   }
+  }
  }
  state.games=policy?policy.select([...games.values()],now):[...games.values()];
  state.loaded=true;state.loading=false;state.lastFetch=Date.now();
