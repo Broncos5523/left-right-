@@ -1,0 +1,60 @@
+/* Visual Analytics v49 — read-only iPhone Game Center modal; seven leagues.
+   Preserves game banners, existing stats pages, and TV routing. */
+#modalBody .vaHero{border:1px solid #41637a;border-radius:14px;padding:15px 14px 14px;background:radial-gradient(ellipse at 25% 0%,#254866,#102238 72%);display:flex;flex-direction:column;gap:7px;min-width:0}
+#modalBody .vaHero small{color:#f6d28a;font-weight:950;font-size:10px;letter-spacing:1.2px}
+#modalBody .vaHero strong{color:#f3f9ff;font-size:18px;line-height:1.24;overflow-wrap:normal;word-break:normal}
+#modalBody .vaHero span{color:#a9c7d8;font-size:11px;line-height:1.4}
+#modalBody .vaTabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:13px 0 14px}
+#modalBody .vaTabs button{border:1px solid #47627c;background:#142c43;color:#bed6e6;font:850 10px/1.12 system-ui,-apple-system,Arial,sans-serif;border-radius:10px;padding:12px 3px;min-height:46px;min-width:0;cursor:pointer}
+#modalBody .vaTabs button.active{background:linear-gradient(130deg,#ffe0a1,#e9b65d);border-color:#f9d991;color:#152637}
+#modalBody .vaTabs button:focus-visible,#modalBody .vaFocus button:focus-visible,#modalBody .vaSelects select:focus-visible{outline:2px solid #f8cd83;outline-offset:2px}
+#modalBody .vaBody{min-height:150px}
+#modalBody .vaSection{font-size:11px;font-weight:950;color:#f2d08c;letter-spacing:1px;margin:15px 0 11px}
+#modalBody .vaChart{background:linear-gradient(160deg,#0d2335,#12263b);border:1px solid #34546c;border-radius:14px;padding:10px 8px;margin-top:9px;display:flex;justify-content:center;align-items:center;overflow:hidden}
+#modalBody .vaChart svg{width:100%;height:auto;max-height:380px;display:block;overflow:visible}
+#modalBody .vaGraph svg{max-height:250px}
+#modalBody .vaFocus{background:#111e30;border:1px solid #2f4e66;border-radius:12px;padding:10px;display:grid;gap:10px}
+#modalBody .vaChips{display:flex;gap:7px;flex-wrap:wrap}
+#modalBody .vaChips button{border:1px solid #416982;color:#c8e3f1;background:#193247;border-radius:9px;padding:9px 11px;font-size:11px;font-weight:850;cursor:pointer}
+#modalBody .vaChips button[aria-pressed=true]{background:#f2cc85;color:#15293a;border-color:#f7db9f}
+#modalBody .vaSelects{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,120px);gap:9px}
+#modalBody .vaSelects label{display:grid;gap:5px;font-size:10px;color:#a7c4d6;font-weight:800}
+#modalBody .vaSelects select{width:100%;min-width:0;background:#172b40;color:#ecf8ff;border:1px solid #4a7088;border-radius:9px;padding:9px 7px;font-size:12px}
+#modalBody .vaKpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+#modalBody .vaKpis>div{border:1px solid #39586e;border-radius:11px;padding:10px 7px;text-align:center;background:#172c40;min-width:0}
+#modalBody .vaKpis small{display:block;font-size:9px;line-height:1.35;color:#a8c5d4;font-weight:850;letter-spacing:.2px}
+#modalBody .vaKpis strong{display:block;font-size:26px;color:#f6d48c;font-variant-numeric:tabular-nums;margin-top:3px}
+#modalBody .vaLegend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin:13px 0}
+#modalBody .vaLegend span{font-size:11px;font-weight:850;color:#d2e6f1;display:inline-flex;gap:5px;align-items:center}
+#modalBody .vaLegend i{height:11px;width:11px;border-radius:50%;border:1px solid #dceaf2;display:inline-block}
+#modalBody .vaNote{font-size:11px;color:#9fb8ca;line-height:1.5;margin:11px 0}
+#modalBody .vaEmpty{border:1px dashed #41647a;border-radius:12px;padding:20px 13px;background:#0c1f31}
+#modalBody .vaEmpty strong{font-size:13px;color:#e9f5ff;display:block}
+#modalBody .vaEmpty p{font-size:12px;line-height:1.55;color:#acc6d5;margin:8px 0 0}
+#modalBody .vaMatchHead{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:#d2e2ec;padding:3px 3px 13px}
+#modalBody .vaCompare{border:1px solid #314e66;background:#14273b;padding:12px 10px;border-radius:11px;margin-bottom:9px}
+#modalBody .vaCompareValues{display:grid;grid-template-columns:60px minmax(0,1fr) 60px;align-items:center;gap:5px;text-align:center}
+#modalBody .vaCompareValues strong{font-variant-numeric:tabular-nums;font-size:15px;color:#f5faff;overflow:hidden;text-overflow:ellipsis}
+#modalBody .vaCompareValues span{font-size:10px;color:#acc8d8;font-weight:900;line-height:1.2}
+#modalBody .vaBars{background:#e4b963;height:12px;border-radius:10px;overflow:hidden;margin-top:9px}
+#modalBody .vaBars span{display:block;height:100%;background:#60dcb3}
+#modalBody .vaCompareNames{display:flex;justify-content:space-between;gap:10px;margin-top:7px}
+#modalBody .vaCompareNames small{color:#acc6d6;font-size:10px;line-height:1.25;max-width:45%;overflow-wrap:normal}
+#modalBody .vaPlayers{padding:11px 12px;border:1px solid #314f65;border-radius:11px;background:#11253a;margin-bottom:12px}
+#modalBody .vaPlayers h3{font-size:13px;color:#f2d392;margin:0 0 10px}
+#modalBody .vaLeader{display:grid;grid-template-columns:minmax(72px,1fr) minmax(90px,1.45fr) minmax(45px,auto);align-items:center;gap:5px;padding:10px 0;border-top:1px solid #3e59715e}
+#modalBody .vaLeader span{font-size:10px;color:#b1c6d7;line-height:1.3}
+#modalBody .vaLeader strong{font-size:11px;color:#ecf8ff;line-height:1.3;overflow-wrap:normal}
+#modalBody .vaLeader b{font-size:12px;text-align:right;color:#f1cf8c;font-variant-numeric:tabular-nums;line-height:1.35;overflow-wrap:anywhere}
+#modalBody .vaFooter{border-top:1px solid #33516c;margin-top:16px;padding-top:12px;display:flex;justify-content:space-between;align-items:center;gap:9px}
+#modalBody .vaFooter small{font-size:10px;color:#9ab4c7;line-height:1.3}
+#modalBody #vaRefresh{font-size:11px;font-weight:850;background:#185267;border:1px solid #418eaa;color:#e7f8ff;border-radius:9px;padding:10px 11px;white-space:nowrap}
+#modalBody #vaRefresh:disabled{opacity:.5}
+.games .gameCard .gameActions button[data-analytics]{background:#183f50;color:#aef6e7;border-color:#327c85}
+@media(max-width:380px){
+ #modalBody .vaTabs{gap:4px}
+ #modalBody .vaTabs button{padding:10px 2px;font-size:9px}
+ #modalBody .vaSelects{grid-template-columns:minmax(0,1fr) 95px}
+ #modalBody .vaCompareValues{grid-template-columns:51px minmax(0,1fr) 51px}
+ #modalBody .vaLeader{grid-template-columns:70px minmax(85px,1fr) 53px}
+}
