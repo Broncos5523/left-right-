@@ -1,0 +1,34 @@
+name: Probe ESPN upcoming game odds for Man Cave controller
+on:
+  push:
+    paths:
+      - .github/workflows/probe-upcoming-odds-20261119.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect live upcoming scoreboard and core odds samples
+        run: |
+          node --input-type=module <<'JS'
+          const leagues=[['NBA','basketball/nba'],['NCAAB','basketball/mens-college-basketball'],['NHL','hockey/nhl'],['NFL','football/nfl']];
+          for(const [league,path] of leagues){
+           try{
+            const date='20261119';
+            const u='https://site.api.espn.com/apis/site/v2/sports/'+path+'/scoreboard?dates='+date+'&limit=100'+(league==='NCAAB'?'&groups=50':'');
+            const response=await fetch(u,{signal:AbortSignal.timeout(12000)});
+            if(!response.ok){console.log('SCOREBOARD_ERROR',league,response.status);continue;}
+            const d=await response.json();const ev=(d.events||[]).find(x=>x.status?.type?.state==='pre')||(d.events||[])[0];
+            if(!ev){console.log('SCOREBOARD_NO_EVENTS',league);continue;}
+            const comp=ev.competitions?.[0]||{};
+            console.log('SCOREBOARD',JSON.stringify({league,id:ev.id,competitionId:comp.id,state:ev.status?.type?.state,total:d.events?.length,odds:comp.odds||ev.odds||null}));
+            const [sport,division]=path.split('/');
+            const core='https://sports.core.api.espn.com/v2/sports/'+sport+'/leagues/'+division+'/events/'+ev.id+'/competitions/'+(comp.id||ev.id)+'/odds?limit=5';
+            const or=await fetch(core,{signal:AbortSignal.timeout(12000)});
+            const od=await or.json().catch(()=>({}));
+            console.log('CORE',JSON.stringify({league,status:or.status,cors:or.headers.get('access-control-allow-origin'),keys:Object.keys(od),count:od.count,items:(od.items||[]).slice(0,2).map(x=>({provider:x.provider,details:x.details,spread:x.spread,overUnder:x.overUnder,homeTeamOdds:x.homeTeamOdds,awayTeamOdds:x.awayTeamOdds,overOdds:x.overOdds,underOdds:x.underOdds,total:x.total,pointSpread:x.pointSpread}))}));
+           }catch(e){console.log('PROBE_ERROR',league,String(e.message||e));}
+          }
+          JS
