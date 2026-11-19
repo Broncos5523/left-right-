@@ -1,0 +1,27 @@
+name: Diagnose MLB next favorite and odds visibility 20261119
+on:
+  push:
+    paths:
+      - .github/workflows/probe-favorite-schedule-20261119.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect Red Sox upcoming fixture dates and ESPN kickoff flags
+        run: |
+          node --input-type=module <<'JS'
+          const base='https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/bos/schedule';
+          for(const q of ['', '?season=2027']){
+            const r=await fetch(base+q,{signal:AbortSignal.timeout(12000)});
+            const d=await r.json();
+            console.log('SCHEDULE',JSON.stringify({query:q,status:r.status,season:d.season,
+              events:(d.events||[]).slice(0,8).map(e=>({
+                id:e.id,name:e.name,date:e.date,status:e.status?.type,
+                season:e.season,competitors:e.competitions?.[0]?.competitors?.map(x=>({homeAway:x.homeAway,team:x.team?.displayName})),
+                timeValid:e.timeValid,notes:e.notes,week:e.week
+              }))
+            }));
+          }
+          JS
