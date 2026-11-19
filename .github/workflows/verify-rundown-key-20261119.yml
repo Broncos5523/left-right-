@@ -1,0 +1,48 @@
+name: Verify new TheRundown key and odds schema (private)
+on:
+  push:
+    paths:
+      - .github/workflows/verify-rundown-key-20261119.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check key and probe one upcoming NBA slate
+        env:
+          THERUNDOWN_API_KEY: ${{ secrets.THERUNDOWN_API_KEY }}
+        run: |
+          node --input-type=module <<'JS'
+          const k=process.env.THERUNDOWN_API_KEY;
+          if(!k){console.log('SECRET_MISSING THERUNDOWN_API_KEY');process.exitCode=2;}
+          else {
+            console.log('SECRET_PRESENT=true');
+            const day=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'America/New_York'})
+              .format(new Date()).replace(/-/g,'');
+            const date=day.length===8?day.slice(0,4)+'-'+day.slice(4,6)+'-'+day.slice(6):new Date().toISOString().slice(0,10);
+            const url='https://therundown.io/api/v2/sports/4/events/'+date+'?market_ids=1,2,3&affiliate_ids=19,22,23&main_line=true&hide_closed=true';
+            try {
+              const r=await fetch(url,{headers:{'X-TheRundown-Key':k},signal:AbortSignal.timeout(20000)});
+              console.log('PROVIDER_HTTP='+r.status,'QUOTA_REMAINING='+r.headers.get('X-Datapoints-Remaining'));
+              const data=await r.json().catch(()=>({}));
+              if(!r.ok){
+                console.log('PROVIDER_ERROR_CLASS',String(data?.error?.code||data?.code||data?.message||'unknown').slice(0,250));
+                process.exitCode=1;
+              } else {
+                const ev=data.events||[];
+                console.log('PROVIDER_EVENTS='+ev.length);
+                console.log('PROVIDER_META',JSON.stringify({keys:Object.keys(data),delay:r.headers.get('X-Data-Delay-Seconds')}));
+                console.log('SCHEMA_SAMPLE',JSON.stringify(ev.slice(0,2).map(e=>({
+                  keys:Object.keys(e),
+                  date:e.event_date,teams:e.teams,
+                  markets:(e.markets||[]).slice(0,3).map(m=>({id:m.market_id,name:m.name,period:m.period_id,
+                   participants:(m.participants||[]).slice(0,2).map(p=>({name:p.name,keys:Object.keys(p),
+                    lines:(p.lines||[]).slice(0,2).map(l=>({value:l.value,keys:Object.keys(l),bookIds:Object.keys(l.prices||{}),
+                     priceSample:Object.entries(l.prices||{}).slice(0,1).map(([book,x])=>({book,keys:Object.keys(x),price:x.price}))}))}))}))
+                }))));
+              }
+            } catch(e){console.log('PROVIDER_NETWORK_ERROR',String(e));process.exitCode=1;}
+          }
+          JS
