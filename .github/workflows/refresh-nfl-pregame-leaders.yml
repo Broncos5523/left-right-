@@ -1,4 +1,4 @@
-name: Build verified NFL team season leaders for pregame scouting
+name: Build verified all-NFL team season leaders for pregame scouting
 on:
   push:
     paths:
@@ -23,7 +23,7 @@ jobs:
       - name: Calculate leaders from ESPN 2026 season player statistics
         env:
           SEASON: "2026"
-          TEAM_IDS: "7,13"
+          TEAM_IDS: "ALL"
         run: node scripts/refresh-nfl-pregame-leaders.mjs
       - name: Validate that both exact NFL teams have real, attributed metrics
         run: |
