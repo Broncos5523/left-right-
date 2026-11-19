@@ -1,0 +1,109 @@
+{
+  "season": 2026,
+  "generatedAt": "2026-11-19T05:00:34.360Z",
+  "source": "ESPN NFL 2026 regular-season athlete statistics (verified team IDs)",
+  "teams": {
+    "7": {
+      "teamId": "7",
+      "team": "Denver Broncos",
+      "season": 2026,
+      "updatedAt": "2026-11-19T05:00:33.501Z",
+      "verifiedAthletes": 49,
+      "rosterCount": 80,
+      "statsMissing": 31,
+      "statsFailures": 0,
+      "leaders": [
+        {
+          "metric": "Passing Yards",
+          "name": "Bo Nix",
+          "value": "1,730",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426338.png"
+        },
+        {
+          "metric": "Rushing Yards",
+          "name": "J.K. Dobbins",
+          "value": "324",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4241985.png"
+        },
+        {
+          "metric": "Receiving Yards",
+          "name": "Jaylen Waddle",
+          "value": "337",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4372016.png"
+        },
+        {
+          "metric": "Passing Touchdowns",
+          "name": "Bo Nix",
+          "value": "11",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426338.png"
+        },
+        {
+          "metric": "Total Tackles",
+          "name": "Alex Singleton",
+          "value": "107",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/2612151.png"
+        },
+        {
+          "metric": "Sacks",
+          "name": "Nik Bonitto",
+          "value": "4.5",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4360259.png"
+        },
+        {
+          "metric": "Interceptions",
+          "name": "Brandon Jones",
+          "value": "2",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4039059.png"
+        }
+      ]
+    },
+    "13": {
+      "teamId": "13",
+      "team": "Las Vegas Raiders",
+      "season": 2026,
+      "updatedAt": "2026-11-19T05:00:34.360Z",
+      "verifiedAthletes": 44,
+      "rosterCount": 75,
+      "statsMissing": 31,
+      "statsFailures": 0,
+      "leaders": [
+        {
+          "metric": "Passing Yards",
+          "name": "Fernando Mendoza",
+          "value": "191",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4837248.png"
+        },
+        {
+          "metric": "Rushing Yards",
+          "name": "Ashton Jeanty",
+          "value": "380",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4890973.png"
+        },
+        {
+          "metric": "Receiving Yards",
+          "name": "Brock Bowers",
+          "value": "676",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4432665.png"
+        },
+        {
+          "metric": "Total Tackles",
+          "name": "Nakobe Dean",
+          "value": "107",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426340.png"
+        },
+        {
+          "metric": "Sacks",
+          "name": "Maxx Crosby",
+          "value": "5",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3916655.png"
+        },
+        {
+          "metric": "Interceptions",
+          "name": "Hezekiah Masses",
+          "value": "3",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4917354.png"
+        }
+      ]
+    }
+  }
+}
