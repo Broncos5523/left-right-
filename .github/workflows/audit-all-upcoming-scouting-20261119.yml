@@ -1,0 +1,59 @@
+name: Audit upcoming scouting data across all seven sports
+on:
+  push:
+    paths: [.github/workflows/audit-all-upcoming-scouting-20261119.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Inspect upcoming events and actual ESPN team leader/summary schemas
+        run: |
+          node --input-type=module <<'JS'
+          const leagues=[
+            ['NFL','football/nfl'],['NBA','basketball/nba'],
+            ['NHL','hockey/nhl'],['MLB','baseball/mlb'],
+            ['WNBA','basketball/wnba'],['NCAAF','football/college-football'],
+            ['NCAAB','basketball/mens-college-basketball']];
+          const now=Date.now();
+          const when=day=>new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'America/New_York'}).format(new Date(now+864e5*day)).replace(/-/g,'');
+          const get=async u=>{
+            try{const r=await fetch(u,{signal:AbortSignal.timeout(13000)});const data=await r.json().catch(()=>null);return {status:r.status,data,cors:r.headers.get('access-control-allow-origin')};}
+            catch(e){return {status:0,error:String(e).slice(0,120),data:null}}
+          };
+          const sample=(d)=>({
+            keys:Object.keys(d||{}).slice(0,22),
+            leadersLen:Array.isArray(d?.leaders)?d.leaders.length:null,
+            leaderCategories:(d?.leaders?.categories||d?.leaders||d?.team?.leaders?.categories||[]).slice?.(0,3).map(x=>({name:x.name,leaders:x.leaders?.length,firstAthlete:x.leaders?.[0]?.athlete?.displayName}))||null,
+            teamsLen:d?.teams?.length,teamLeaders:d?.teamLeaders?.categories?.length,
+            summaryTopLeaders:(d?.leaders||[]).slice?.(0,2).map(x=>({teamId:x.team?.id,leaders:(x.leaders||[]).slice(0,1).map(y=>y.athlete?.displayName)}))||null
+          });
+          for(const [league,path] of leagues){
+            const days=league==='NFL'||league==='NCAAF'?7:league==='NCAAB'?3:2;
+            const scoreboard=await Promise.all(Array.from({length:days},(_,i)=>get('https://site.api.espn.com/apis/site/v2/sports/'+path+'/scoreboard?dates='+when(i)+'&limit='+(league==='NCAAB'?500:250)+(league==='NCAAB'?'&groups=50':league==='NCAAF'?'&groups=80':''))));
+            const events=[...new Map(scoreboard.flatMap(x=>x.data?.events||[]).filter(e=>e.status?.type?.state==='pre').map(e=>[e.id,e])).values()];
+            const teamList=[...new Map(events.flatMap(e=>(e.competitions?.[0]?.competitors||[]).map(c=>c.team)).filter(t=>t?.id).map(t=>[t.id,t])).values()];
+            const chosen=teamList.slice(0,2);
+            const summaryEvent=events[0];
+            const summary=summaryEvent?await get('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+summaryEvent.id):null;
+            const scans=await Promise.all(chosen.flatMap(t=>[
+              ['site-v2-leaders','https://site.api.espn.com/apis/site/v2/sports/'+path+'/teams/'+t.id+'/leaders',t],
+              ['site-v3-leaders','https://site.api.espn.com/apis/site/v3/sports/'+path+'/teams/'+t.id+'/leaders',t],
+              ['site-v2-stats','https://site.api.espn.com/apis/site/v2/sports/'+path+'/teams/'+t.id+'/statistics',t],
+              ['site-v2-team','https://site.api.espn.com/apis/site/v2/sports/'+path+'/teams/'+t.id,t]
+            ].map(async ([label,u,team])=>{
+              const d=await get(u);
+              const root=d.data?.leaders||d.data?.categories||d.data?.team?.leaders||d.data?.statistics||null;
+              const categories=Array.isArray(root)?root:Array.isArray(root?.categories)?root.categories:[];
+              const hasName=categories.some(x=>(x.leaders||[]).some(y=>y.athlete?.displayName||y.name));
+              return {label,team:team.displayName,id:team.id,status:d.status,keys:Object.keys(d.data||{}).slice(0,14),
+                categories:categories.length,hasNamedPlayers:hasName,err:d.error};
+            }))));
+            console.log('LEAGUE_AUDIT',JSON.stringify({league,path,upcomingEvents:events.length,uniqueUpcomingTeams:teamList.length,
+              nextEvent:summaryEvent?{id:summaryEvent.id,name:summaryEvent.name,start:summaryEvent.date}:null,
+              summary:summary?{status:summary.status,...sample(summary.data)}:null,
+              scans}));
+          }
+          JS
