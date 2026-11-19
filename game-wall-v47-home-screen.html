@@ -620,6 +620,7 @@ header.centeredControllerHeader .brandLogo{
 <link rel="stylesheet" href="./game-wall-v34-stats.css">
 <link rel="stylesheet" href="./game-wall-v35-pregame.css">
 <link rel="stylesheet" href="./game-wall-v36-team-leaders.css?v=qb-name-layout-20261119">
+<link rel="stylesheet" href="./game-wall-v49-visual-analytics.css?v=analytics-v1-20261119">
 </head>
 <body>
 <div class="shell">
@@ -683,6 +684,7 @@ header.centeredControllerHeader .brandLogo{
 <script src="./game-wall-v48-upcoming-odds.js?v=odds-sync-20261119"></script>
 <script src="./game-wall-v35-stats.js"></script>
 <script src="./game-wall-v47-nhl-leaders-cloudflare.js?v=qb-name-layout-20261119"></script>
+<script src="./game-wall-v49-visual-analytics.js?v=analytics-v1-20261119"></script>
 <script>
 (() => {
 'use strict';
@@ -825,7 +827,7 @@ function renderGames(){
     '<div class="matchup">'+team(g.away)+'<div class="score">'+score+'<small>'+time+'</small></div>'+team(g.home)+'</div>'+
     broadcastRow+(g.state==='upcoming'&&!futureFavorite?(window.ManCaveUpcomingOdds?.markup?.(g)||''):'')+
     '<div class="gameBannerDivider"><span>'+gameContext+'</span><i aria-hidden="true"></i></div>'+
-    '<div class="gameActions"><button type="button" data-stats="'+escapeHtml(g.id)+'">Stats</button><button type="button" class="accent" data-assign-game="'+escapeHtml(g.id)+'">Tune to TV</button></div></div>';
+    '<div class="gameActions"><button type="button" data-stats="'+escapeHtml(g.id)+'">Stats</button><button type="button" data-analytics="'+escapeHtml(g.id)+'">Analytics</button><button type="button" class="accent" data-assign-game="'+escapeHtml(g.id)+'">Tune to TV</button></div></div>';
   }).join('')+'</div>';
  }else{
   body+='<div class="emptyGames"><strong>'+(state?.loading?'Loading games…':state?.loaded?'No games match this filter':'Connecting to ESPN…')+'</strong>'+
@@ -838,6 +840,7 @@ function renderGames(){
  document.querySelectorAll('[data-filter]').forEach(el=>el.onclick=()=>{filter=el.dataset.filter;renderGames();});
  document.querySelectorAll('[data-league-filter]').forEach(el=>el.onclick=()=>{leagueFilter=el.dataset.leagueFilter;renderGames();});
  document.querySelectorAll('[data-stats]').forEach(el=>el.onclick=()=>window.ManCaveRealGames?.showStats?.(el.dataset.stats));
+ document.querySelectorAll('[data-analytics]').forEach(el=>el.onclick=()=>window.ManCaveVisualAnalytics?.openById?.(el.dataset.analytics));
  document.querySelectorAll('[data-assign-game]').forEach(el=>el.onclick=()=>window.ManCaveRealGames?.openAssign?.(el.dataset.assignGame));
  $('clearGameFilters')?.addEventListener('click',()=>{filter='live';leagueFilter='all';renderGames();});
  $('refreshRealGames')?.addEventListener('click',()=>window.ManCaveRealGames?.refresh?.());
