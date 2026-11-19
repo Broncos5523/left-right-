@@ -1,0 +1,17 @@
+name: Verify 32-inch no-scoreboard analytics design preview
+on:
+  push:
+    paths:
+      - analytics-32-inch-preview-v1.html
+      - tests/analytics-32inch-preview-v2.mjs
+      - .github/workflows/verify-analytics-32inch-preview.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check layout, JS syntax and controls
+        run: node --test tests/analytics-32inch-preview-v2.mjs
