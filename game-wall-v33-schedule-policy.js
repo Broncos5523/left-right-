@@ -27,8 +27,10 @@ function visibleByWindow(game,now=Date.now()){
   const reference=Number.isFinite(finished)?finished:start;
   return reference<=now&&reference>=now-48*HOURS_MS;
  }
+ // ESPN can report 'pre' briefly after scheduled tip-off. Preserve the
+ // match under Upcoming without mislabeling it as live.
  return game.state==='upcoming'&&
-  Number.isFinite(HOURS[game.league])&&start>=now&&start<=now+HOURS[game.league]*HOURS_MS;
+  Number.isFinite(HOURS[game.league])&&start>=now-60*60000&&start<=now+HOURS[game.league]*HOURS_MS;
 }
 function select(games,now=Date.now()){
  const all=[...new Map((games||[]).filter(g=>g?.id).map(g=>[g.id,g])).values()];
