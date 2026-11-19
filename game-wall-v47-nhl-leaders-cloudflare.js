@@ -100,7 +100,7 @@ function people(){
     '</div></div>').join('')+'</div>':
    blank(s.game.league==='NHL'?'Team leaders unavailable — NHL and ESPN did not return usable team statistics.':'Team leaders unavailable — ESPN has not supplied statistical leaders for this team.'))+'</section>';
  }).join('')+
- '<p class="pgFootnote">Each row shows a reported category leader. NHL stats come from the NHL when available; all other sports use ESPN.</p>';
+ '<p class="pgFootnote">Each row shows a verified category leader. NFL: ESPN 2026 season athlete totals when cached; NHL: official NHL team statistics; other sports: ESPN.</p>';
 }
 function past(){
  return '<div class="pgSectionTitle">PREVIOUS FIVE GAMES</div>'+['away','home'].map(which=>{
@@ -167,15 +167,40 @@ async function officialNhl(g,side){
   encodeURIComponent(team)+'&season='+season);
  return Array.isArray(result?.leaders)&&result.leaders.length?result:null;
 }
+// NFL season player leaders are compiled from the verified ESPN athlete stats
+// endpoint. The older site-v2 /teams/{id}/leaders endpoint returns HTTP 200
+// with {} for both the Broncos and Raiders. A tiny daily JSON cache avoids
+// fetching 150 player records on a phone.
+const nflCache=new Map();
+async function officialNfl(g,which){
+ const d=new Date(g.start),year=d.getUTCFullYear()-(d.getUTCMonth()<6?1:0);
+ const id=teamID(g,which);
+ if(!id||!/^[0-9]{1,3}$/.test(id)||year<2026||year>2035)return null;
+ const key=String(year),now=Date.now();
+ let cached=nflCache.get(key);
+ if(!cached||now-cached.at>12*60000){
+  const req=fetch('./stats-cache/nfl-team-leaders-'+year+'.json',{cache:'no-store'})
+   .then(r=>r.ok?r.json():null).catch(()=>null);
+  cached={at:now,promise:req};nflCache.set(key,cached);
+ }
+ const data=await cached.promise;
+ const group=data?.season===year?data.teams?.[id]:null;
+ if(!group||String(group.teamId)!==id||group.season!==year)return null;
+ const when=Date.parse(group.updatedAt||'');
+ // Avoid claiming stale historical roster totals are current.
+ if(!Number.isFinite(when)||now-when>7*86400000)return null;
+ return Array.isArray(group.leaders)&&group.leaders.length?{leaders:group.leaders}:null;
+}
 async function lookup(g,which,force=false){
  const id=teamID(g,which);
  if(!id)return {detail:null,leaders:null,schedule:null};
  const key=g.path+'|'+id,now=Date.now(),cached=CACHE.get(key);
  if(!force&&cached&&now-cached.at<15*60000)return cached.data;
  const base=ROOT+g.path+'/teams/'+encodeURIComponent(id);
- const responses=await Promise.allSettled([request(base),request(base+'/leaders'),request(base+'/schedule'),...(g.league==='NHL'?[officialNhl(g,which)]:[])]);
+ const responses=await Promise.allSettled([request(base),request(base+'/leaders'),request(base+'/schedule'),
+  ...(g.league==='NHL'?[officialNhl(g,which)]:g.league==='NFL'?[officialNfl(g,which)]:[])]);
  const val={detail:responses[0].status==='fulfilled'?responses[0].value:cached?.data.detail||null,
-  leaders:g.league==='NHL'&&responses[3]?.status==='fulfilled'&&responses[3].value?.leaders?.length?
+  leaders:['NHL','NFL'].includes(g.league)&&responses[3]?.status==='fulfilled'&&responses[3].value?.leaders?.length?
    responses[3].value:responses[1].status==='fulfilled'?responses[1].value:cached?.data.leaders||null,
   schedule:responses[2].status==='fulfilled'?responses[2].value:cached?.data.schedule||null};
  CACHE.set(key,{at:now,data:val});return val;
