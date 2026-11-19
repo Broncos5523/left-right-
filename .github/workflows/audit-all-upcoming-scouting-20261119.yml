@@ -50,7 +50,7 @@ jobs:
               const hasName=categories.some(x=>(x.leaders||[]).some(y=>y.athlete?.displayName||y.name));
               return {label,team:team.displayName,id:team.id,status:d.status,keys:Object.keys(d.data||{}).slice(0,14),
                 categories:categories.length,hasNamedPlayers:hasName,err:d.error};
-            }))));
+            })));
             console.log('LEAGUE_AUDIT',JSON.stringify({league,path,upcomingEvents:events.length,uniqueUpcomingTeams:teamList.length,
               nextEvent:summaryEvent?{id:summaryEvent.id,name:summaryEvent.name,start:summaryEvent.date}:null,
               summary:summary?{status:summary.status,...sample(summary.data)}:null,
