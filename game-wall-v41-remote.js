@@ -68,6 +68,12 @@ async function sendWingGame(game,options={}){
 }
 window.ManCaveBridge={render,renderBoardExtras,openScreenAssignment,openLibraryBoard,
  sendWingGame,wingStatus:()=>({connected:!!state.user,busy:!!state.busy})};
+let renderQueued=false;
+function scheduleRender(){
+ if(renderQueued)return;
+ renderQueued=true;
+ requestAnimationFrame(()=>{renderQueued=false;render();});
+}
 let unsubs=[];
 function listen(){
  unsubs.forEach(fn=>fn());unsubs=[];state.left=null;state.right=null;state.third=null;
@@ -80,7 +86,7 @@ function listen(){
      assignment:state[side]}
     }));
     if(!state.busy)state.message='Signed in · Saved Firebase assignments loaded (not TV receipts).';
-    render();
+    scheduleRender();
   },err=>{state.message='Firebase read error: '+(err.code||err.message);render();}));
  });
 }
@@ -145,9 +151,21 @@ async function loadGames(){
 document.addEventListener('submit',async e=>{
  if(e.target?.id!=='liveAuthForm')return;e.preventDefault();if(state.busy)return;
  const email=document.getElementById('liveEmail')?.value.trim(),password=document.getElementById('livePassword')?.value;
- if(!email||!password)return;state.busy=true;state.message='Signing in...';render();
- try{await signInWithEmailAndPassword(auth,email,password);state.message='Signed in to Firebase.';}
- catch(err){state.message='Sign-in failed: '+(err.code||err.message);}
+ if(!email||!password)return;
+ state.busy=true;state.message='Signing in...';
+ // Keep the form mounted while iPhone Safari finishes autofill/authentication.
+ // Replacing the form on submit can leave the browser interaction unresponsive.
+ const status=el()?.querySelector('.liveStatus');
+ if(status)status.textContent=state.message;
+ const submitButton=e.target.querySelector('[type="submit"]');
+ if(submitButton)submitButton.disabled=true;
+ try{
+  await Promise.race([
+   signInWithEmailAndPassword(auth,email,password),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('Firebase sign-in timed out. Check your connection and retry.')),18000))
+  ]);
+  state.message='Signed in to Firebase.';
+ }catch(err){state.message='Sign-in failed: '+(err.code||err.message);}
  finally{state.busy=false;render();}
 });
 document.addEventListener('change',e=>{
