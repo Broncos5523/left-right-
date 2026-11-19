@@ -161,6 +161,21 @@ test('two quick college scoring events queue in game order without duplicate pla
  assert.equal(h.active(),false,'repeat poll must not replay either made basket');
 });
 
+test('late ESPN backfill still flashes a new basket even when a later timeout already arrived',async()=>{
+ const h=wing(teamNames[0]);
+ const timeout={id:'late-timeout',sequenceNumber:121604446,text:'UConn Timeout',shootingPlay:false,scoringPlay:false,scoreValue:0,team:{id:'338'}};
+ await h.tick(game([...baseline,timeout]));
+ assert.equal(h.active(),false);
+ const backfilled=shot('backfilled-3pt',121604293,'333','5082704','Drew Fielder makes 25-foot three point jumper',3,{x:36,y:23});
+ await h.tick(game([...baseline,backfilled,timeout], 'in',20,16));
+ assert.equal(h.active(),true,'a unique made shot must not be dropped because a later play appeared first');
+ assert.match(h.overlay.innerHTML,/DREW FIELDER/i);
+ assert.match(h.overlay.innerHTML,/THREE-POINTER/);
+ assert.equal(h.advance(),8000);
+ await h.tick(game([...baseline,backfilled,timeout], 'in',20,16));
+ assert.equal(h.active(),false,'backfilled play ID must not flash twice');
+});
+
 test('30-second TV delay holds score and shot graphic in order without slowing 10-second feed',async()=>{
  const h=wing(teamNames[0],30);
  await h.tick(game(baseline));
