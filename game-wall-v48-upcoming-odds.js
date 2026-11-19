@@ -4,6 +4,8 @@
 'use strict';
 const cache=new Map(),pending=new Set(),queue=[];
 let externalQuotes=Object.create(null),externalLoaded=false,externalPromise=null;
+let externalLastCheck=0,externalGeneratedAt=0,externalStatus='checking';
+const externalCheckMs=12*60*1000;
 const coverage=o=>['moneyAway','moneyHome','spreadAway','spreadHome','overUnder'].filter(k=>o?.[k]).length;
 let active=0,observer=null;
 const concurrency=3,cacheMs=12*60*1000;
@@ -63,8 +65,13 @@ function markup(g){
  const secondary=externalQuotes[g.id];
  // Choose one provider's internally consistent quote, not a mix of books.
  const odds=coverage(secondary)>coverage(espn)?secondary:espn||secondary||null;
- const source=odds?'<span>'+esc(odds.provider)+' · via '+esc(odds.source||'ESPN')+'</span>':
-  '<span>ESPN + multi-book fallback</span>';
+ const secondaryChecked=externalStatus==='ready'&&externalGeneratedAt>0;
+ const checkedAt=secondaryChecked?' · '+new Date(externalGeneratedAt).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}):'';
+ const source=odds?'<span>'+esc(odds.provider)+' · via '+esc(odds.source||'ESPN')+checkedAt+'</span>':
+  '<span>'+(
+    secondaryChecked?'ESPN · DK · FD · BetMGM':
+    externalStatus==='unavailable'?'ESPN · extra feed unavailable':
+    'ESPN + multi-book fallback')+'</span>';
  let body='';
  if(odds){
   const away=abbrev(g.away),home=abbrev(g.home);
@@ -79,7 +86,9 @@ function markup(g){
    '</div>';
  }else{
   const looking=!cached||cached.expires<=Date.now();
-  body='<div class="mcOddsEmpty">'+(looking?'Checking available odds…':'Odds not posted')+'</div>';
+  body='<div class="mcOddsEmpty">'+(looking&&externalStatus==='checking'?'Checking available odds…':
+   externalStatus==='unavailable'?'No verified line · extra feed unavailable':
+   'No verified sportsbook line yet')+'</div>';
  }
  return '<section class="mcOdds" data-odds-for="'+esc(g.id)+'" aria-label="Upcoming betting odds">'+
   '<div class="mcOddsHead"><b>PRE-GAME ODDS</b>'+source+'</div>'+body+'</section>';
@@ -135,18 +144,22 @@ function drain(){
  }
 }
 async function loadExternalOnce(){
- if(externalLoaded)return;
  if(externalPromise)return externalPromise;
+ if(externalLoaded&&Date.now()-externalLastCheck<externalCheckMs)return;
  externalPromise=(async()=>{
   try{
    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8500);
    let response;
    try{response=await fetch('./odds-cache/therundown.json',{cache:'no-store',signal:controller.signal});}
    finally{clearTimeout(timer);}
-   if(!response.ok)return;
+   if(!response.ok){externalStatus='unavailable';return;}
    const data=await response.json();
    const expires=Date.parse(data.validUntil||'');
-   if(!Number.isFinite(expires)||expires<=Date.now()||!data.games||typeof data.games!=='object')return;
+   if(!Number.isFinite(expires)||expires<=Date.now()||!data.games||typeof data.games!=='object'){
+    externalStatus='unavailable';return;
+   }
+   externalGeneratedAt=Date.parse(data.generatedAt||'')||0;
+   externalStatus='ready';
    const safe=Object.create(null);
    for(const [id,o] of Object.entries(data.games)){
     if(!/^(?:NFL|NBA|NHL|MLB|WNBA|NCAAF|NCAAB)-\d{5,15}$/.test(id)||!o||typeof o!=='object')continue;
@@ -154,9 +167,11 @@ async function loadExternalOnce(){
     if(coverage(o))safe[id]={...o,source:'TheRundown'};
    }
    externalQuotes=safe;
-  }catch(e){/* Unconfigured, old, offline, or optional feed. ESPN still works. */}
+  }catch(e){externalStatus='unavailable';/* ESPN still works when supplement fails. */}
   finally{
    externalLoaded=true;
+   externalLastCheck=Date.now();
+   externalPromise=null;
    // Keep ESPN-loaded odds and update only the compact odds rail, never the
    // approved banner, TV buttons or other Game Finder state.
    for(const el of [...document.querySelectorAll('.games .mcOdds[data-odds-for]')])
@@ -170,7 +185,7 @@ function hydrate(){
  observer?.disconnect();observer=null;
  const nodes=[...document.querySelectorAll('.games .mcOdds[data-odds-for]')];
  if(!nodes.length)return;
- if(!externalLoaded)loadExternalOnce();
+ if(!externalLoaded||Date.now()-externalLastCheck>=externalCheckMs)loadExternalOnce();
  if(typeof IntersectionObserver==='function'){
   observer=new IntersectionObserver(entries=>{
    for(const entry of entries)if(entry.isIntersecting){
