@@ -1,0 +1,21 @@
+name: Verify seven-league controller visual analytics
+on:
+  push:
+    paths:
+      - game-wall-v49-visual-analytics.js
+      - game-wall-v49-visual-analytics.css
+      - game-wall-v47-home-screen.html
+      - tests/controller-visual-analytics-v1.mjs
+      - .github/workflows/verify-controller-visual-analytics-v1.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test seven-sport chart data, case-specific ESPN filters and safe controller integration
+        run: node --test tests/controller-visual-analytics-v1.mjs
+      - name: Check existing Game Finder odds and scouting regressions
+        run: node --test tests/seven-sport-pregame-leaders-v1.mjs tests/nfl-pregame-leaders-v1.mjs tests/upcoming-odds-v1.mjs
