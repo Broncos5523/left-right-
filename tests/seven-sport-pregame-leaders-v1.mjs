@@ -142,3 +142,25 @@ test('TBD tournament opponents show an honest missing-data message rather than a
  assert.doesNotMatch(view,/Real Away Scorer/);
  assert.match(view,/Real Home Scorer/);
 });
+
+test('college football passing card protects QB full names from wide ESPN stat breakdown',async()=>{
+ const h=harness('NCAAF','football/college-football');
+ const content=await renderTeamTab(h);
+ assert.match(content,/pgLeaderCategory--passing/);
+ assert.match(source,/\^passing\\s\*yards\$/i);
+ const stylesheet=read('game-wall-v36-team-leaders.css');
+ assert.match(stylesheet,/\.pgLeaderCategory--passing \.pgLeaderPerson/);
+ assert.match(stylesheet,/grid-template-areas:"portrait passer" "numbers numbers"/);
+ assert.match(stylesheet,/\.pgLeaderCategory--passing \.pgLeaderValue/);
+ assert.match(stylesheet,/white-space:normal/);
+ assert.match(html,/game-wall-v36-team-leaders\.css\?v=qb-name-layout-20261119/);
+ assert.match(html,/game-wall-v47-nhl-leaders-cloudflare\.js\?v=qb-name-layout-20261119/);
+});
+test('all non-passing sports retain the approved leader card layout',async()=>{
+ for(const [league,path] of [['NBA','basketball/nba'],['NHL','hockey/nhl'],['NCAAB','basketball/mens-college-basketball']]){
+  const h=harness(league,path);
+  const content=await renderTeamTab(h);
+  assert.doesNotMatch(content,/pgLeaderCategory--passing/);
+  assert.match(content,/class="pgLeaderCategory"/);
+ }
+});
