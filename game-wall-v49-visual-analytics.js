@@ -333,7 +333,7 @@ function open(g){
  if(!safeGame(g))return false;
  window.ManCaveStats?.deactivate?.();
  s.token++;s.game=g;s.data=null;s.error='';s.loading=false;s.lastFetch=0;
- s.team='all';s.player='all';s.period='all';s.tab='map';
+ s.team='all';s.player='all';s.period='all';s.tab=g.state==='upcoming'?'matchup':'map';
  render();load();return true;
 }
 function openById(id){
