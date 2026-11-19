@@ -1,0 +1,20 @@
+name: Verify future favorite dates and upcoming odds isolation
+on:
+  push:
+    paths:
+      - game-wall-v33-schedule-policy.js
+      - game-wall-v47-games-cloudflare.js
+      - game-wall-v47-home-screen.html
+      - game-wall-v32-games-style.css
+      - tests/future-favorites-odds-v1.mjs
+      - .github/workflows/verify-future-favorites-odds-v1.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify exact season, future favorite, placeholder time and odds behavior
+        run: node --test tests/future-favorites-odds-v1.mjs tests/upcoming-odds-v1.mjs
