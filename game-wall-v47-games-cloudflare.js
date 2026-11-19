@@ -88,6 +88,7 @@ function parse(event,league,path){
   endedAt:event.status?.type?.completedAt||c.endDate||event.endDate||'',
   detail:event.status?.type?.shortDetail||event.status?.type?.detail||'',
   broadcasts:broadcasters(event,c),
+  oddsRaw:Array.isArray(c?.odds)?c.odds:Array.isArray(event.odds)?event.odds:[],
   seasonType:Number(event.season?.type||c.season?.type||0),seasonSlug:String(event.season?.slug||''),
   favorite:FAVORITES.has(aName)||FAVORITES.has(hName),
   espnUrl:(event.links||[]).find(x=>/^https:\/\/www\.espn\.com\//.test(x.href||''))?.href||''};
@@ -179,6 +180,7 @@ async function refresh(force=false){
    // Prefer a fresher LIVE/FINAL state over an older 'pre' state.
    if(!current||(rank[g.state]??0)>(rank[current.state]??0)){
     if(current&&!g.broadcasts.length)g.broadcasts=current.broadcasts;
+    if(current&&!g.oddsRaw?.length)g.oddsRaw=current.oddsRaw||[];
     games.set(g.id,g);
    }
   }
