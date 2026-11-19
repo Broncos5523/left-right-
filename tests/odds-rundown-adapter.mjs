@@ -38,8 +38,8 @@ test('fixture reconciliation rebuilds separated city and mascot without guessing
 });
 test('markets correctly attribute both sides when provider lists only a short city name',()=>{
  const event={teams:[
-  {name:'Utah',mascot:'Utes',is_away:true},
-  {name:'Miami',mascot:'Hurricanes',is_home:true}
+  {name:'Utah',mascot:'Utes',is_away:true,is_home:false},
+  {name:'Miami',mascot:'Hurricanes',is_home:true,is_away:false}
  ],markets:[{market_id:1,participants:[
   mk('Utah Utes',+220),mk('Miami Hurricanes',-260)
  ]},{market_id:2,participants:[
