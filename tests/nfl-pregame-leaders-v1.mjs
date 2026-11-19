@@ -11,6 +11,13 @@ vm.runInContext(source,context);
 const parse=data=>context.window.ManCavePregame.helpers.leaders({leaders:data.leaders},'NFL');
 test('ESPN team leaders cache includes every completed regular-season game for screenshot matchup',()=>{
  assert.equal(cache.season,2026);
+ assert.equal(Object.keys(cache.teams).length,32,'all NFL teams must have verified season player leaders');
+ for(const x of Object.values(cache.teams)){
+  assert.equal(x.gamesVerified,x.gamesExpected,'no incomplete season records');
+  assert.ok(x.gamesVerified>=6,'season game counts must be credible');
+  assert.ok(x.leaders.length>=5,'all NFL teams need real category leaders');
+  assert.ok(Number.isFinite(Date.parse(x.updatedAt)));
+ }
  const raiders=cache.teams['13'],broncos=cache.teams['7'];
  assert.equal(raiders.team,'Las Vegas Raiders');
  assert.equal(broncos.team,'Denver Broncos');
