@@ -1,0 +1,38 @@
+name: Probe Arizona Kansas State pregame visual analytics
+on:
+  push:
+    paths: [.github/workflows/probe-pregame-ncaaf-analytics-20261119.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Inspect actual upcoming Arizona-Kansas State player and team comparison source
+        run: |
+          node --input-type=module <<'JS'
+          const base='https://site.api.espn.com/apis/site/v2/sports/football/college-football';
+          const q=async url=>{const r=await fetch(url,{signal:AbortSignal.timeout(14000)});return{http:r.status,d:await r.json().catch(()=>({}))}};
+          const date='20261121';
+          const sb=await q(base+'/scoreboard?dates='+date+'&limit=300&groups=80');
+          const found=(sb.d.events||[]).filter(e=>/Arizona|Kansas State/i.test(e.name||''));
+          console.log('SCHEDULE',JSON.stringify({http:sb.http,count:sb.d.events?.length,found:found.map(e=>({id:e.id,name:e.name,teams:e.competitions?.[0]?.competitors?.map(t=>({id:t.team?.id,name:t.team?.displayName})),date:e.date}))}));
+          const game=found.find(e=>/Arizona.*Kansas State|Kansas State.*Arizona/i.test(e.name||''));
+          if(!game)throw Error('Upcoming Arizona Kansas State not found');
+          const result=await q(base+'/summary?event='+game.id),d=result.d;
+          console.log('GAME_SUMMARY',JSON.stringify({id:game.id,http:result.http,rootKeys:Object.keys(d),
+           competitors:d.header?.competitions?.[0]?.competitors?.map(c=>({id:c.team?.id,name:c.team?.displayName})),
+           leaders:(d.leaders||[]).map(t=>({team:{id:t.team?.id,name:t.team?.displayName},
+            categories:(t.leaders||[]).map(c=>({name:c.name,displayName:c.displayName,
+             keys:Object.keys(c),leaders:(c.leaders||[]).slice(0,2).map(l=>({keys:Object.keys(l),name:l.athlete?.displayName,value:l.value,displayValue:l.displayValue,mainStat:l.mainStat,stats:l.stats}))}))})),
+           matchup:d.matchup,teamStats:d.boxscore?.teams,
+           predictor:d.predictor,winprobability:d.winprobability,againstTheSpread:d.againstTheSpread
+          }).slice(0,35000));
+          for(const t of game.competitions?.[0]?.competitors||[]){
+           const data=await q(base+'/teams/'+t.team.id);
+           console.log('TEAM_DETAIL',JSON.stringify({id:t.team.id,http:data.http,keys:Object.keys(data.d?.team||{}),
+            teamRecord:data.d.team?.record,teamStatistics:data.d.team?.statistics,teamLeaders:data.d.team?.leaders
+           }).slice(0,16000));
+          }
+          JS
