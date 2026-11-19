@@ -49,6 +49,18 @@ test('pre-game Arizona Kansas State default Scouting shows real multi-row ESPN s
  assert.doesNotMatch(body.innerHTML,/No completed-game path exists yet/);
  assert.doesNotMatch(body.innerHTML,/No fictional shot maps/i);
 });
+test('upcoming basketball and NHL open real Scouting rather than an empty shot map',async()=>{
+ for(const [league,path] of [['NBA','basketball/nba'],['WNBA','basketball/wnba'],
+ ['NCAAB','basketball/mens-college-basketball'],['NHL','hockey/nhl']]){
+  const {api,body}=harness();
+  const g={...game,league,path};
+  assert.equal(api.open(g),true);
+  await new Promise(resolve=>setTimeout(resolve,20));
+  assert.match(body.innerHTML,/aria-selected="true" class="active">Scouting/);
+  assert.match(body.innerHTML,/vaSeasonCard/,league+' did not render a season comparison');
+  assert.doesNotMatch(body.innerHTML,/Pregame shot chart not published|No verified shot locations/,league);
+ }
+});
 test('team ID validation survives ESPN reversing its team list',()=>{
  const {api}=harness();
  const rows=Array.from(api.helpers.pregameRows(fixture,game));
