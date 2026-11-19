@@ -42,7 +42,8 @@ test('both team leaders resolve to actual attributed ESPN players, not team rank
 test('iPhone controller uses small cached ESPN season results, preserving NHL and existing pregame UI',()=>{
  assert.match(source,/async function officialNfl\(/);
  assert.match(source,/stats-cache\/nfl-team-leaders-/);
- assert.match(source,/\['NHL','NFL'\]\.includes\(g\.league\)/);
+ assert.match(source,/independent\?\.leaders\?\.length/);
+ assert.match(source,/async function matchupLeaders\(/);
  assert.match(source,/officialNhl\(g,which\)/);
  assert.match(source,/data-pg-tab/);
  assert.match(source,/Team Comparison/);
