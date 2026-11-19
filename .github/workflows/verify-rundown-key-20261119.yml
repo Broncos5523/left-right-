@@ -1,4 +1,4 @@
-name: Verify new TheRundown key and odds schema (private)
+name: Verify TheRundown upcoming NBA and NCAAB pregame markets (private)
 on:
   push:
     paths:
@@ -8,41 +8,34 @@ permissions: {contents: read}
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 4
     steps:
-      - name: Check key and probe one upcoming NBA slate
+      - name: Probe next upcoming NBA and college basketball odds
         env:
           THERUNDOWN_API_KEY: ${{ secrets.THERUNDOWN_API_KEY }}
         run: |
           node --input-type=module <<'JS'
-          const k=process.env.THERUNDOWN_API_KEY;
-          if(!k){console.log('SECRET_MISSING THERUNDOWN_API_KEY');process.exitCode=2;}
-          else {
-            console.log('SECRET_PRESENT=true');
-            const day=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'America/New_York'})
-              .format(new Date()).replace(/-/g,'');
-            const date=day.length===8?day.slice(0,4)+'-'+day.slice(4,6)+'-'+day.slice(6):new Date().toISOString().slice(0,10);
-            const url='https://therundown.io/api/v2/sports/4/events/'+date+'?market_ids=1,2,3&affiliate_ids=19,22,23&main_line=true&hide_closed=true';
-            try {
-              const r=await fetch(url,{headers:{'X-TheRundown-Key':k},signal:AbortSignal.timeout(20000)});
-              console.log('PROVIDER_HTTP='+r.status,'QUOTA_REMAINING='+r.headers.get('X-Datapoints-Remaining'));
-              const data=await r.json().catch(()=>({}));
-              if(!r.ok){
-                console.log('PROVIDER_ERROR_CLASS',String(data?.error?.code||data?.code||data?.message||'unknown').slice(0,250));
-                process.exitCode=1;
-              } else {
-                const ev=data.events||[];
-                console.log('PROVIDER_EVENTS='+ev.length);
-                console.log('PROVIDER_META',JSON.stringify({keys:Object.keys(data),delay:r.headers.get('X-Data-Delay-Seconds')}));
-                console.log('SCHEMA_SAMPLE',JSON.stringify(ev.slice(0,2).map(e=>({
-                  keys:Object.keys(e),
-                  date:e.event_date,teams:e.teams,
-                  markets:(e.markets||[]).slice(0,3).map(m=>({id:m.market_id,name:m.name,period:m.period_id,
-                   participants:(m.participants||[]).slice(0,2).map(p=>({name:p.name,keys:Object.keys(p),
-                    lines:(p.lines||[]).slice(0,2).map(l=>({value:l.value,keys:Object.keys(l),bookIds:Object.keys(l.prices||{}),
-                     priceSample:Object.entries(l.prices||{}).slice(0,1).map(([book,x])=>({book,keys:Object.keys(x),price:x.price}))}))}))}))
-                }))));
-              }
-            } catch(e){console.log('PROVIDER_NETWORK_ERROR',String(e));process.exitCode=1;}
+          const key=process.env.THERUNDOWN_API_KEY;
+          if(!key)throw Error('THERUNDOWN_API_KEY missing');
+          const date=new Date().toISOString().slice(0,10);
+          for(const [sport,label] of [[4,'NBA'],[5,'NCAAB']]){
+            const url='https://therundown.io/api/v2/sports/'+sport+'/events/'+date+
+              '?market_ids=1,2,3&affiliate_ids=19,22,23&main_line=true&hide_closed=true';
+            const res=await fetch(url,{headers:{'X-TheRundown-Key':key},signal:AbortSignal.timeout(20000)});
+            if(!res.ok)throw Error(label+' HTTP '+res.status);
+            const data=await res.json(),ev=data.events||[];
+            const future=ev.filter(e=>Date.parse(e.event_date)>Date.now()&&e.markets?.length);
+            console.log('ODDS_PROBE',JSON.stringify({
+              sport:label,date,status:res.status,delay:res.headers.get('X-Data-Delay-Seconds'),
+              quotaRemaining:res.headers.get('X-Datapoints-Remaining'),
+              allEvents:ev.length,eventsWithMarkets:ev.filter(e=>e.markets?.length).length,
+              futureWithMarkets:future.length,
+              sample:future.slice(0,2).map(e=>({id:e.event_id,date:e.event_date,
+                teams:e.teams.map(t=>({name:t.name,mascot:t.mascot,is_home:t.is_home,is_away:t.is_away})),
+                markets:e.markets.slice(0,3).map(m=>({id:m.market_id,name:m.name,period:m.period_id,
+                  participants:m.participants.slice(0,2).map(p=>({name:p.name,type:p.type,
+                    lines:p.lines.slice(0,2).map(l=>({value:l.value,prices:l.prices}))}))}))}))
+            }));
+            await new Promise(r=>setTimeout(r,1150));
           }
           JS
