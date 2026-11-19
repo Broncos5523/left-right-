@@ -1,0 +1,42 @@
+name: Verify read-only upcoming betting odds rail
+on:
+  push:
+    branches: [main]
+    paths:
+      - game-wall-v48-upcoming-odds.js
+      - game-wall-v48-upcoming-odds.css
+      - game-wall-v47-home-screen.html
+      - game-wall-v47-games-cloudflare.js
+      - tests/upcoming-odds-v1.mjs
+      - .github/workflows/verify-upcoming-odds-v1.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify odds formats, missing markets and locked controller wiring
+        run: node --test tests/upcoming-odds-v1.mjs
+      - name: Verify all published odds assets
+        run: |
+          node --input-type=module <<'JS'
+          const origin='https://broncos5523.github.io/left-right-/';
+          const files=['game-wall-v47-home-screen.html','game-wall-v47-games-cloudflare.js','game-wall-v48-upcoming-odds.js','game-wall-v48-upcoming-odds.css'];
+          for(let tryNo=0;tryNo<16;tryNo++){
+           try{
+            const responses=await Promise.all(files.map(async f=>{
+             const r=await fetch(origin+f+'?verify='+Date.now(),{cache:'no-store'});
+             return {file:f,status:r.status,body:r.ok?await r.text():''};
+            }));
+            if(responses.every(x=>x.status===200)&&responses[0].body.includes('game-wall-v48-upcoming-odds.js')&&
+             responses[1].body.includes('oddsRaw')&&responses[2].body.includes('PRE-GAME ODDS')&&
+             responses[3].body.includes('mcOddsGrid')){
+             console.log('PASS_PUBLISHED_UPCOMING_ODDS_RAIL');process.exit(0);
+            }
+           }catch(e){console.log('VERIFY_RETRY',String(e));}
+           await new Promise(r=>setTimeout(r,6000));
+          }
+          throw Error('New odds assets are not yet fully published');
+          JS
