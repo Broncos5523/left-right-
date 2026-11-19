@@ -1,4 +1,4 @@
-name: Verify pregame matchup team leaders all seven leagues
+name: Verify MLB and WNBA future and finished matchup reports
 on:
   push:
     paths: [.github/workflows/audit-all-upcoming-scouting-20261119.yml]
@@ -9,30 +9,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
-      - name: Verify actual ESPN game-summary players for current 2026 matchups
+      - name: Check real MLB and WNBA next favorite, final boxscore, and team leader availability
         run: |
           node --input-type=module <<'JS'
-          const pairs=[
-           ['NFL','football/nfl','401873075'],
-           ['NBA','basketball/nba','401910019'],
-           ['NHL','hockey/nhl','401892742'],
-           ['NCAAF','football/college-football','401862830'],
-           ['NCAAB','basketball/mens-college-basketball','401920517']
-          ];
-          for(const [league,path,event] of pairs){
-           const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+event,{signal:AbortSignal.timeout(14000)});
-           const d=await r.json();
-           console.log('PREGAME_LEADERS_SCHEMA',JSON.stringify({league,event,status:r.status,
-             teams:d.header?.competitions?.[0]?.competitors?.map(c=>({id:c.team?.id,name:c.team?.displayName})),
-             leaders:(d.leaders||[]).map(group=>({
-               team:group.team,
-               keys:Object.keys(group),
-               leaderCount:group.leaders?.length,
-               categories:(group.leaders||[]).slice(0,7).map(c=>({
-                keys:Object.keys(c),name:c.name,displayName:c.displayName,shortDisplayName:c.shortDisplayName,
-                leaders:c.leaders?.slice(0,2),athletes:c.athletes?.slice(0,2)
-               }))
-             }))
-           }));
+          const leagues=[
+            ['MLB','baseball/mlb','bos'],['WNBA','basketball/wnba','ind']];
+          const get=async u=>{try{
+           const r=await fetch(u,{signal:AbortSignal.timeout(13000)});
+           return {http:r.status,data:await r.json().catch(()=>({}))};
+          }catch(e){return{http:0,error:String(e),data:{}}}};
+          for(const [league,path,team] of leagues){
+           const url='https://site.api.espn.com/apis/site/v2/sports/'+path+'/teams/'+team+'/schedule';
+           const schedule=await get(url);
+           const list=schedule.data.events||[];
+           const future=list.filter(e=>Date.parse(e.date)>Date.now()).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
+           const done=list.filter(e=>e.competitions?.[0]?.status?.type?.completed===true).sort((a,b)=>Date.parse(b.date)-Date.parse(a.date));
+           console.log('OFFSEASON_SCHEDULE',JSON.stringify({league,http:schedule.http,events:list.length,
+            future:future.slice(0,3).map(e=>({id:e.id,date:e.date,name:e.name,timeValid:e.timeValid,season:e.season})),
+            lastFinished:done.slice(0,3).map(e=>({id:e.id,date:e.date,name:e.name}))}));
+           for(const e of [future[0],done[0]].filter(Boolean)){
+            const sum=await get('https://site.api.espn.com/apis/site/v2/sports/'+path+'/summary?event='+e.id);
+            const groups=sum.data.leaders||[];
+            const box=sum.data.boxscore||{};
+            console.log('OFFSEASON_SUMMARY',JSON.stringify({league,state:Date.parse(e.date)>Date.now()?'future':'final',
+             id:e.id,date:e.date,http:sum.http,
+             season:sum.data.header?.season,
+             teamIds:sum.data.header?.competitions?.[0]?.competitors?.map(x=>({id:x.team?.id,name:x.team?.displayName})),
+             leaders:groups.map(x=>({team:x.team?.displayName,id:x.team?.id,
+              categories:(x.leaders||[]).map(c=>({name:c.name,players:c.leaders?.filter(y=>y.athlete?.displayName).length||0}))})),
+             boxPlayerGroups:box.players?.length||0,boxTeamGroups:box.teams?.length||0}));
+           }
           }
           JS
