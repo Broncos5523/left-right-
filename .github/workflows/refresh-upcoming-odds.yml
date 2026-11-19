@@ -1,0 +1,46 @@
+name: Refresh multi-book upcoming odds (optional free TheRundown)
+on:
+  schedule:
+    - cron: "20 20 * * *" # Daily late afternoon ET, one low-quota pass
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/odds-rundown-adapter.mjs
+      - scripts/refresh-upcoming-odds.mjs
+      - tests/odds-rundown-adapter.mjs
+      - .github/workflows/refresh-upcoming-odds.yml
+permissions:
+  contents: write
+concurrency:
+  group: mancave-multibook-odds
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Verify fixture identity, market source and closed-line handling
+        run: node --test tests/odds-rundown-adapter.mjs
+      - name: Fetch available sportsbook odds (key never sent to browser or stored in repo)
+        env:
+          THERUNDOWN_API_KEY: ${{ secrets.THERUNDOWN_API_KEY }}
+        run: node scripts/refresh-upcoming-odds.mjs
+      - name: Publish refreshed public quotes only when changed
+        run: |
+          if [ ! -f odds-cache/therundown.json ]; then
+            echo "Provider not configured; leave existing ESPN controller untouched."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add odds-cache/therundown.json
+          git diff --cached --quiet && { echo "No change"; exit 0; }
+          git commit -m "Refresh signed bookmaker odds in Game Center read-only cache"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep 3
+          done
+          exit 1
