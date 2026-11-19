@@ -1,7 +1,9 @@
 name: Refresh multi-book upcoming odds (optional free TheRundown)
 on:
   schedule:
-    - cron: "20 20 * * *" # Daily late afternoon ET, one low-quota pass
+    # Twice-daily, ~8:20 AM and 3:20 PM Eastern in standard time.
+    # Two 7-league scans/day preserve monthly free-tier quota headroom.
+    - cron: "20 13,20 * * *"
   workflow_dispatch:
   push:
     paths:
