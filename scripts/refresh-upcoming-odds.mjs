@@ -70,9 +70,10 @@ for(const target of dateSorted){
  const matched=addMatchedOdds(all,target.league,games,entries);
  stats.queried++;stats.matched+=matched.matched;stats.quoted+=matched.quoted;
  stats.unmatched+=matched.unmatched;
- const remaining=Number(res.headers.get('x-datapoints-remaining'));
- console.log('ODDS_SOURCE',JSON.stringify({sport:target.league,day:target.day,events:all.length,...matched,quotaRemaining:Number.isFinite(remaining)?remaining:null}));
- if(Number.isFinite(remaining)&&remaining<2000){console.log('LOW_QUOTA: Stopping safely with current matched odds.');break;}
+ const rawRemaining=res.headers.get('x-datapoints-remaining');
+ const remaining=rawRemaining===null?null:Number(rawRemaining);
+ console.log('ODDS_SOURCE',JSON.stringify({sport:target.league,day:target.day,events:all.length,...matched,quotaRemaining:remaining!==null&&Number.isFinite(remaining)?remaining:null}));
+ if(remaining!==null&&Number.isFinite(remaining)&&remaining<2000){console.log('LOW_QUOTA: Stopping safely with current matched odds.');break;}
  await sleep(1150); // TheRundown Free limits to 1 request/s.
 }
 const output={generatedAt:new Date().toISOString(),validUntil:new Date(now+30*3600000).toISOString(),
