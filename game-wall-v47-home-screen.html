@@ -782,6 +782,11 @@ function renderGames(){
  const state=window.ManCaveRealGames?.state;
  const leagues=[['all','All leagues'],['NFL','NFL'],['NBA','NBA'],['NHL','NHL'],['MLB','MLB'],['WNBA','WNBA'],['NCAAF','NCAA FB'],['NCAAB','NCAA BB']];
  const games=(state?.games||[]).filter(g=>(filter==='all'||g.state===filter)&&(leagueFilter==='all'||g.league===leagueFilter));
+ const distantFavorite=g=>window.ManCaveGameWindows?.isDistantFavorite?.(g,Date.now())||false;
+ // Keep approved "next available favorite" feature, but DO NOT present a
+ // March 2027 MLB game among tomorrow's November 2026 matchups.
+ const displayGames=[...games].sort((a,b)=>Number(distantFavorite(a))-Number(distantFavorite(b)));
+ let distantHeadingShown=false;
  let body=header('Game Finder',state?.lastFetch?'Real ESPN games · Updated '+new Date(state.lastFetch).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'Real ESPN games · seven sports','LIVE DATA');
  body+='<div class="gameFilterGroup"><div class="gameFilterLabel">Choose game status</div><div class="gameStatusTiles">'+
   [['live','Live Games'],['upcoming','Upcoming Games'],['final','Game Finals']].map(([value,label])=>
@@ -795,20 +800,30 @@ function renderGames(){
  body+='<div class="realGamesStatus" role="status">'+escapeHtml(state?.message||'Connecting to ESPN…')+
   '<button id="refreshRealGames" type="button"'+(state?.loading?' disabled':'')+'>'+(state?.loading?'Refreshing…':'Refresh')+'</button></div>';
  if(games.length){
-  body+='<div class="games">'+games.map(g=>{
-   const started=g.state!=='upcoming';
+  body+='<div class="games">'+displayGames.map(g=>{
+   const started=g.state!=='upcoming',futureFavorite=distantFavorite(g);
+   const sectionStart=futureFavorite&&!distantHeadingShown?
+    '<div class="gameFutureHeading"><strong>NEXT FAVORITE GAMES</strong><span>Scheduled beyond the near-term window · dates and kickoff times may change</span></div>':'';
+   if(futureFavorite)distantHeadingShown=true;
    const score=started?escapeHtml((g.away.score??'–')+' – '+(g.home.score??'–')):'vs';
+   const localDate=new Date(g.start);
+   const longDate=localDate.toLocaleDateString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',year:'numeric'});
+   const exactTime=localDate.toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});
    const time=started?escapeHtml(g.detail||g.state.toUpperCase()):
-    escapeHtml(new Date(g.start).toLocaleString('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'}));
-   const smart=window.ManCaveRealGames?.routeFor?.(g);
+    escapeHtml(g.timeConfirmed===false?(longDate+' · TIME TBD'):
+     futureFavorite?(longDate+' · '+exactTime):
+     localDate.toLocaleString('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'}));
+   // Broadcaster logos for next season are not verified TV assignments.
+   const smart=futureFavorite?null:window.ManCaveRealGames?.routeFor?.(g);
    // No verified/available network means no badge, text, or empty container.
    const badge=smart?.status==='ready'?(window.ManCaveNetworkLogos?.badge?.(smart)||''):'';
    const broadcastRow=badge?'<div class="realGameNetwork">'+badge+'</div>':'';
    const awayAccent=gameTeamAccent(g.away,'#287bc3'),homeAccent=gameTeamAccent(g.home,'#ae6632');
-   const gameContext=g.state==='live'?'LIVE SCORE · ESPN DATA':g.state==='final'?'FINAL RESULT':'UPCOMING MATCHUP';
-   return '<div class="gameCard '+escapeHtml(g.state)+(g.favorite?' is-favorite':'')+'" style="--away-team:'+awayAccent+';--home-team:'+homeAccent+'"><div class="gameMeta"><span class="league">'+escapeHtml(g.league)+(g.favorite?' · ★ FAVORITE':'')+'</span><span class="status '+g.state+'">'+g.state.toUpperCase()+'</span></div>'+
+   const gameContext=futureFavorite?'NEXT FAVORITE · FUTURE SCHEDULE':
+    g.state==='live'?'LIVE SCORE · ESPN DATA':g.state==='final'?'FINAL RESULT':'UPCOMING MATCHUP';
+   return sectionStart+'<div class="gameCard '+escapeHtml(g.state)+(g.favorite?' is-favorite':'')+'" style="--away-team:'+awayAccent+';--home-team:'+homeAccent+'"><div class="gameMeta"><span class="league">'+escapeHtml(g.league)+(g.favorite?' · ★ FAVORITE':'')+'</span><span class="status '+g.state+'">'+(futureFavorite?'NEXT FAVORITE':g.state.toUpperCase())+'</span></div>'+
     '<div class="matchup">'+team(g.away)+'<div class="score">'+score+'<small>'+time+'</small></div>'+team(g.home)+'</div>'+
-    broadcastRow+(g.state==='upcoming'?(window.ManCaveUpcomingOdds?.markup?.(g)||''):'')+
+    broadcastRow+(g.state==='upcoming'&&!futureFavorite?(window.ManCaveUpcomingOdds?.markup?.(g)||''):'')+
     '<div class="gameBannerDivider"><span>'+gameContext+'</span><i aria-hidden="true"></i></div>'+
     '<div class="gameActions"><button type="button" data-stats="'+escapeHtml(g.id)+'">Stats</button><button type="button" class="accent" data-assign-game="'+escapeHtml(g.id)+'">Tune to TV</button></div></div>';
   }).join('')+'</div>';
