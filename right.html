@@ -21,7 +21,7 @@ const urls={
  live:'https://testcave.pages.dev/',
  wrestling:'https://broncos5523.github.io/Inside-the-squared-circle/staging/?view=tv&mode=active&rotate=none',
  rotation:'https://man-cave-28-page.broncos5523.workers.dev/staging/player.html?rotate=off',
- gta6:'./gta-vi-wing.html?side=right'
+ gta6:'./gta-vi-wing-fullscreen.html?side=right&v=fullbleed2'
 };
 function display(value){const url=urls[value];document.documentElement.dataset.boardMode=(value==='wrestling'||value==='rotation'||value==='gta6')?'team':url?'other':'idle';if(!url){board.classList.add('hidden');fallback.classList.remove('hidden');board.removeAttribute('src');return}if(board.getAttribute('src')!==url)board.setAttribute('src',url);board.classList.remove('hidden');fallback.classList.add('hidden')}
 const params=new URLSearchParams(location.search);const rotate=params.get('rotate');if(['cw','ccw','off'].includes(rotate))document.documentElement.dataset.rotation=rotate;display(params.get('board')||'');
