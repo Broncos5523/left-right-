@@ -692,13 +692,15 @@ const boards=[
 {id:'live-lookin',name:'Man Cave Sports Book Live Lookin',short:'LIVE LOOKIN',sub:'MAN CAVE SPORTS BOOK',detail:'Live games and results'},
 {id:'upcoming',name:'Upcoming Games',short:'UPCOMING GAMES',sub:'MAN CAVE SPORTS BOOK',detail:'Your next games'},
 {id:'wrestling',name:'Presents Inside the Squared Circle',short:'INSIDE THE\nSQUARED CIRCLE',sub:'MAN CAVE SPORTS BOOK PRESENTS',detail:'Wrestling board'},
-{id:'deep-dive',name:'League Deep Dive',short:'LEAGUE\nDEEP DIVE',sub:'MAN CAVE SPORTS BOOK',detail:'League standings and stats'}
+{id:'deep-dive',name:'League Deep Dive',short:'LEAGUE\nDEEP DIVE',sub:'MAN CAVE SPORTS BOOK',detail:'League standings and stats'},
+{id:'gta-vi',name:'GTA VI · Vice City',short:'GTA VI',sub:'MAN CAVE SPECIAL SHOWCASE',detail:'NEW · Twin-portrait neon visual'}
 ];
 const boardBannerArtwork=Object.freeze({
  'live-lookin':'./assets/gamecenter/live-lookin-banner.jpg',
  'upcoming':'./assets/gamecenter/upcoming-games-banner.jpg',
  'wrestling':'./assets/gamecenter/inside-squared-circle-banner.jpg',
- 'deep-dive':'./assets/gamecenter/league-deep-dive-banner.jpg'
+ 'deep-dive':'./assets/gamecenter/league-deep-dive-banner.jpg',
+ 'gta-vi':'./assets/gamecenter/gta-vi-banner.svg'
 });
 const screens=[
 {id:'top-left',name:'Top Left',size:'40″ TV',kind:'tv',source:'Top Left',content:'Cable · Top Left',hold:'Manual hold'},
@@ -845,7 +847,7 @@ function renderGames(){
  $('clearGameFilters')?.addEventListener('click',()=>{filter='live';leagueFilter='all';renderGames();});
  $('refreshRealGames')?.addEventListener('click',()=>window.ManCaveRealGames?.refresh?.());
 }
-function renderBoards(){$('content').innerHTML=header('Board Library','Your approved content, organized by board name','4 APPROVED')+`<div class="boardGrid">${boards.map(b=>`<button class="boardTile" data-board="${b.id}"><div class="boardGraphic boardArtwork"><img src="${boardBannerArtwork[b.id]}" alt="${escapeHtml(b.name)} original landscape banner" loading="lazy" decoding="async"></div><div class="boardText"><div><strong>${escapeHtml(b.name)}</strong><div style="font-size:10px;color:#91a7bd;margin-top:3px">${escapeHtml(b.detail)}</div></div><span>›</span></div></button>`).join('')}</div><div class="note">Tap any banner to select Left Wing, Right Wing, 32″ Portrait, or multiple displays. League Deep Dive sends the approved 28-page auto rotation.</div><div id="boardExtras"></div>`;document.querySelectorAll('[data-board]').forEach(n=>n.addEventListener('click',()=>{
+function renderBoards(){$('content').innerHTML=header('Board Library','Four approved boards plus a new optional GTA VI visual','4 APPROVED + 1 NEW')+`<div class="boardGrid">${boards.map(b=>`<button class="boardTile" data-board="${b.id}"><div class="boardGraphic boardArtwork"><img src="${boardBannerArtwork[b.id]}" alt="${escapeHtml(b.name)} original landscape banner" loading="lazy" decoding="async"></div><div class="boardText"><div><strong>${escapeHtml(b.name)}</strong><div style="font-size:10px;color:#91a7bd;margin-top:3px">${escapeHtml(b.detail)}</div></div><span>›</span></div></button>`).join('')}</div><div class="note">Tap any banner to assign supported portrait displays. GTA VI supports Left Wing and Right Wing only. League Deep Dive retains the approved 28-page rotation.</div><div id="boardExtras"></div>`;document.querySelectorAll('[data-board]').forEach(n=>n.addEventListener('click',()=>{
  const boardId=n.dataset.board;
  // All four approved Board Library banners now open real multi-target
  // Firebase assignment controls; never silently change the wall preview.
@@ -906,7 +908,7 @@ render();
 })();
 </script>
 <script src="./game-wall-v43-wall-sync.js?v=v46-20261117"></script>
-<script type="module" src="./game-wall-v41-remote.js?v=auth-stability-20261118"></script>
+<script type="module" src="./game-wall-v41-remote.js?v=gta-vi-wing-20261121"></script>
 <script src="./game-wall-v12-tune.js" defer></script>
 <script type="module" src="./game-wall-v42-logo-lineup.js"></script>
 <script type="module" src="./game-wall-v47-streaming-cloudflare.js?v=v47-xfinity-stage"></script>
