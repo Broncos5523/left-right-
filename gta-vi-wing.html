@@ -10,8 +10,7 @@
 html,body{width:100%;height:100%;margin:0;background:#080611;color:#fff;font-family:Arial,Helvetica,sans-serif}
 body{overflow:hidden}
 .wing{position:fixed;inset:0;overflow:hidden;background:#080611}
-.backdrop{position:absolute;inset:-12%;width:124%;height:124%;object-fit:cover;filter:blur(24px) brightness(.42);opacity:.9}
-.poster{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
 .preview{min-height:100vh;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 12px;background:#080611}
 .preview h1{margin:0;font-size:20px;text-align:center}
 .preview p{margin:0;color:#c2c3d2;text-align:center;font-size:12px;max-width:420px}
@@ -27,15 +26,15 @@ body{overflow:hidden}
  const mode=new URLSearchParams(location.search).get('side');
  const src=mode==='left'?'./assets/gamecenter/gta-vi-left-original.jpeg':mode==='right'?'./assets/gamecenter/gta-vi-right-original.jpeg':null;
  if(src){
-  // Full original artwork is always shown, without cropping or overlays.
-  // A blurred copy fills only the remaining aspect-ratio space on 9:16 TVs.
-  document.body.innerHTML='<main class="wing"><img class="backdrop" src="'+src+'" alt=""><img class="poster" src="'+src+'" alt="GTA VI '+mode+' wing artwork"></main>';
+  // Edge-to-edge portrait TV fill. Minor cropping is intentional to avoid black bars.
+  // The source image is unchanged; only its CSS display behavior differs.
+  document.body.innerHTML='<main class="wing"><img class="poster" src="'+src+'" alt="GTA VI '+mode+' wing artwork"></main>';
  }else{
   document.body.className='preview';
   document.body.innerHTML='<h1>GTA VI · ORIGINAL ARTWORK</h1>'
    +'<div class="pair"><iframe title="Left wing GTA VI" src="?side=left"></iframe><iframe title="Right wing GTA VI" src="?side=right"></iframe></div>'
    +'<div class="links"><a href="?side=left">Left wing</a><a href="?side=right">Right wing</a></div>'
-   +'<p>First supplied picture on the left · second supplied picture on the right. No generated graphics or additional text. Your other board modes are unchanged.</p>';
+   +'<p>First supplied picture on the left · second on the right. Both fill the TV edge-to-edge, cropping only as needed for the TV shape. No new artwork or text.</p>';
  }
 })();
 </script>
