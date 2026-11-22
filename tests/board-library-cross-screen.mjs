@@ -69,6 +69,9 @@ try{
  }
  // An individual-screen send must not disturb the other two TVs.
  await page.locator('[data-board="wrestling"]').click();
+ // The 32-inch Onn is now preselected by design; deselect it when the
+ // user explicitly wants ONLY the right wing.
+ await page.locator('#modalBody [data-board-target="third"]').uncheck();
  await page.locator('#modalBody [data-board-target="right"]').check();
  await page.locator('#liveModalSend').click();
  await page.waitForFunction(()=>window.__BOARD_TEST_WRITES__?.length===5,null,{timeout:10000});
