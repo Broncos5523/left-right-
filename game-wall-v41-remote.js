@@ -356,7 +356,12 @@ function openLibraryBoard(boardId,pageId){
   targets=[['third','32″ Portrait · Onn']];
  }else return false;
  const html='<h4 class="liveDestinationHeading">Choose one or more board TVs</h4>'+
-  boardDestinationTiles(targets,'data-board-target')+
+  // Default approved 32-inch Onn for named sports boards. Users can
+  // deselect it and choose other TVs; tapping the banner alone still
+  // performs NO database write. This matches the existing direct Screens
+  // send path and avoids a silent no-destination modal.
+  boardDestinationTiles(targets,'data-board-target',
+    targets.some(([side])=>side==='third')?['third']:[])+
   '<p class="liveDestinationHelp">Select Left Wing, Right Wing or the 32″ portrait — or send to several at once. Unchecked TVs stay on their current board.</p>';
  if(!liveModalBase(title,desc,html,'Send board to TV'))return false;
  document.getElementById('liveModalSend')?.addEventListener('click',()=>{
