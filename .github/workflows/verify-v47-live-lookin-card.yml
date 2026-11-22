@@ -1,0 +1,43 @@
+name: Verify V47 Live Lookin banner-to-Onn routing (mock Firebase)
+on:
+  push:
+    branches: [fix/live-lookin-card-assignment-20261122]
+    paths:
+      - .github/workflows/verify-v47-live-lookin-card.yml
+      - game-wall-v47-home-screen.html
+      - game-wall-v41-remote.js
+      - tests/board-library-cross-screen.mjs
+      - tests/v47-live-card-to-onn.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/fix/live-lookin-card-assignment-20261122'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve current V47 controller
+        run: |
+          python -m http.server 8877 --bind 127.0.0.1 >/tmp/v47-controller-http.log 2>&1 &
+      - name: Verify banner modal sends Firebase commands in current V47 version
+        env:
+          CONTROLLER_URL: http://127.0.0.1:8877/game-wall-v47-home-screen.html
+        run: |
+          node tests/board-library-cross-screen.mjs
+          node tests/v47-live-card-to-onn.mjs
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v47-live-lookin-card-firebase-contract
+          if-no-files-found: ignore
+          retention-days: 7
+          path: |
+            board-library-cross-screen-result.json
+            v47-live-card-routing.json
