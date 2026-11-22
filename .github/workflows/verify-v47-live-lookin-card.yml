@@ -7,6 +7,7 @@ on:
       - game-wall-v47-home-screen.html
       - game-wall-v41-remote.js
       - tests/board-library-cross-screen.mjs
+      - tests/v47-live-card-to-onn.mjs
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,7 +28,9 @@ jobs:
       - name: Verify banner modal sends Firebase commands in current V47 version
         env:
           CONTROLLER_URL: http://127.0.0.1:8877/game-wall-v47-home-screen.html
-        run: node tests/board-library-cross-screen.mjs
+        run: |
+          node tests/board-library-cross-screen.mjs
+          node tests/v47-live-card-to-onn.mjs
       - name: Preserve evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -35,4 +38,6 @@ jobs:
           name: v47-live-lookin-card-firebase-contract
           if-no-files-found: ignore
           retention-days: 7
-          path: board-library-cross-screen-result.json
+          path: |
+            board-library-cross-screen-result.json
+            v47-live-card-routing.json
