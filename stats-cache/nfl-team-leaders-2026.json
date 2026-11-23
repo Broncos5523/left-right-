@@ -1,13 +1,13 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-22T08:32:23.002Z",
+  "generatedAt": "2026-11-23T19:29:17.954Z",
   "source": "ESPN completed-game NFL player box scores, 2026 regular season (all verified games)",
   "teams": {
     "1": {
       "teamId": "1",
       "team": "Atlanta Falcons",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:31:58.501Z",
+      "updatedAt": "2026-11-23T19:29:10.673Z",
       "verifiedAthletes": 51,
       "gamesExpected": 10,
       "gamesVerified": 10,
@@ -61,46 +61,46 @@
       "teamId": "2",
       "team": "Buffalo Bills",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:31:59.403Z",
-      "verifiedAthletes": 52,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "updatedAt": "2026-11-23T19:29:11.139Z",
+      "verifiedAthletes": 55,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Josh Allen",
-          "value": "2,223",
+          "value": "2,527",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3918298.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "James Cook III",
-          "value": "971",
+          "value": "1,060",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4379399.png"
         },
         {
           "metric": "Receiving Yards",
-          "name": "Dalton Kincaid",
-          "value": "487",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4385690.png"
+          "name": "Khalil Shakir",
+          "value": "539",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4373678.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Josh Allen",
-          "value": "13",
+          "value": "14",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3918298.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Terrel Bernard",
-          "value": "65",
+          "value": "67",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4259166.png"
         },
         {
           "metric": "Sacks",
           "name": "Greg Rousseau",
-          "value": "8",
+          "value": "10",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4362506.png"
         },
         {
@@ -115,40 +115,40 @@
       "teamId": "3",
       "team": "Chicago Bears",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:00.263Z",
+      "updatedAt": "2026-11-23T19:29:11.634Z",
       "verifiedAthletes": 50,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-09T01:20Z",
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Caleb Williams",
-          "value": "1,546",
+          "value": "1,727",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4431611.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "D'Andre Swift",
-          "value": "576",
+          "value": "627",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4259545.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Luther Burden III",
-          "value": "644",
+          "value": "654",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685278.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Caleb Williams",
-          "value": "8",
+          "value": "10",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4431611.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Dillon Thieneman",
-          "value": "57",
+          "value": "64",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4954445.png"
         },
         {
@@ -159,9 +159,9 @@
         },
         {
           "metric": "Interceptions",
-          "name": "Cam Lewis",
-          "value": "1",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3916577.png"
+          "name": "Dillon Thieneman",
+          "value": "2",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4954445.png"
         }
       ]
     },
@@ -169,7 +169,7 @@
       "teamId": "4",
       "team": "Cincinnati Bengals",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:01.098Z",
+      "updatedAt": "2026-11-23T19:29:11.884Z",
       "verifiedAthletes": 44,
       "gamesExpected": 9,
       "gamesVerified": 9,
@@ -223,7 +223,7 @@
       "teamId": "5",
       "team": "Cleveland Browns",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:01.296Z",
+      "updatedAt": "2026-11-23T19:29:12.108Z",
       "verifiedAthletes": 47,
       "gamesExpected": 10,
       "gamesVerified": 10,
@@ -277,46 +277,46 @@
       "teamId": "6",
       "team": "Dallas Cowboys",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:01.816Z",
-      "verifiedAthletes": 52,
-      "gamesExpected": 10,
-      "gamesVerified": 10,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T21:25Z",
+      "updatedAt": "2026-11-23T19:29:12.338Z",
+      "verifiedAthletes": 54,
+      "gamesExpected": 11,
+      "gamesVerified": 11,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Dak Prescott",
-          "value": "2,724",
+          "value": "3,049",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/2577417.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Javonte Williams",
-          "value": "692",
+          "value": "759",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361579.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "CeeDee Lamb",
-          "value": "976",
+          "value": "1,108",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4241389.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Dak Prescott",
-          "value": "21",
+          "value": "25",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/2577417.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Caleb Downs",
-          "value": "66",
+          "value": "73",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4870706.png"
         },
         {
           "metric": "Sacks",
           "name": "Quinnen Williams",
-          "value": "6",
+          "value": "8",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4040982.png"
         },
         {
@@ -331,16 +331,16 @@
       "teamId": "7",
       "team": "Denver Broncos",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:02.223Z",
-      "verifiedAthletes": 47,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-08T18:00Z",
+      "updatedAt": "2026-11-23T19:29:12.561Z",
+      "verifiedAthletes": 48,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T21:25Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Bo Nix",
-          "value": "1,730",
+          "value": "1,955",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426338.png"
         },
         {
@@ -352,26 +352,26 @@
         {
           "metric": "Receiving Yards",
           "name": "Jaylen Waddle",
-          "value": "337",
+          "value": "398",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4372016.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Bo Nix",
-          "value": "11",
+          "value": "12",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426338.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Alex Singleton",
-          "value": "107",
+          "value": "118",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/2612151.png"
         },
         {
           "metric": "Sacks",
-          "name": "Nik Bonitto",
-          "value": "4.5",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4360259.png"
+          "name": "Malcolm Roach",
+          "value": "5",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4039064.png"
         },
         {
           "metric": "Interceptions",
@@ -385,47 +385,47 @@
       "teamId": "8",
       "team": "Detroit Lions",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:03.671Z",
-      "verifiedAthletes": 47,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T14:30Z",
+      "updatedAt": "2026-11-23T19:29:12.821Z",
+      "verifiedAthletes": 49,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Jared Goff",
-          "value": "2,437",
+          "value": "2,716",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3046779.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Jahmyr Gibbs",
-          "value": "1,000",
+          "value": "1,098",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4429795.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Amon-Ra St. Brown",
-          "value": "755",
+          "value": "792",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4374302.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Jared Goff",
-          "value": "18",
+          "value": "20",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3046779.png"
         },
         {
           "metric": "Total Tackles",
-          "name": "Jack Campbell",
-          "value": "57",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4569465.png"
+          "name": "Chuck Clark",
+          "value": "61",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3045463.png"
         },
         {
           "metric": "Sacks",
-          "name": "Alim McNeill",
-          "value": "6.5",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361662.png"
+          "name": "DJ Wonnum",
+          "value": "7",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4038849.png"
         },
         {
           "metric": "Interceptions",
@@ -439,7 +439,7 @@
       "teamId": "9",
       "team": "Green Bay Packers",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:03.992Z",
+      "updatedAt": "2026-11-23T19:29:13.055Z",
       "verifiedAthletes": 45,
       "gamesExpected": 10,
       "gamesVerified": 10,
@@ -493,40 +493,40 @@
       "teamId": "10",
       "team": "Tennessee Titans",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:22.666Z",
+      "updatedAt": "2026-11-23T19:29:17.727Z",
       "verifiedAthletes": 50,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Cam Ward",
-          "value": "1,714",
+          "value": "1,962",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4688380.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Tony Pollard",
-          "value": "628",
+          "value": "738",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3916148.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Carnell Tate",
-          "value": "413",
+          "value": "471",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4871023.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Cam Ward",
-          "value": "8",
+          "value": "10",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4688380.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Anthony Hill Jr.",
-          "value": "82",
+          "value": "88",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4870805.png"
         },
         {
@@ -547,7 +547,7 @@
       "teamId": "11",
       "team": "Indianapolis Colts",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:06.139Z",
+      "updatedAt": "2026-11-23T19:29:13.541Z",
       "verifiedAthletes": 51,
       "gamesExpected": 11,
       "gamesVerified": 11,
@@ -601,16 +601,16 @@
       "teamId": "12",
       "team": "Kansas City Chiefs",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:06.663Z",
+      "updatedAt": "2026-11-23T19:29:14.067Z",
       "verifiedAthletes": 49,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Patrick Mahomes",
-          "value": "2,385",
+          "value": "2,709",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3139477.png"
         },
         {
@@ -622,25 +622,25 @@
         {
           "metric": "Receiving Yards",
           "name": "Travis Kelce",
-          "value": "512",
+          "value": "586",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/15847.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Patrick Mahomes",
-          "value": "19",
+          "value": "22",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3139477.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Nick Bolton",
-          "value": "89",
+          "value": "94",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4362759.png"
         },
         {
           "metric": "Sacks",
           "name": "George Karlaftis",
-          "value": "5.5",
+          "value": "8",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426659.png"
         },
         {
@@ -655,11 +655,11 @@
       "teamId": "13",
       "team": "Las Vegas Raiders",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:07.330Z",
-      "verifiedAthletes": 46,
-      "gamesExpected": 10,
-      "gamesVerified": 10,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T21:05Z",
+      "updatedAt": "2026-11-23T19:29:14.311Z",
+      "verifiedAthletes": 48,
+      "gamesExpected": 11,
+      "gamesVerified": 11,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T21:25Z",
       "leaders": [
         {
           "metric": "Passing Yards",
@@ -670,7 +670,7 @@
         {
           "metric": "Rushing Yards",
           "name": "Ashton Jeanty",
-          "value": "380",
+          "value": "459",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4890973.png"
         },
         {
@@ -688,7 +688,7 @@
         {
           "metric": "Total Tackles",
           "name": "Nakobe Dean",
-          "value": "107",
+          "value": "119",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426340.png"
         },
         {
@@ -709,7 +709,7 @@
       "teamId": "14",
       "team": "Los Angeles Rams",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:10.173Z",
+      "updatedAt": "2026-11-23T19:29:14.744Z",
       "verifiedAthletes": 52,
       "gamesExpected": 10,
       "gamesVerified": 10,
@@ -763,11 +763,11 @@
       "teamId": "15",
       "team": "Miami Dolphins",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:11.117Z",
-      "verifiedAthletes": 51,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "updatedAt": "2026-11-23T19:29:14.979Z",
+      "verifiedAthletes": 53,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
@@ -778,13 +778,13 @@
         {
           "metric": "Rushing Yards",
           "name": "Ollie Gordon II",
-          "value": "539",
+          "value": "608",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4711533.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Malik Washington",
-          "value": "400",
+          "value": "430",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4569603.png"
         },
         {
@@ -795,9 +795,9 @@
         },
         {
           "metric": "Total Tackles",
-          "name": "Jordyn Brooks",
-          "value": "84",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4043130.png"
+          "name": "Jacob Rodriguez",
+          "value": "93",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4566094.png"
         },
         {
           "metric": "Sacks",
@@ -817,11 +817,11 @@
       "teamId": "16",
       "team": "Minnesota Vikings",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:11.301Z",
-      "verifiedAthletes": 48,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "updatedAt": "2026-11-23T19:29:15.185Z",
+      "verifiedAthletes": 49,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-23T01:20Z",
       "leaders": [
         {
           "metric": "Passing Yards",
@@ -832,13 +832,13 @@
         {
           "metric": "Rushing Yards",
           "name": "Aaron Jones Sr.",
-          "value": "521",
+          "value": "551",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3042519.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Justin Jefferson",
-          "value": "467",
+          "value": "553",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4262921.png"
         },
         {
@@ -850,7 +850,7 @@
         {
           "metric": "Total Tackles",
           "name": "Blake Cashman",
-          "value": "76",
+          "value": "85",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3728281.png"
         },
         {
@@ -871,7 +871,7 @@
       "teamId": "17",
       "team": "New England Patriots",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:12.418Z",
+      "updatedAt": "2026-11-23T19:29:15.393Z",
       "verifiedAthletes": 53,
       "gamesExpected": 10,
       "gamesVerified": 10,
@@ -925,34 +925,34 @@
       "teamId": "18",
       "team": "New Orleans Saints",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:12.710Z",
+      "updatedAt": "2026-11-23T19:29:15.627Z",
       "verifiedAthletes": 48,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Tyler Shough",
-          "value": "2,173",
+          "value": "2,395",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4360689.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Tyler Shough",
-          "value": "187",
+          "value": "221",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4360689.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Chris Olave",
-          "value": "764",
+          "value": "866",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361370.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Tyler Shough",
-          "value": "15",
+          "value": "16",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4360689.png"
         },
         {
@@ -979,28 +979,28 @@
       "teamId": "19",
       "team": "New York Giants",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:13.297Z",
-      "verifiedAthletes": 55,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-13T01:15Z",
+      "updatedAt": "2026-11-23T19:29:15.962Z",
+      "verifiedAthletes": 58,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T21:25Z",
       "leaders": [
         {
           "metric": "Passing Yards",
-          "name": "Jameis Winston",
-          "value": "1,028",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/2969939.png"
+          "name": "J.J. McCarthy",
+          "value": "1,088",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4433970.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Cam Skattebo",
-          "value": "496",
+          "value": "530",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4696981.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Malik Nabers",
-          "value": "692",
+          "value": "747",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4595348.png"
         },
         {
@@ -1012,7 +1012,7 @@
         {
           "metric": "Total Tackles",
           "name": "Arvell Reese",
-          "value": "81",
+          "value": "88",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4950400.png"
         },
         {
@@ -1033,46 +1033,46 @@
       "teamId": "20",
       "team": "New York Jets",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:14.803Z",
-      "verifiedAthletes": 52,
-      "gamesExpected": 10,
-      "gamesVerified": 10,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "updatedAt": "2026-11-23T19:29:16.205Z",
+      "verifiedAthletes": 53,
+      "gamesExpected": 11,
+      "gamesVerified": 11,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T21:05Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Geno Smith",
-          "value": "2,226",
+          "value": "2,402",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/15864.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Braelon Allen",
-          "value": "638",
+          "value": "713",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685247.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Garrett Wilson",
-          "value": "633",
+          "value": "672",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4569618.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Geno Smith",
-          "value": "12",
+          "value": "15",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/15864.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Jamien Sherwood",
-          "value": "86",
+          "value": "97",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361331.png"
         },
         {
           "metric": "Sacks",
           "name": "David Bailey",
-          "value": "7.5",
+          "value": "9.5",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685248.png"
         },
         {
@@ -1087,11 +1087,11 @@
       "teamId": "21",
       "team": "Philadelphia Eagles",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:15.551Z",
-      "verifiedAthletes": 52,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-08T18:00Z",
+      "updatedAt": "2026-11-23T19:29:16.478Z",
+      "verifiedAthletes": 54,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
@@ -1102,14 +1102,14 @@
         {
           "metric": "Rushing Yards",
           "name": "Saquon Barkley",
-          "value": "296",
+          "value": "371",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3929630.png"
         },
         {
           "metric": "Receiving Yards",
-          "name": "Makai Lemon",
-          "value": "312",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4870795.png"
+          "name": "DeVonta Smith",
+          "value": "351",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4241478.png"
         },
         {
           "metric": "Passing Touchdowns",
@@ -1125,9 +1125,9 @@
         },
         {
           "metric": "Sacks",
-          "name": "Jalen Carter",
-          "value": "5",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685759.png"
+          "name": "Nolan Smith Jr.",
+          "value": "6",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426331.png"
         },
         {
           "metric": "Interceptions",
@@ -1141,11 +1141,11 @@
       "teamId": "22",
       "team": "Arizona Cardinals",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:31:58.063Z",
-      "verifiedAthletes": 55,
-      "gamesExpected": 10,
-      "gamesVerified": 10,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T21:05Z",
+      "updatedAt": "2026-11-23T19:29:10.445Z",
+      "verifiedAthletes": 56,
+      "gamesExpected": 11,
+      "gamesVerified": 11,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
@@ -1156,13 +1156,13 @@
         {
           "metric": "Rushing Yards",
           "name": "Tyler Allgeier",
-          "value": "383",
+          "value": "406",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4373626.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Trey McBride",
-          "value": "635",
+          "value": "689",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361307.png"
         },
         {
@@ -1174,7 +1174,7 @@
         {
           "metric": "Total Tackles",
           "name": "Mack Wilson Sr.",
-          "value": "71",
+          "value": "79",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4040983.png"
         },
         {
@@ -1195,40 +1195,40 @@
       "teamId": "23",
       "team": "Pittsburgh Steelers",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:16.431Z",
-      "verifiedAthletes": 47,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-16T01:20Z",
+      "updatedAt": "2026-11-23T19:29:16.725Z",
+      "verifiedAthletes": 49,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Aaron Rodgers",
-          "value": "2,014",
+          "value": "2,241",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/8439.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Jaylen Warren",
-          "value": "719",
+          "value": "747",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4569987.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "DK Metcalf",
-          "value": "432",
+          "value": "434",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4047650.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Aaron Rodgers",
-          "value": "15",
+          "value": "16",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/8439.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Payton Wilson",
-          "value": "88",
+          "value": "91",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361652.png"
         },
         {
@@ -1249,34 +1249,34 @@
       "teamId": "24",
       "team": "Los Angeles Chargers",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:08.000Z",
-      "verifiedAthletes": 47,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-17T01:15Z",
+      "updatedAt": "2026-11-23T19:29:14.523Z",
+      "verifiedAthletes": 48,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T21:05Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Justin Herbert",
-          "value": "1,720",
+          "value": "1,851",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4038941.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Omarion Hampton",
-          "value": "474",
+          "value": "563",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685382.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Tre' Harris",
-          "value": "348",
+          "value": "376",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4686612.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Justin Herbert",
-          "value": "6",
+          "value": "8",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4038941.png"
         },
         {
@@ -1303,40 +1303,40 @@
       "teamId": "25",
       "team": "San Francisco 49ers",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:20.003Z",
-      "verifiedAthletes": 53,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T21:25Z",
+      "updatedAt": "2026-11-23T19:29:16.926Z",
+      "verifiedAthletes": 54,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-23T01:20Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Brock Purdy",
-          "value": "2,369",
+          "value": "2,624",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361741.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Christian McCaffrey",
-          "value": "519",
+          "value": "568",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3117251.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "George Kittle",
-          "value": "557",
+          "value": "591",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3040151.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Brock Purdy",
-          "value": "20",
+          "value": "23",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4361741.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Fred Warner",
-          "value": "87",
+          "value": "95",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3138826.png"
         },
         {
@@ -1357,7 +1357,7 @@
       "teamId": "26",
       "team": "Seattle Seahawks",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:20.229Z",
+      "updatedAt": "2026-11-23T19:29:17.264Z",
       "verifiedAthletes": 47,
       "gamesExpected": 10,
       "gamesVerified": 10,
@@ -1411,46 +1411,46 @@
       "teamId": "27",
       "team": "Tampa Bay Buccaneers",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:21.252Z",
+      "updatedAt": "2026-11-23T19:29:17.492Z",
       "verifiedAthletes": 40,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-09T01:20Z",
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Baker Mayfield",
-          "value": "922",
+          "value": "1,109",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3052587.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Bucky Irving",
-          "value": "825",
+          "value": "893",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4596448.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Emeka Egbuka",
-          "value": "278",
+          "value": "296",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4567750.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Baker Mayfield",
-          "value": "3",
+          "value": "5",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3052587.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Josiah Trotter",
-          "value": "76",
+          "value": "90",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4870998.png"
         },
         {
           "metric": "Sacks",
           "name": "David Walker",
-          "value": "4",
+          "value": "5",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/5085355.png"
         },
         {
@@ -1465,7 +1465,7 @@
       "teamId": "28",
       "team": "Washington Commanders",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:23.000Z",
+      "updatedAt": "2026-11-23T19:29:17.953Z",
       "verifiedAthletes": 56,
       "gamesExpected": 9,
       "gamesVerified": 9,
@@ -1519,47 +1519,47 @@
       "teamId": "29",
       "team": "Carolina Panthers",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:31:59.747Z",
-      "verifiedAthletes": 54,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "updatedAt": "2026-11-23T19:29:11.418Z",
+      "verifiedAthletes": 55,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Bryce Young",
-          "value": "2,397",
+          "value": "2,651",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685720.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Chuba Hubbard",
-          "value": "711",
+          "value": "831",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4241416.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Tetairoa McMillan",
-          "value": "660",
+          "value": "731",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685472.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Bryce Young",
-          "value": "16",
+          "value": "18",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4685720.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Devin Lloyd",
-          "value": "63",
+          "value": "67",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4243256.png"
         },
         {
           "metric": "Sacks",
-          "name": "Jaelan Phillips",
-          "value": "3.5",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4242975.png"
+          "name": "Princely Umanmielen",
+          "value": "4.5",
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4429166.png"
         },
         {
           "metric": "Interceptions",
@@ -1573,47 +1573,47 @@
       "teamId": "30",
       "team": "Jacksonville Jaguars",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:06.364Z",
-      "verifiedAthletes": 45,
-      "gamesExpected": 9,
-      "gamesVerified": 9,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-15T18:00Z",
+      "updatedAt": "2026-11-23T19:29:13.751Z",
+      "verifiedAthletes": 48,
+      "gamesExpected": 10,
+      "gamesVerified": 10,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T21:25Z",
       "leaders": [
         {
           "metric": "Passing Yards",
           "name": "Trevor Lawrence",
-          "value": "2,284",
+          "value": "2,585",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4360310.png"
         },
         {
           "metric": "Rushing Yards",
           "name": "Bhayshul Tuten",
-          "value": "609",
+          "value": "642",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4882093.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Parker Washington",
-          "value": "645",
+          "value": "748",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4432620.png"
         },
         {
           "metric": "Passing Touchdowns",
           "name": "Trevor Lawrence",
-          "value": "21",
+          "value": "22",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4360310.png"
         },
         {
           "metric": "Total Tackles",
           "name": "Foyesade Oluokun",
-          "value": "68",
+          "value": "77",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3050073.png"
         },
         {
           "metric": "Sacks",
-          "name": "Travon Walker",
+          "name": "Josh Hines-Allen",
           "value": "3",
-          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4426349.png"
+          "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3915239.png"
         },
         {
           "metric": "Interceptions",
@@ -1627,11 +1627,11 @@
       "teamId": "33",
       "team": "Baltimore Ravens",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:31:58.903Z",
-      "verifiedAthletes": 52,
-      "gamesExpected": 10,
-      "gamesVerified": 10,
-      "coverage": "all ESPN-completed regular-season games through 2026-11-17T01:15Z",
+      "updatedAt": "2026-11-23T19:29:10.911Z",
+      "verifiedAthletes": 54,
+      "gamesExpected": 11,
+      "gamesVerified": 11,
+      "coverage": "all ESPN-completed regular-season games through 2026-11-22T18:00Z",
       "leaders": [
         {
           "metric": "Passing Yards",
@@ -1642,13 +1642,13 @@
         {
           "metric": "Rushing Yards",
           "name": "Derrick Henry",
-          "value": "699",
+          "value": "793",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3043078.png"
         },
         {
           "metric": "Receiving Yards",
           "name": "Zay Flowers",
-          "value": "688",
+          "value": "785",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4429615.png"
         },
         {
@@ -1660,13 +1660,13 @@
         {
           "metric": "Total Tackles",
           "name": "Roquan Smith",
-          "value": "82",
+          "value": "91",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/3915189.png"
         },
         {
           "metric": "Sacks",
           "name": "Mike Green",
-          "value": "5.5",
+          "value": "7.5",
           "headshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4683188.png"
         },
         {
@@ -1681,7 +1681,7 @@
       "teamId": "34",
       "team": "Houston Texans",
       "season": 2026,
-      "updatedAt": "2026-11-22T08:32:04.310Z",
+      "updatedAt": "2026-11-23T19:29:13.283Z",
       "verifiedAthletes": 57,
       "gamesExpected": 10,
       "gamesVerified": 10,
