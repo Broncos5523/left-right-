@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100820"><title>MAN CAVE · GTA VI Scene</title>
+<style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#100820;color:white;font-family:Arial,sans-serif}
+body{overflow:hidden}.scene{position:fixed;inset:0}.scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:center center}
+body.gallery{height:auto;min-height:100vh;overflow:auto;padding:16px}.gallery h1{font-size:20px;margin:4px 0 16px}.gallery .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:800px}.gallery a{display:block;color:white;text-decoration:none;border:1px solid #945eb5;border-radius:12px;overflow:hidden;background:#1b1129}.gallery a img{display:block;width:100%;aspect-ratio:9/16;object-fit:cover}.gallery a span{display:block;text-align:center;padding:8px;font-size:12px;font-weight:bold}
+</style></head><body><script>
+(function(){
+ 'use strict';
+ const art={
+  neon:['Neon Crew','./assets/gamecenter/gta-neon-crew.webp'],
+  street:['Vice Street Crew','./assets/gamecenter/gta-vice-street-crew.webp'],
+  crew:['Vice City Crew','./assets/gamecenter/gta-vice-city-crew.webp'],
+  firefight:['Firefight','./assets/gamecenter/gta-firefight.webp']
+ };
+ const selected=new URLSearchParams(location.search).get('scene');
+ if(Object.prototype.hasOwnProperty.call(art,selected)){
+  const [name,src]=art[selected],main=document.createElement('main'),img=document.createElement('img');
+  main.className='scene';img.src=src;img.alt='GTA VI · '+name+' artwork';img.decoding='async';
+  main.appendChild(img);document.body.appendChild(main);document.title='MAN CAVE · '+name;return;
+ }
+ document.body.className='gallery';
+ const h=document.createElement('h1');h.textContent='GTA VI · WALLPAPER SCENES';document.body.appendChild(h);
+ const root=document.createElement('div');root.className='choices';
+ Object.entries(art).forEach(([key,[label,src]])=>{
+  const link=document.createElement('a');link.href='?scene='+key;
+  const img=document.createElement('img');img.src=src;img.alt=label+' preview';img.loading='lazy';
+  const cap=document.createElement('span');cap.textContent=label;link.append(img,cap);root.appendChild(link);
+ });
+ document.body.appendChild(root);
+})();
+</script></body></html>

@@ -4,7 +4,7 @@ const state={user:null,busy:false,message:'Checking Firebase session...',left:nu
  leftMode:'keep',rightMode:'keep',games:[],gameId:'',swap:false,gamesStatus:'Use Refresh to load actual ESPN games.'};
 const el=()=>document.getElementById('liveBridge');
 const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const descriptions={upcoming:'Upcoming Games',live:'Live Lookin · Live Games / Results',wrestling:'Inside the Squared Circle',rotation:'League Deep Dive · 28-page rotation',team:'Team player board',gta6:'GTA VI · Vice City showcase'};
+const descriptions={upcoming:'Upcoming Games',live:'Live Lookin · Live Games / Results',wrestling:'Inside the Squared Circle',rotation:'League Deep Dive · 28-page rotation',team:'Team player board',gta6:'GTA VI · Vice City showcase', 'gta-neon':'GTA VI · Neon Crew','gta-street':'GTA VI · Vice Street Crew','gta-crew':'GTA VI · Vice City Crew','gta-firefight':'GTA VI · Firefight'};
 const thirdBoards=[["rotation","LEAGUE DEEP DIVE · ALL 28 AUTO ROTATION"],["wrestling","INSIDE THE SQUARED CIRCLE · WRESTLING"],["upcoming","UPCOMING GAMES"],["live","LIVE LOOKIN · LIVE / RESULTS"],["page1_nfl","Broncos · Page 1"],["page2_nfl","Broncos · Page 2"],["page3_broncos","Broncos · Page 3"],["page4_broncos","Broncos · Page 4"],["page1_nba","Celtics · Page 1"],["page2_nba","Celtics · Page 2"],["page3_celtics","Celtics · Page 3"],["page4_celtics","Celtics · Page 4"],["page1_nhl","Bruins · Page 1"],["page2_nhl","Bruins · Page 2"],["page3_bruins","Bruins · Page 3"],["page4_bruins","Bruins · Page 4"],["page1_mlb","Red Sox · Page 1"],["page2_mlb","Red Sox · Page 2"],["page3_redsox","Red Sox · Page 3"],["page4_redsox","Red Sox · Page 4"],["page1_wnba","Fever · Page 1"],["page2_wnba","Fever · Page 2"],["page3_fever","Fever · Page 3"],["page4_fever","Fever · Page 4"],["page1_cfb","Arizona Football · Page 1"],["page2_cfb","Arizona Football · Page 2"],["page3_arizona_cfb","Arizona Football · Page 3"],["page4_arizona_cfb","Arizona Football · Page 4"],["page1_cbb","Arizona Basketball · Page 1"],["page2_cbb","Arizona Basketball · Page 2"],["page3_arizona_cbb","Arizona Basketball · Page 3"],["page4_arizona_cbb","Arizona Basketball · Page 4"]];
 const thirdOptions=(choice)=>[['keep','Keep current display'],...thirdBoards].map(([value,label])=>
  '<option value="'+safe(value)+'"'+(choice===value?' selected':'')+'>'+safe(label)+'</option>').join('');
@@ -16,7 +16,7 @@ const thirdLabel=(v)=>{if(!v)return 'No Firebase assignment yet';
  if(v.type==='board')return thirdBoards.find(x=>x[0]===v.board)?.[1]||('Board '+String(v.board||'unknown'));
  return 'Other mode ('+(v.type||'unknown')+')';};
 function label(v){if(!v)return 'No Firebase assignment yet';return (v.type==='team'?(v.team||'Team')+' · player board':(descriptions[v.type]||'Unsupported mode'));}
-function options(mode){return [['keep','Keep current'],['upcoming','Upcoming Games'],['live','Live Lookin · Live Games / Results'],['wrestling','Inside the Squared Circle'],['rotation','League Deep Dive · All 28 Sports Pages'],['gta6','GTA VI · Vice City showcase']].map(x=>
+function options(mode){return [['keep','Keep current'],['upcoming','Upcoming Games'],['live','Live Lookin · Live Games / Results'],['wrestling','Inside the Squared Circle'],['rotation','League Deep Dive · All 28 Sports Pages'],['gta6','GTA VI · Vice City showcase'],['gta-neon','GTA VI · Neon Crew'],['gta-street','GTA VI · Vice Street Crew'],['gta-crew','GTA VI · Vice City Crew'],['gta-firefight','GTA VI · Firefight']].map(x=>
  '<option value="'+x[0]+'"'+(mode===x[0]?' selected':'')+'>'+x[1]+'</option>').join('');}
 function render(){
  const node=el();if(!node)return;
@@ -263,7 +263,7 @@ function buildThirdCommand(choice,now){
 }
 function choiceFor(side,choice,now){
  if(side==='third')return buildThirdCommand(choice,now);
- if((side==='left'||side==='right')&&['live','upcoming','wrestling','rotation','gta6'].includes(choice))
+ if((side==='left'||side==='right')&&['live','upcoming','wrestling','rotation','gta6','gta-neon','gta-street','gta-crew','gta-firefight'].includes(choice))
    return {type:choice,updatedAt:now};
  return null;
 }
@@ -345,11 +345,15 @@ function openLibraryBoard(boardId,pageId){
   upcoming:['Upcoming Games','Your next games'],
   wrestling:['Inside the Squared Circle','The approved wrestling board'],
   'deep-dive':['League Deep Dive','The approved 28-page sports-board rotation'],
-  'gta-vi':['GTA VI · Vice City','The new twin-portrait GTA VI showcase']
+  'gta-vi':['GTA VI · Vice City','The original twin-portrait GTA VI showcase'],
+   'gta-neon':['GTA VI · Neon Crew','the neon sunset crew artwork'],
+   'gta-street':['GTA VI · Vice Street Crew','the custom Vice Street Crew artwork'],
+   'gta-crew':['GTA VI · Vice City Crew','the GTA VI crew-and-cars artwork'],
+   'gta-firefight':['GTA VI · Firefight','the GTA VI action firefight wallpaper']
  };
  if(namedBoards[boardId]){
   title=namedBoards[boardId][0];desc='Send '+namedBoards[boardId][1]+' to the selected portrait TVs. Other displays are unchanged.';
-  targets=boardId==='gta-vi'?[['left','Left Wing'],['right','Right Wing']]:[['left','Left Wing'],['right','Right Wing'],['third','32″ Portrait · Onn']];
+  targets=boardId.startsWith('gta-')?[['left','Left Wing'],['right','Right Wing']]:[['left','Left Wing'],['right','Right Wing'],['third','32″ Portrait · Onn']];
  }else if(boardId==='team-page'&&thirdBoards.some(([id])=>id===pageId)){
   title=thirdBoards.find(([id])=>id===pageId)[1];
   desc='Send this approved individual sports page to the 32″ Onn display.';
@@ -369,7 +373,7 @@ function openLibraryBoard(boardId,pageId){
    if(!selected.length){document.getElementById('liveModalStatus').textContent='Select a destination first.';return;}
    const patch={},now=Date.now();
    selected.forEach(side=>{
-     const choice=boardId==='live-lookin'?'live':boardId==='upcoming'?'upcoming':boardId==='wrestling'?'wrestling':boardId==='deep-dive'?'rotation':boardId==='gta-vi'?'gta6':pageId;
+     const choice=boardId==='live-lookin'?'live':boardId==='upcoming'?'upcoming':boardId==='wrestling'?'wrestling':boardId==='deep-dive'?'rotation':({'gta-vi':'gta6','gta-neon':'gta-neon','gta-street':'gta-street','gta-crew':'gta-crew','gta-firefight':'gta-firefight'}[boardId]||pageId);
      const command=choiceFor(side,choice,now);
      if(command)patch[side]=command;
    });

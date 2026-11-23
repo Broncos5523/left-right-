@@ -613,6 +613,7 @@ header.centeredControllerHeader .brandLogo{
 .realReconnectStatus{color:#f0d195;font-size:11px;line-height:1.45;margin-top:8px}
 .realReconnectStatus:empty{display:none}
 .realReconnectSettings{padding:8px 2px 0;border:0;background:transparent;text-decoration:underline;color:#8bd6e9;font-size:11px;font-weight:800}
+ .boardGraphic.boardArtwork.gtaSceneArtwork img{width:100%;height:100%;object-fit:cover;object-position:center 42%;filter:none}
 </style>
 <link rel="stylesheet" href="./game-wall-v40-wings.css">
 <link rel="stylesheet" href="./game-wall-v41-wall-sync.css">
@@ -693,14 +694,22 @@ const boards=[
 {id:'upcoming',name:'Upcoming Games',short:'UPCOMING GAMES',sub:'MAN CAVE SPORTS BOOK',detail:'Your next games'},
 {id:'wrestling',name:'Presents Inside the Squared Circle',short:'INSIDE THE\nSQUARED CIRCLE',sub:'MAN CAVE SPORTS BOOK PRESENTS',detail:'Wrestling board'},
 {id:'deep-dive',name:'League Deep Dive',short:'LEAGUE\nDEEP DIVE',sub:'MAN CAVE SPORTS BOOK',detail:'League standings and stats'},
-{id:'gta-vi',name:'GTA VI · Vice City',short:'GTA VI',sub:'MAN CAVE SPECIAL SHOWCASE',detail:'NEW · Twin-portrait neon visual'}
+{id:'gta-vi',name:'GTA VI · Vice City',short:'GTA VI',sub:'MAN CAVE SPECIAL SHOWCASE',detail:'Twin-portrait original artwork'},
+{id:'gta-neon',name:'GTA VI · Neon Crew',short:'NEON CREW',sub:'GTA SPECIAL SHOWCASE',detail:'Original sunset · four characters'},
+{id:'gta-street',name:'GTA VI · Vice Street Crew',short:'VICE STREET CREW',sub:'GTA SPECIAL SHOWCASE',detail:'Purple sunset · crew and muscle cars'},
+{id:'gta-crew',name:'GTA VI · Vice City Crew',short:'VICE CITY CREW',sub:'GTA SPECIAL SHOWCASE',detail:'Official-style GTA VI logo · neon street'},
+{id:'gta-firefight',name:'GTA VI · Firefight',short:'FIREFIGHT',sub:'GTA SPECIAL SHOWCASE',detail:'Action scene · guns, cars and helicopters'}
 ];
 const boardBannerArtwork=Object.freeze({
  'live-lookin':'./assets/gamecenter/live-lookin-banner.jpg',
  'upcoming':'./assets/gamecenter/upcoming-games-banner.jpg',
  'wrestling':'./assets/gamecenter/inside-squared-circle-banner.jpg',
  'deep-dive':'./assets/gamecenter/league-deep-dive-banner.jpg',
- 'gta-vi':'./assets/gamecenter/gta-vi-banner.svg'
+ 'gta-vi':'./assets/gamecenter/gta-vi-banner.svg',
+ 'gta-neon':'./assets/gamecenter/gta-neon-crew.webp',
+ 'gta-street':'./assets/gamecenter/gta-vice-street-crew.webp',
+ 'gta-crew':'./assets/gamecenter/gta-vice-city-crew.webp',
+ 'gta-firefight':'./assets/gamecenter/gta-firefight.webp'
 });
 const screens=[
 {id:'top-left',name:'Top Left',size:'40″ TV',kind:'tv',source:'Top Left',content:'Cable · Top Left',hold:'Manual hold'},
@@ -847,7 +856,7 @@ function renderGames(){
  $('clearGameFilters')?.addEventListener('click',()=>{filter='live';leagueFilter='all';renderGames();});
  $('refreshRealGames')?.addEventListener('click',()=>window.ManCaveRealGames?.refresh?.());
 }
-function renderBoards(){$('content').innerHTML=header('Board Library','Four approved boards plus a new optional GTA VI visual','4 APPROVED + 1 NEW')+`<div class="boardGrid">${boards.map(b=>`<button class="boardTile" data-board="${b.id}"><div class="boardGraphic boardArtwork"><img src="${boardBannerArtwork[b.id]}" alt="${escapeHtml(b.name)} original landscape banner" loading="lazy" decoding="async"></div><div class="boardText"><div><strong>${escapeHtml(b.name)}</strong><div style="font-size:10px;color:#91a7bd;margin-top:3px">${escapeHtml(b.detail)}</div></div><span>›</span></div></button>`).join('')}</div><div class="note">Tap any banner to assign supported portrait displays. GTA VI supports Left Wing and Right Wing only. League Deep Dive retains the approved 28-page rotation.</div><div id="boardExtras"></div>`;document.querySelectorAll('[data-board]').forEach(n=>n.addEventListener('click',()=>{
+function renderBoards(){$('content').innerHTML=header('Board Library','Four approved sports boards plus five GTA visual options','4 APPROVED + 5 ART')+`<div class="boardGrid">${boards.map(b=>`<button class="boardTile" data-board="${b.id}"><div class="boardGraphic boardArtwork ${b.id.startsWith('gta-')&&b.id!=='gta-vi'?'gtaSceneArtwork':''}"><img src="${boardBannerArtwork[b.id]}" alt="${escapeHtml(b.name)} original landscape banner" loading="lazy" decoding="async"></div><div class="boardText"><div><strong>${escapeHtml(b.name)}</strong><div style="font-size:10px;color:#91a7bd;margin-top:3px">${escapeHtml(b.detail)}</div></div><span>›</span></div></button>`).join('')}</div><div class="note">Tap any banner to assign supported portrait displays. GTA scenes support Left Wing and Right Wing only. Choose each scene independently; League Deep Dive keeps the approved 28-page rotation.</div><div id="boardExtras"></div>`;document.querySelectorAll('[data-board]').forEach(n=>n.addEventListener('click',()=>{
  const boardId=n.dataset.board;
  // All four approved Board Library banners now open real multi-target
  // Firebase assignment controls; never silently change the wall preview.
